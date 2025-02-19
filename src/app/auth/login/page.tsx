@@ -1,21 +1,8 @@
 "use client";
 import UserForm from "@/Components/Auth/UserForm";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Col, Container, Row } from "reactstrap";
 
 const UserLogin = () => {
-  const { data: session } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (session) {
-      router.push("/dashboard/ecommerce");
-    }
-  }, [session, router]);
-
-  if (session) return null;
   return (
     <Container fluid className="p-0">
       <Row className="m-0">

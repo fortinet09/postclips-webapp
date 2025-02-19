@@ -2,7 +2,6 @@ import { Href, ImagePath } from "@/Constant";
 import { userProfileData } from "@/Data/Layout/Header";
 import { useAuth } from "@/Hooks/auth/useAuth";
 import { supabase } from "@/Clients/supabase/SupabaseClient";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { LogOut } from "react-feather";
