@@ -23,7 +23,7 @@ const EmailVerification = () => {
                                 </Row>
                             </div>
                         </Col>
-                        <VerificationCode />
+                        {/* <VerificationCode /> */}
                     </Row>
                 </CardBody>
             </Card>
