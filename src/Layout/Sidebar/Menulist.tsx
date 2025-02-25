@@ -18,6 +18,7 @@ const Menulist: React.FC<MenuListType> = ({ menu, setActiveMenu, activeMenu, lev
   const ActiveNavLinkUrl = (path?: string, active?: boolean) => {
     return pathname === path ? (active ? active : true) : "";
   };
+  
   const shouldSetActive = ({ item }: SidebarItemTypes) => {
     var returnValue = false;
     if (item?.path === pathname) returnValue = true;
@@ -29,6 +30,7 @@ const Menulist: React.FC<MenuListType> = ({ menu, setActiveMenu, activeMenu, lev
     }
     return returnValue;
   };
+
   useEffect(() => {
     menu?.forEach((item: any) => {
       let gotValue = shouldSetActive({ item });

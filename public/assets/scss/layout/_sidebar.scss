@@ -1648,7 +1648,7 @@
                           }
                           &.active{
                             span{
-                              color: $white;
+                              color: $black;
                             }
                           }
                         }
@@ -1725,7 +1725,7 @@
                               text-overflow: ellipsis;
                               &.active {
                                 span{
-                                  color: $white;
+                                  color: $black;
                                 }
                               }
                               &:after {

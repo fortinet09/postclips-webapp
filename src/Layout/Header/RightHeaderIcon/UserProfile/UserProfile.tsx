@@ -1,18 +1,20 @@
 import { Href, ImagePath } from "@/Constant";
 import { userProfileData } from "@/Data/Layout/Header";
-import { useAuth } from "@/Hooks/auth/useAuth";
+import { useAuth } from "@/Providers/SessionProvider";
 import { supabase } from "@/Clients/supabase/SupabaseClient";
 import Image from "next/image";
 import Link from "next/link";
 import { LogOut } from "react-feather";
 import { useRouter } from "next/navigation";
+
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, selectedRole } = useAuth();
   const router = useRouter();
   const handleLogout = () => {
     supabase.auth.signOut();
     router.push("/auth/login");
   };
+
   return (
     <li className="profile-nav onhover-dropdown p-0">
       <div className="d-flex align-items-center profile-media">
@@ -25,7 +27,9 @@ const UserProfile = () => {
         />
         <div className="flex-grow-1">
           <span>{user?.email || "Unknown"}</span>
-          <p className="mb-0">{user?.role || "Clipper"}</p>
+          {selectedRole && (
+            <p className="mb-0">{selectedRole || "Clipper"}</p>
+          )}
         </div>
       </div>
       <ul className="profile-dropdown onhover-show-div">

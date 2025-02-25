@@ -13,7 +13,7 @@ export const LogoWrapper = () => {
     <>
       <div className="logo-wrapper">
         <Link href={`/dashboard/default`}>
-          <Image className="img-fluid" src={`${ImagePath}/logo/logo.png`} width={121} height={38} alt="" />
+          <Image className="img-fluid" src={`${ImagePath}/logo/logo-1.png`} width={121} height={38} alt="" />
         </Link>
         <div className="toggle-sidebar" onClick={() => dispatch(setToggleSidebar(!toggleSidebar))}>
           <SVG className='sidebar-toggle' iconId='toggle-icon' />

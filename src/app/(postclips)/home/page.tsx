@@ -1,8 +1,8 @@
 "use client";
 import { FunctionComponent, useEffect, useState } from "react";
-import { useAuth } from "@/Hooks/auth/useAuth";
+import { useAuth } from "@/Providers/SessionProvider";
 const Home = () => {
-  const { session, user } = useAuth();
+  const { session, user, userRoles, loading } = useAuth();
   const [MyAwesomeMap, setClient] = useState<FunctionComponent>();
   useEffect(() => {
     (async () => {
@@ -15,8 +15,8 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    console.log({ session, user });
-  }, [session, user]);
+    console.log({ session, user, userRoles, loading });
+  }, [session, user, userRoles, loading]);
 
   return MyAwesomeMap ? <MyAwesomeMap /> : "";
 };

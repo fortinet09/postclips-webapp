@@ -1,22 +1,72 @@
 import { MenuItem } from "@/Types/Layout.type";
 
-export const PostClipsMenuList: MenuItem[] | undefined = [
+export const PostClipsMenuListAdmin: MenuItem[] | undefined = [
   {
     title: "General",
     lanClass: "lan-1",
     menucontent: "Dashboards",
     Items: [
       {
-        title: "Dashboards",
-        id: 1,
+        path: "/home",
         icon: "home",
-        type: "sub",
-        lanClass: "lan-3",
-        children: [
-          { path: "/home", title: "Clipper", type: "link", lanClass: "lan-4" },
-          { path: "/home", title: "Brand", type: "link", lanClass: "lan-4" },
-          { path: "/home", title: "Admin", type: "link", lanClass: "lan-4" },
-        ],
+        type: "link",
+        title: "Dashboard",
+        id: 1,
+      },
+      {
+        path: "/users",
+        icon: "bookmark",
+        type: "link",
+        title: "Users",
+        id: 2,
+      },
+    ],
+  },
+];
+
+export const PostClipsMenuListBrand: MenuItem[] | undefined = [
+  {
+    title: "General",
+    lanClass: "lan-1",
+    menucontent: "Dashboards",
+    Items: [
+      {
+        path: "/home",
+        icon: "home",
+        type: "link",
+        title: "Dashboard",
+        id: 1,
+      },
+      {
+        path: "/campaigns",
+        icon: "bookmark",
+        type: "link",
+        title: "Campaigns",
+        id: 2,
+      },
+    ],
+  },
+];
+
+export const PostClipsMenuListClipper: MenuItem[] | undefined = [
+  {
+    title: "General",
+    lanClass: "lan-1",
+    menucontent: "Dashboards",
+    Items: [
+      {
+        path: "/home",
+        icon: "home",
+        type: "link",
+        title: "Dashboard",
+        id: 1,
+      },
+      {
+        path: "/clips",
+        icon: "bookmark",
+        type: "link",
+        title: "Clips",
+        id: 2,
       },
     ],
   },

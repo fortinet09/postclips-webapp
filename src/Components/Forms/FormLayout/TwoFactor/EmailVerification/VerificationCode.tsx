@@ -1,5 +1,4 @@
-import { Href, ImagePath, VerificationCodeTitle, Verify } from "@/Constant";
-import { otpGenerate } from "@/Data/Forms/FormLayout";
+import { ImagePath, VerificationCodeTitle, Verify } from "@/Constant";
 import Image from "next/image";
 import React, { useState } from "react";
 import { Button, Col, Form, Input, Row } from "reactstrap";
@@ -9,11 +8,33 @@ import { useRouter } from "next/navigation";
 const VerificationCode = ({ email }: { email: string }) => {
   const router = useRouter();
   const [otp, setOtp] = useState(Array(6).fill(""));
+  const [error, setError] = useState("");
+
   const handleChange = (e: string, index: number) => {
     if (e.length > 1) return;
     const tempOtp = [...otp];
     tempOtp[index] = e;
     setOtp(tempOtp);
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    pasteCode(e.clipboardData.getData("text").trim());
+  };
+
+  const pasteCode = async (clipboardText?: string) => {
+    try {
+      let pasteData = clipboardText || (await navigator.clipboard.readText()).trim();
+      
+      if (pasteData.length === 6 && /^\d{6}$/.test(pasteData)) {
+        setOtp(pasteData.split(""));
+      } else {
+        setError("Invalid OTP format. Must be 6 digits.");
+      }
+    } catch (err) {
+      console.error("Failed to read clipboard:", err);
+      setError("Failed to read clipboard.");
+    }
   };
 
   const handleVerify = async () => {
@@ -23,9 +44,8 @@ const VerificationCode = ({ email }: { email: string }) => {
       console.log("OTP verified:", result);
       if (result?.success) {
         router.push("/home");
-        // Handle successful verification, e.g., redirect to dashboard
       } else {
-        // Handle verification failure, e.g., show an error message
+        setError("Invalid OTP code");
       }
     } catch (error) {
       console.error("OTP verification failed:", error);
@@ -52,13 +72,14 @@ const VerificationCode = ({ email }: { email: string }) => {
                 <h5>{"Your OTP Code here:"}</h5>
               </Col>
               <Col className="otp-generate">
-                {otp.map((_, index) => (
+                {otp.map((value, index) => (
                   <Input
                     key={index}
-                    value={otp[index]}
+                    value={value}
                     className="code-input"
                     type="number"
                     onChange={(e) => handleChange(e.target.value, index)}
+                    onPaste={handlePaste}
                   />
                 ))}
               </Col>
@@ -71,6 +92,16 @@ const VerificationCode = ({ email }: { email: string }) => {
                   {Verify}
                 </Button>
               </Col>
+              <Col>
+                <Button
+                  color="secondary"
+                  className="w-100 mt-2"
+                  onClick={() => pasteCode()}
+                >
+                  Paste Code
+                </Button>
+              </Col>
+              {error && <p className="text-danger mt-3 mb-3">{error}</p>}
               <div>
                 <span>{"Not received your code?"}</span>
                 <span className="text-primary cursor-pointer">Resend</span>
@@ -82,4 +113,5 @@ const VerificationCode = ({ email }: { email: string }) => {
     </Row>
   );
 };
+
 export default VerificationCode;

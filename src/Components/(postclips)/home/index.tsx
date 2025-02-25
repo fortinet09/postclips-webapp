@@ -24,7 +24,7 @@ const HomeDashboard = () => {
         <div className="page-title">
           <Row>
             <Col sm={12} className="p-0">
-              <h3>Clipper Dashboard</h3>
+              <h3>Dashboard</h3>
             </Col>
           </Row>
         </div>
