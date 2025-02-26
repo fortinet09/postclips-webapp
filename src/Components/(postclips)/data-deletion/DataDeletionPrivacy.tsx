@@ -3,13 +3,13 @@
 import CommonCardHeader from "@/CommonComponent/CommonCardHeader";
 import { Card, CardBody, Col, Container, Row } from "reactstrap";
 
-const PrivacyPolicy = () => {
+const DataDeletionPolicy = () => {
   return (
     <Container fluid>
       <Row className="mt-5">
         <Col sm={12}>
           <Card>
-            <CommonCardHeader title={"Terms of Service"} headClass="pb-0" />
+            <CommonCardHeader title={"Data Deletion Policy"} headClass="pb-0" />
             <CardBody>
               <h3 className="mb-3">1. Introduction</h3>
               <p>{`PostClips is committed to protecting user privacy and providing transparency regarding the handling of personal data. Users have the right to request the deletion of their data from our platform.`}</p>
@@ -50,4 +50,4 @@ const PrivacyPolicy = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default DataDeletionPolicy;

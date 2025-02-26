@@ -3,7 +3,7 @@
 import CommonCardHeader from "@/CommonComponent/CommonCardHeader";
 import { Card, CardBody, Col, Container, Row } from "reactstrap";
 
-const PrivacyPolicy = () => {
+const TermsOfService = () => {
   return (
     <Container fluid>
       <Row className="mt-5">
@@ -40,4 +40,4 @@ const PrivacyPolicy = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default TermsOfService;
