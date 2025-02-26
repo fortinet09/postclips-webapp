@@ -3,35 +3,45 @@
 import CommonCardHeader from "@/CommonComponent/CommonCardHeader";
 import { Card, CardBody, Col, Container, Row } from "reactstrap";
 
-const PrivacyPolicy = () => {
+const DataDeletionPolicy = () => {
   return (
     <Container fluid>
       <Row className="mt-5">
         <Col sm={12}>
           <Card>
-            <CommonCardHeader
-              title={"Terms of Service"}
-              headClass="pb-0"
-            />
+            <CommonCardHeader title={"Data Deletion Policy"} headClass="pb-0" />
             <CardBody>
-              <h2 className="mb-3">Social Media & Content Extraction Terms of Service</h2>
-              <h3 className="mb-2">1. Introduction</h3>
-              <p>{`By using the APIs provided by X (formerly Twitter), TikTok, Instagram, and Facebook, you agree to adhere to their respective terms and conditions. Additionally, our platform provides services for campaign content extraction, ensuring compliance with intellectual property laws and brand guidelines.`}</p>
-              <h3 className="mb-2">2. X (Twitter) API</h3>
-              <p>{`Users must comply with X's developer policy, including rate limits, content restrictions, and security guidelines.`}</p>
-              <h3 className="mb-2">3. TikTok API</h3>
-              <p>{`TikTok requires developers to obtain proper authentication and adhere to its privacy policies when accessing user data.`}</p>
-              <h3 className="mb-2">4. Instagram API</h3>
-              <p>{`Instagram's Graph API follows Meta's platform policies, including restrictions on data access and automated posting.`}</p>
-              <h3 className="mb-2">5. Facebook API</h3>
-              <p>{`Facebook Graph API has strict security measures, ensuring compliance with its privacy and data-sharing policies.`}</p>
-              <h3 className="mb-2">6. Campaign Content Extraction & Usage</h3>
-              <p>{`Our platform provides tools for clippers to extract clips from brand campaigns while ensuring compliance with the terms and conditions set by the brand owners.`}</p>
-              <p>{`The extracted content remains the intellectual property of our platform, and its usage must align with the agreed campaign terms. Unauthorized redistribution or modification is strictly prohibited.`}</p>
-              <h3 className="mb-2">7. Compliance and Restrictions</h3>
-              <p>{`Each platform and brand has its own set of restrictions regarding automated actions, data retention, and API usage limits. Violations may result in account bans, legal action, or API access termination.`}</p>
-              <h3 className="mb-2">8. Updates to Terms</h3>
-              <p>{`These policies are subject to change by the respective platforms and brands. Ensure you regularly review the terms to stay compliant.`}</p>
+              <h3 className="mb-3">1. Introduction</h3>
+              <p>{`PostClips is committed to protecting user privacy and providing transparency regarding the handling of personal data. Users have the right to request the deletion of their data from our platform.`}</p>
+              <h3 className="mb-3">2. How to Request Data Deletion</h3>
+              <p>{`Users can request the deletion of their data by following these steps:`}</p>
+              <ul>
+                <li>{`Go to the PostClips settings page in your account.`}</li>
+                <li>{`Click on the "Delete My Data" option.`}</li>
+                <li>{`Confirm the deletion request by following the on-screen instructions.`}</li>
+              </ul>
+              <p>
+                {`Alternatively, users can email us at `}
+                <strong>support@postclips.com</strong>
+                {` with the subject line "Data Deletion Request" and include their account details.`}
+              </p>
+              <h3 className="mb-3">3. Processing Time</h3>
+              <p>{`All data deletion requests will be processed within 7 business days. Users will receive a confirmation email once the deletion is complete.`}</p>
+              <h3 className="mb-3">4. What Data is Deleted</h3>
+              <p>{`Upon successful request, the following data will be permanently deleted from our servers:`}</p>
+              <ul>
+                <li>{`Personal profile data (name, email, phone number).`}</li>
+                <li>{`Connected social media accounts and associated data.`}</li>
+                <li>{`Stored content, analytics, and activity logs.`}</li>
+              </ul>
+              <h3 className="mb-3">5. Exceptions</h3>
+              <p>{`Certain data may be retained for legal or security reasons, such as compliance with regulatory obligations or fraud prevention.`}</p>
+              <h3 className="mb-3">6. Contact Us</h3>
+              <p>
+                {`For any questions regarding data deletion, users can contact our support team at `}
+                <strong>support@postclips.com</strong>
+                {`.`}
+              </p>
             </CardBody>
           </Card>
         </Col>
@@ -40,4 +50,4 @@ const PrivacyPolicy = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default DataDeletionPolicy;
