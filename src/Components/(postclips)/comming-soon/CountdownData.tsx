@@ -26,7 +26,7 @@ const CountdownData = () => {
   var year = d.getFullYear();
   var month = d.getMonth();
   var day = d.getDate();
-  var countdown = new Date(2025, 6, 1).getTime();
+  var countdown = new Date(2025, 5, 1).getTime();
 
   return <Countdown date={countdown} renderer={renderer} />;
 };
