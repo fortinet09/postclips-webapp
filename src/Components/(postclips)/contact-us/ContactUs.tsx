@@ -13,7 +13,10 @@ const ContactUs = () => {
   const [status, setStatus] = useState<{
     type: 'success' | 'error' | null;
     message: string;
-  }>({ type: null, message: '' });
+  }>({ 
+    type: null, 
+    message: '' 
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,10 +38,14 @@ const ContactUs = () => {
       });
       setFormData({ name: '', email: '', message: '' });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let errorMessage = 'Sorry, there was an error sending your message. Please try again.';
+      if (error instanceof Error) {
+        errorMessage = error.message || errorMessage;
+      }
       setStatus({
         type: 'error',
-        message: error.message || 'Sorry, there was an error sending your message. Please try again.',
+        message: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
