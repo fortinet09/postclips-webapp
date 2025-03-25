@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Container, Row, Col, Card, CardBody, Form, FormGroup, Label, Input, Button, Alert } from 'reactstrap';
-import { fetchAPI } from '@/Clients/postclips/server/ApiClient';
+import { submitContactForm } from './actions'; // Import the server action
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -13,10 +13,7 @@ const ContactUs = () => {
   const [status, setStatus] = useState<{
     type: 'success' | 'error' | null;
     message: string;
-  }>({ 
-    type: null, 
-    message: '' 
-  });
+  }>({ type: null, message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,24 +22,24 @@ const ContactUs = () => {
     setStatus({ type: null, message: '' });
 
     try {
-      const response = await fetchAPI(
-        '',
-        'POST',
-        '/contact/submit',
-        formData
-      );
-
-      setStatus({
-        type: 'success',
-        message: '🎉 Thank you for reaching out! We will get back to you as soon as possible.',
-      });
-      setFormData({ name: '', email: '', message: '' });
-
-    } catch (error: unknown) {
+      // Call the server action instead of fetchAPI directly
+      const result = await submitContactForm(formData);
+      
+      if (result.success) {
+        setStatus({
+          type: 'success',
+          message: '🎉 Thank you for reaching out! We will get back to you as soon as possible.',
+        });
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
       let errorMessage = 'Sorry, there was an error sending your message. Please try again.';
       if (error instanceof Error) {
         errorMessage = error.message || errorMessage;
       }
+      
       setStatus({
         type: 'error',
         message: errorMessage,
