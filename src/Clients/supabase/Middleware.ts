@@ -40,17 +40,17 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (
-    (!user &&
-      // !request.nextUrl.pathname.startsWith("/login") &&
-      // !request.nextUrl.pathname.startsWith("/terms") &&
-      // !request.nextUrl.pathname.startsWith("/privacy") &&
-      // !request.nextUrl.pathname.startsWith("/auth") &&
-      // !request.nextUrl.pathname.startsWith("/comming-soon")
-      request.nextUrl.pathname.startsWith("/campaigns")) ||
-    request.nextUrl.pathname.startsWith("/home") ||
-    request.nextUrl.pathname.startsWith("/accounts") ||
-    request.nextUrl.pathname.startsWith("/clips") ||
-    request.nextUrl.pathname.startsWith("/settings")
+    !user &&
+    // !request.nextUrl.pathname.startsWith("/login") &&
+    // !request.nextUrl.pathname.startsWith("/terms") &&
+    // !request.nextUrl.pathname.startsWith("/privacy") &&
+    // !request.nextUrl.pathname.startsWith("/auth") &&
+    // !request.nextUrl.pathname.startsWith("/comming-soon")
+    (request.nextUrl.pathname.startsWith("/campaigns") ||
+      request.nextUrl.pathname.startsWith("/home") ||
+      request.nextUrl.pathname.startsWith("/accounts") ||
+      request.nextUrl.pathname.startsWith("/clips") ||
+      request.nextUrl.pathname.startsWith("/settings"))
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();

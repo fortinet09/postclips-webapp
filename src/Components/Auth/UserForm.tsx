@@ -41,7 +41,6 @@ const UserForm = () => {
   ) => {
     try {
       const userData = await login(provider, email);
-      console.log("User logged in:", userData);
       setStep(Step.Verification);
     } catch (error) {
       console.error("Login failed:", error);

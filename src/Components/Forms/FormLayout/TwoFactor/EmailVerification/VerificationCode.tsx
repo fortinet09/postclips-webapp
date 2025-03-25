@@ -41,7 +41,6 @@ const VerificationCode = ({ email }: { email: string }) => {
     try {
       const otpCode = otp.join("");
       const result = await verifyOtp(email, otpCode);
-      console.log("OTP verified:", result);
       if (result?.success) {
         router.push("/home");
       } else {

@@ -2,6 +2,7 @@
 import { ImagePath, WeAreComingSoon } from "@/Constant";
 import { Container } from "reactstrap";
 import CountdownData from "./CountdownData";
+import Link from "next/link";
 
 const CommingSoon = () => {
   return (
@@ -16,6 +17,11 @@ const CommingSoon = () => {
             <h5>{WeAreComingSoon}</h5>
             <div className="countdown">
               <CountdownData />
+            </div>
+            <div className="mt-4">
+              <Link href="/contact-us" className="btn btn-primary" style={{fontSize: 22}}>
+                Want to Contact Us?
+              </Link>
             </div>
           </div>
         </div>
