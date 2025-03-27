@@ -75,7 +75,7 @@ const VerificationCode = ({ email }: { email: string }) => {
                   <Input
                     key={index}
                     value={value}
-                    className="code-input"
+                    className="otp-input"
                     type="number"
                     onChange={(e) => handleChange(e.target.value, index)}
                     onPaste={handlePaste}
