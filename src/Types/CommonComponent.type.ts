@@ -11,7 +11,7 @@ export interface SvgType {
 }
 
 export interface BreadcrumbsProps {
-    mainTitle: string;
+    mainTitle?: string;
     parent: string;
     title: string;
 }

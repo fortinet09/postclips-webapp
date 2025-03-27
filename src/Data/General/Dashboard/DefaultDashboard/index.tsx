@@ -468,7 +468,7 @@ export const growthChartData: ApexOptions = {
             style: {
                 fontFamily: 'Lexend, sans-serif',
                 fontWeight: 600,
-                colors: '#171829',
+                colors: '#161616',
             },
         },
     },

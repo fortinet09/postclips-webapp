@@ -55,7 +55,7 @@ export default async function RootLayout({
         </head>
         <body
           suppressHydrationWarning={true}
-          className={lexend.className || roboto.className}
+          className={`${lexend.className || roboto.className} dark-only`}
         >
           <NoSsr>
             <SessionProvider >

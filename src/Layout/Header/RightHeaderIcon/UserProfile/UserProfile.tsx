@@ -8,11 +8,11 @@ import { LogOut } from "react-feather";
 import { useRouter } from "next/navigation";
 
 const UserProfile = () => {
-  const { user, selectedRole } = useAuth();
+  const { user, selectedRole, brand } = useAuth();
   const router = useRouter();
   const handleLogout = () => {
     supabase.auth.signOut();
-    router.push("/auth/login");
+    router.push("/login");
   };
 
   return (
@@ -25,14 +25,17 @@ const UserProfile = () => {
           src={user?.avatar || `${ImagePath}/dashboard/profile.png`}
           alt=""
         />
-        <div className="flex-grow-1">
+        {/* <div className="flex-grow-1">
           <span>{user?.email || "Unknown"}</span>
           {selectedRole && (
             <p className="mb-0">{selectedRole || "Clipper"}</p>
           )}
-        </div>
+        </div> */}
       </div>
-      <ul className="profile-dropdown onhover-show-div">
+      <ul className="profile-dropdown onhover-show-div pb-3" style={{ boxShadow: "0px 0px 15px 0px #7c7c7c" }}>
+        <div className="text-center pt-2 pb-2 mb-2" style={{ fontSize: "14px", fontWeight: "bold", borderBottom: "1px solid #e0e0e0", paddingBottom: "10px" }}>
+          {brand?.name}
+        </div>
         {userProfileData.map((item, index) => (
           <li key={index}>
             <Link href={`/${item.link}`}>

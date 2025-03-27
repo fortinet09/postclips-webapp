@@ -1,10 +1,12 @@
 import RatioImage from "@/CommonComponent/RatioImage";
 import SVG from "@/CommonComponent/SVG";
 import { ImagePath } from "@/Constant";
+import Image from "next/image";
 import { ProductListType } from "@/Types/ECommerce.type";
 import Link from "next/link";
 import { TableColumn } from "react-data-table-component";
 import { Badge, FormGroup, Input } from "reactstrap";
+import dayjs from 'dayjs';
 
 export const campaignListBodyData = [
     {
@@ -386,4 +388,103 @@ export const campaignListColumns: TableColumn<ProductListType>[] = [
         ),
         sortable: true,
     },
+];
+
+export interface Campaign {
+    id: string;
+    profile_picture: string;
+    title: string;
+    targeted_social_networks: string[];
+    created_at: string;
+    end_date: string;
+    total_budget: number;
+    status: string;
+}
+
+export const campaignColumns: TableColumn<Campaign>[] = [
+    {
+        name: 'Campaign',
+        selector: (row) => row.title,
+        sortable: true,
+        cell: (row) => (
+            <div className="campaign-info d-flex align-items-center gap-2">
+                <div className="campaign-image" style={{ width: '50px', height: '50px', position: 'relative', flexShrink: 0 }}>
+                    <Image 
+                        src={row.profile_picture || `${ImagePath}/dashboard-3/user/3.png`}
+                        alt={row.title}
+                        className="rounded-circle"
+                        width={50}
+                        height={50}
+                        style={{ objectFit: 'cover' }}
+                    />
+                </div>
+                <div className="campaign-title">
+                    <p className="mb-0 fw-bold">{row.title}</p>
+                </div>
+            </div>
+        ),
+        width: '30%'
+    },
+    {
+        name: 'Platforms',
+        selector: (row) => row.targeted_social_networks.length,
+        sortable: true,
+        cell: (row) => (
+            <div className="platforms">
+                <Badge color="light-primary">
+                    {row.targeted_social_networks.length}
+                </Badge>
+            </div>
+        ),
+        width: '20%'
+    },
+    {
+        name: 'Duration',
+        sortable: true,
+        cell: (row) => {
+            const startDate = dayjs(row.created_at).format('MMM D, YYYY');
+            const endDate = row.end_date ? dayjs(row.end_date).format('MMM D, YYYY') : 'No end date';
+            const duration = row.end_date ? 
+                `${dayjs(row.end_date).diff(dayjs(row.created_at), 'day')} days` : 
+                'Draft';
+
+            return (
+                <div className="duration">
+                    <p className="mb-0">
+                        {startDate} {row.end_date ? `- ${endDate}` : ''}
+                    </p>
+                    <small className="text-muted">
+                        {duration}
+                    </small>
+                </div>
+            );
+        },
+        width: '20%'
+    },
+    {
+        name: 'Budget',
+        selector: (row) => row.total_budget,
+        sortable: true,
+        cell: (row) => (
+            <div className="budget">
+                ${row.total_budget.toLocaleString()}
+            </div>
+        ),
+        width: '15%'
+    },
+    {
+        name: 'Status',
+        selector: (row) => row.status,
+        sortable: true,
+        cell: (row) => (
+            <Badge
+                color={row.status === 'active' ? 'success' :
+                    row.status === 'pending' ? 'warning' : 'secondary'}
+                className="text-capitalize"
+            >
+                {row.status}
+            </Badge>
+        ),
+        width: '15%'
+    }
 ];

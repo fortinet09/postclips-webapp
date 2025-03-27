@@ -20,9 +20,9 @@ const RightHeaderIcon = () => {
         {/* <ResponsiveSearchInput /> */}
         {/* <Language /> */}
         {/* <ZoomInOut /> */}
-        <Notifications />
+        {/* <Notifications /> */}
         {/* <HeaderBookmark /> */}
-        <DarkMode />
+        {/* <DarkMode /> */}
         {/* <HeaderMessage /> */}
         {/* <HeaderCart /> */}
         <UserProfile />

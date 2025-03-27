@@ -2,6 +2,6 @@
 import { PagesOptions } from 'next-auth';
 
 export const pagesOptions: Partial<PagesOptions> = {
-  signIn: '/auth/login',
-  error: '/auth/login',
+  signIn: '/login',
+  error: '/login',
 };

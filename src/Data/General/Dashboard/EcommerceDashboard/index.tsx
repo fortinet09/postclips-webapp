@@ -137,7 +137,7 @@ export const productSalesChartData: ApexOptions = {
         labels: {
             style: {
                 fontSize: "14px",
-                colors: "#171829",
+                colors: "#161616",
                 fontWeight: "500",
                 fontFamily: "Lexend, sans-serif",
             },

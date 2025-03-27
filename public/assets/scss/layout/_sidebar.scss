@@ -1288,7 +1288,8 @@
           z-index: 9;
           height: auto;
           line-height: inherit;
-          background: $sidebar-background;
+          // background: $sidebar-background;
+          background: $dark-sidebar-background;
           width: $sidebar-width;
           text-align: left;
           transition: 0.3s;

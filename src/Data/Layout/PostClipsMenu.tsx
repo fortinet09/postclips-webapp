@@ -26,23 +26,30 @@ export const PostClipsMenuListAdmin: MenuItem[] | undefined = [
 
 export const PostClipsMenuListBrand: MenuItem[] | undefined = [
   {
-    title: "General",
+    title: "Brand",
     lanClass: "lan-1",
-    menucontent: "Dashboards",
+    menucontent: "Brand",
     Items: [
       {
-        path: "/home",
-        icon: "home",
+        path: "/campaigns",
+        icon: "campaigns",
         type: "link",
-        title: "Dashboard",
+        title: "Campaigns",
         id: 1,
       },
       {
-        path: "/campaigns",
-        icon: "bookmark",
+        path: "/clips-approval",
+        icon: "clips-approval",
         type: "link",
-        title: "Campaigns",
+        title: "Clips approval",
         id: 2,
+      },
+      {
+        path: "/analytics",
+        icon: "analytics",
+        type: "link",
+        title: "Analytics",
+        id: 3,
       },
     ],
   },

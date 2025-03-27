@@ -14,6 +14,9 @@ import TasksSlice from "./Reducers/TasksSlice";
 import ThemeCustomizerSlice from "./Reducers/ThemeCustomizerSlice";
 import TodoSlice from "./Reducers/TodoSlice";
 
+// Postclips
+import HeaderSlice from "./Reducers/(postclips)/auth/HeaderSlice";
+
 const Store = configureStore({
   reducer: {
     layout: LayoutSlice,
@@ -30,6 +33,7 @@ const Store = configureStore({
     filter: FilterReducer,
     searchResult: SearchResultSlice,
     themeCustomizer: ThemeCustomizerSlice,
+    header: HeaderSlice,
   },
 });
 

@@ -20,7 +20,7 @@ const CampaignContainer = () => {
             <Card>
               <CardBody>
                 <CampaignHeader linkTitle="Add Product" />
-                <CampaignTable />
+                <CampaignTable campaigns={[]} />
               </CardBody>
             </Card>
           </Col>

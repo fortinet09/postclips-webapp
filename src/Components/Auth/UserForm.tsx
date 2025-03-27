@@ -93,8 +93,8 @@ const UserForm = () => {
                   </Button>
                 </div>
               </div>
-              <h6 className="text-muted mt-4 or">Or use your</h6>
-              <UserSocialApp />
+              {/* <h6 className="text-muted mt-4 or">Or use your</h6>
+              <UserSocialApp /> */}
             </>
           )}
           {step === Step.Verification && <VerificationCode email={email} />}

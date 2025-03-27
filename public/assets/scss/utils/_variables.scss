@@ -1,5 +1,5 @@
 // General variables
-$theme-font-color: #171829;
+$theme-font-color: #161616;
 $theme-body-font-color: $theme-font-color;
 $theme-body-sub-title-color: #959595;
 $body-color: #F2F5FA;
@@ -89,8 +89,9 @@ $font-ICO: IcoFont;
 $landing-header: #323C58;
 $landing-card-box-shadow: -13px 8px 41px rgba(42, 54, 80, 0.25);
 // dark layout variables
-$dark-body-background: #10101c;
-$dark-card-background: #171829;
+$dark-body-background: #161616;
+$dark-card-background: #161616;
+$dark-sidebar-background: #161616;
 $dark-background: #21283b;
 $dark-card-inbox: #323846;
 $dark-small-font-color: #98a6ad;
@@ -103,7 +104,7 @@ $bg-dark-color: #1f2533;
 $dark-datatable-odd: $dark-body-background;
 $dark-datatable-sorting: $dark-card-background;
 $dark-datatable-sorting-even: $dark-body-background;
-$dark-even-hover-sorting: #171829;
+$dark-even-hover-sorting: #161616;
 //General tag settings
 $body-font-size: 14px;
 $body-font-color: $theme-body-font-color;

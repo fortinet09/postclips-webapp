@@ -1,5 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { fetchAPI } from "../postclips/server/ApiClient";
+import { PostClipsMenuListAdmin, PostClipsMenuListBrand, PostClipsMenuListClipper } from "@/Data/Layout/PostClipsMenu";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -36,16 +38,15 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: DO NOT REMOVE auth.getUser()
 
   const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (
     !user &&
-    // !request.nextUrl.pathname.startsWith("/login") &&
-    // !request.nextUrl.pathname.startsWith("/terms") &&
-    // !request.nextUrl.pathname.startsWith("/privacy") &&
-    // !request.nextUrl.pathname.startsWith("/auth") &&
-    // !request.nextUrl.pathname.startsWith("/comming-soon")
     (request.nextUrl.pathname.startsWith("/campaigns") ||
       request.nextUrl.pathname.startsWith("/home") ||
       request.nextUrl.pathname.startsWith("/accounts") ||
@@ -54,14 +55,44 @@ export async function updateSession(request: NextRequest) {
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && request.nextUrl.pathname.includes("/login")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/home";
-    return NextResponse.redirect(url);
+  if (user && session && request.nextUrl.pathname.includes("/login")) {
+    const data = await fetchAPI(
+      session.access_token,
+      "GET",
+      "/auth/roles"
+    );
+    if (data && data.length > 0) {
+
+      let selectedRole = data[0].role;
+
+      let menuList;
+      if (selectedRole === "ADMIN") {
+        menuList = PostClipsMenuListAdmin;
+      } else if (selectedRole === "BRAND") {
+        menuList = PostClipsMenuListBrand;
+      } else if (selectedRole === "CLIPPER") {
+        menuList = PostClipsMenuListClipper;
+      }
+
+      if (menuList && menuList.length > 0 && menuList[0].Items && menuList[0].Items.length > 0) {
+        const firstItem = menuList[0].Items[0];
+        const url = request.nextUrl.clone();
+        url.pathname = firstItem.path || "/login";
+        return NextResponse.redirect(url);
+      }
+
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    } else {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

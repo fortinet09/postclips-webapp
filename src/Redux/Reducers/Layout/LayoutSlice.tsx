@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   flip: false,
-  darkMode: false,
+  darkMode: true,
   toggleSidebar: false,
   pinedMenu: [""],
   layoutName: "",
