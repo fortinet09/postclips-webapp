@@ -72,25 +72,41 @@ export const SessionProvider = ({
         }
       });
 
-      const data = await response.json();
+      // Check if response is ok before proceeding
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      if (data.refreshed && data.newAccessToken && data.newRefreshToken) {
+      const newAccessToken = response.headers.get('X-New-Access-Token');
+      const newRefreshToken = response.headers.get('X-New-Refresh-Token');
+
+      if (newAccessToken && newRefreshToken) {
+        console.log('Received new tokens, updating session...');
+
         // Update session with new tokens
         const updatedSession = {
           ...session,
-          access_token: data.newAccessToken,
-          refresh_token: data.newRefreshToken
+          access_token: newAccessToken,
+          refresh_token: newRefreshToken
         };
-        setSession(updatedSession);
 
-        // Update supabase session
+        // Update supabase session first
         await supabase.auth.setSession({
-          access_token: data.newAccessToken,
-          refresh_token: data.newRefreshToken
+          access_token: newAccessToken,
+          refresh_token: newRefreshToken
         });
+
+        // Then update local state
+        setSession(updatedSession);
       }
     } catch (error) {
       console.error("Error verifying token:", error);
+      // If we get an authentication error, trigger a logout
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('403'))) {
+        await supabase.auth.signOut();
+        setSession(null);
+        setUser(null);
+      }
     }
   }, [session]);
 
@@ -115,21 +131,17 @@ export const SessionProvider = ({
     };
   }, []);
 
-  // Periodically check token when user is active
+  // Modify the token check interval to be more frequent
   useEffect(() => {
     if (!session) return;
 
     const checkTokenInterval = setInterval(() => {
-      const inactiveTime = Date.now() - lastActivity;
-
-      // If user has been active in the last 5 minutes, check token
-      if (inactiveTime < 5 * 60 * 1000) {
-        verifyAndRefreshToken();
-      }
-    }, 4 * 60 * 1000); // Check every 4 minutes
+      // Check token every 2 minutes regardless of activity
+      verifyAndRefreshToken();
+    }, 2 * 60 * 1000); // 2 minutes
 
     return () => clearInterval(checkTokenInterval);
-  }, [session, lastActivity, verifyAndRefreshToken]);
+  }, [session, verifyAndRefreshToken]);
 
   // Listen for window focus events
   useEffect(() => {

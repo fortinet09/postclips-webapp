@@ -45,6 +45,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log("Middleware", { user: !!user, session: !!session });
+
   if (
     !user &&
     (request.nextUrl.pathname.startsWith("/campaigns") ||
@@ -65,9 +67,30 @@ export async function updateSession(request: NextRequest) {
       "GET",
       "/auth/roles"
     );
-    if (data && data.length > 0) {
 
-      let selectedRole = data[0].role;
+    if (!data) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/comming-soon";
+      return NextResponse.redirect(url);
+    }
+
+    let roles = [];
+    let permissions = [];
+    let brand;
+
+    if (data) {
+      roles = data.roles;
+      permissions = data.permissions;
+      brand = data.brand;
+    } else {
+      const url = request.nextUrl.clone();
+      url.pathname = "/comming-soon";
+      return NextResponse.redirect(url);
+    }
+
+    if (roles && roles.length > 0) {
+
+      let selectedRole = roles[0];
 
       let menuList;
       if (selectedRole === "ADMIN") {
