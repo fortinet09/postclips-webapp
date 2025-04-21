@@ -6,7 +6,6 @@ import { fetchAPI } from '@/Clients/postclips/server/ApiClient';
 export async function submitContactForm(formData: any) {
     try {
         const response = await fetchAPI(
-            '',
             'POST',
             '/contact/submit',
             {
