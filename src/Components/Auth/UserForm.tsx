@@ -34,16 +34,25 @@ enum Step {
 const UserForm = () => {
   const [step, setStep] = useState(Step.Login);
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (
     provider: "email" | "google" | "facebook" | "apple",
     email?: string
   ) => {
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const userData = await login(provider, email);
+      await login(provider, email);
       setStep(Step.Verification);
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch {
+      // Error toast is handled in the login function
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,6 +90,7 @@ const UserForm = () => {
                   type="email"
                   defaultValue={email}
                   onChange={(event) => setEmail(event.target.value)}
+                  disabled={loading}
                 />
               </FormGroup>
               <div className="form-group mb-0">
@@ -88,8 +98,9 @@ const UserForm = () => {
                   <Button
                     color="primary"
                     onClick={() => handleLogin("email", email)}
+                    disabled={loading}
                   >
-                    {SignIn}
+                    {loading ? "Sending OTP..." : SignIn}
                   </Button>
                 </div>
               </div>

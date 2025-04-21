@@ -19,6 +19,7 @@ interface AuthContextProps {
   brand: Brand | null;
   permissions: string;
   loading: boolean;
+  token: string | null;
 }
 
 // Define user metadata structure
@@ -39,6 +40,7 @@ const AuthContext = createContext<AuthContextProps>({
   brand: null,
   permissions: "",
   loading: true,
+  token: null,
 });
 
 // Custom hook to access auth context
@@ -58,137 +60,32 @@ export const SessionProvider = ({
   const [rolesFetched, setRolesFetched] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lastActivity, setLastActivity] = useState(Date.now());
+  const [token, setToken] = useState<string | null>(null);
 
-  // Add a function to verify and refresh tokens if needed
-  const verifyAndRefreshToken = useCallback(async () => {
-    if (!session?.access_token || !session?.refresh_token) return;
+  useEffect(() => {
+    // Initialize token from cookies
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
 
-    try {
-      const response = await fetch('/api/auth/verify', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'X-Refresh-Token': session.refresh_token
-        }
-      });
-
-      // Check if response is ok before proceeding
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const newAccessToken = response.headers.get('X-New-Access-Token');
-      const newRefreshToken = response.headers.get('X-New-Refresh-Token');
-
-      if (newAccessToken && newRefreshToken) {
-        console.log('Received new tokens, updating session...');
-
-        // Update session with new tokens
-        const updatedSession = {
-          ...session,
-          access_token: newAccessToken,
-          refresh_token: newRefreshToken
-        };
-
-        // Update supabase session first
-        await supabase.auth.setSession({
-          access_token: newAccessToken,
-          refresh_token: newRefreshToken
-        });
-
-        // Then update local state
-        setSession(updatedSession);
-      }
-    } catch (error) {
-      console.error("Error verifying token:", error);
-      // If we get an authentication error, trigger a logout
-      if (error instanceof Error && (error.message.includes('401') || error.message.includes('403'))) {
-        await supabase.auth.signOut();
-        setSession(null);
-        setUser(null);
-      }
+    const storedToken = getCookie("auth_token");
+    if (storedToken) {
+      setToken(storedToken);
     }
-  }, [session]);
-
-  // Track user activity
-  useEffect(() => {
-    const activityEvents = ['mousedown', 'keydown', 'touchstart', 'scroll'];
-
-    const updateActivity = () => {
-      setLastActivity(Date.now());
-    };
-
-    // Add event listeners
-    activityEvents.forEach(event => {
-      window.addEventListener(event, updateActivity);
-    });
-
-    // Cleanup
-    return () => {
-      activityEvents.forEach(event => {
-        window.removeEventListener(event, updateActivity);
-      });
-    };
-  }, []);
-
-  // Modify the token check interval to be more frequent
-  useEffect(() => {
-    if (!session) return;
-
-    const checkTokenInterval = setInterval(() => {
-      // Check token every 2 minutes regardless of activity
-      verifyAndRefreshToken();
-    }, 2 * 60 * 1000); // 2 minutes
-
-    return () => clearInterval(checkTokenInterval);
-  }, [session, verifyAndRefreshToken]);
-
-  // Listen for window focus events
-  useEffect(() => {
-    const handleWindowFocus = () => {
-      if (session) {
-        verifyAndRefreshToken();
-      }
-    };
-
-    window.addEventListener('focus', handleWindowFocus);
-
-    return () => {
-      window.removeEventListener('focus', handleWindowFocus);
-    };
-  }, [session, verifyAndRefreshToken]);
-
-  useEffect(() => {
-    // Listen for authentication changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser((session?.user?.user_metadata as UserMetadata) ?? null);
-      }
-    );
-
-    // Fetch initial session and user data
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser((data.session?.user?.user_metadata as UserMetadata) ?? null);
-    });
-
-    return () => {
-      authListener?.subscription.unsubscribe(); // Cleanup listener on unmount
-    };
   }, []);
 
   useEffect(() => {
-    // Fetch user roles when session is ready
+    // Fetch user roles when token is available
     const fetchRoles = async () => {
-      if (session?.user && !rolesFetched) {
+      if (token && !rolesFetched) {
         try {
-          const data = await fetchAPI(
-            session.access_token,
+          const { data, error } = await fetchAPI(
             "GET",
             "/auth/roles"
           );
-          console.log("fetching roles 3", { data });
           if (!data) {
             setUserRoles([]);
             return;
@@ -196,7 +93,7 @@ export const SessionProvider = ({
 
           setUserRoles(data?.roles ?? []);
           setBrand(data?.brand ?? null);
-          setPermissions(data?.permissions![0] ?? "");
+          setPermissions(data?.permissions ? data?.permissions[0] : "");
 
           const roleNames = data?.roles ?? [];
 
@@ -207,8 +104,12 @@ export const SessionProvider = ({
           } else if (roleNames.includes("CLIPPER")) {
             setSelectedRole("CLIPPER");
           }
-        } catch (error) {
+        } catch (error: any) {
           console.log("Failed to fetch roles:", error);
+          if (error.message === "UNAUTHORIZED") {
+            await supabase.auth.signOut();
+            window.location.href = "/login";
+          }
         } finally {
           setRolesFetched(true);
         }
@@ -216,11 +117,11 @@ export const SessionProvider = ({
       setLoading(false);
     };
     fetchRoles();
-  }, [session, rolesFetched]);
+  }, [token, rolesFetched]);
 
   return (
     <AuthContext.Provider
-      value={{ session, user, userRoles, selectedRole, loading, brand, permissions }}
+      value={{ session, user, userRoles, selectedRole, loading, brand, permissions, token }}
     >
       {children}
     </AuthContext.Provider>

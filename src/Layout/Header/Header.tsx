@@ -26,7 +26,7 @@ const Header = () => {
         <Col xxl={5} xl={4} md={4} className="left-header col-auto box-col-6 horizontal-wrapper p-0" >
           {/* <div className="left-menu-header"> */}
           {/* <ul className="header-left"> */}
-          <Breadcrumbs parent={mainPage.name} title={currentPage?.name || ""} />
+          {/* <Breadcrumbs parent={mainPage.name} title={currentPage?.name || ""} /> */}
           {/* </ul> */}
           {/* </div> */}
         </Col>

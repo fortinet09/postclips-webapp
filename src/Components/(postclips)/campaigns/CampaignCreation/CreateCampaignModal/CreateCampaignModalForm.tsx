@@ -10,7 +10,7 @@ export interface CreateCampaignModalFormProps {
 }
 
 const CreateCampaignModalForm: React.FC<CreateCampaignModalFormProps> = ({ modal, toggle }) => {
-    const { session } = useAuth();
+    const { token } = useAuth();
     const [campaign, setCampaign] = useState({
         title: '',
         description: '',
@@ -26,13 +26,8 @@ const CreateCampaignModalForm: React.FC<CreateCampaignModalFormProps> = ({ modal
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!session?.access_token) {
-            toast.error('Not authorized');
-            return;
-        }
         try {
             await fetchAPI(
-                session?.access_token,
                 'POST',
                 '/campaigns/draft',
                 campaign

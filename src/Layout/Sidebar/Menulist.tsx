@@ -46,7 +46,8 @@ const Menulist: React.FC<MenuListType> = ({ menu, setActiveMenu, activeMenu, lev
         <li key={index} className={`${level === 0 ? "sidebar-list" : ""} ${(item.children ? item.children.map((innerItem) => ActiveNavLinkUrl(innerItem.path)).includes(true) : ActiveNavLinkUrl(item.path)) || activeMenu[level] === item.title ? "active" : ""} `}>
 
           <Link
-            className={`${!className && level !== 2 ? "sidebar-link sidebar-title" : ""}  ${(item.children ? item.children.map((innerItem) => ActiveNavLinkUrl(innerItem.path)).includes(true) : ActiveNavLinkUrl(item.path)) || activeMenu[level] === item.title ? "active" : ""}`}
+            // className={`${!className && level !== 2 ? "sidebar-link sidebar-title" : ""}  ${(item.children ? item.children.map((innerItem) => ActiveNavLinkUrl(innerItem.path)).includes(true) : ActiveNavLinkUrl(item.path)) || activeMenu[level] === item.title ? "active" : ""}`}
+            className={`${!className && level !== 2 ? "sidebar-link sidebar-title" : ""}  ${(item.children ? item.children.map((innerItem) => ActiveNavLinkUrl(innerItem.path)).includes(true) : ActiveNavLinkUrl(item.path))}`}
             href={item?.path ? `${item.path}` : ""}
             onClick={() => {
               const temp = activeMenu;
@@ -55,7 +56,8 @@ const Menulist: React.FC<MenuListType> = ({ menu, setActiveMenu, activeMenu, lev
             }}>
             {item.icon && (
               // <SVG className={`${sidebarIconType}-icon`} iconId={`${sidebarIconType}-${item.icon}`} />
-              <SVG className={`${sidebarIconType}-icon`} iconId={`${item.icon}${ActiveNavLinkUrl(item.path) ? "-active" : ""}`} />
+              // <SVG className={`${sidebarIconType}-icon`} iconId={`${item.icon}${ActiveNavLinkUrl(item.path) ? "-active" : ""}`} />
+              <SVG className={`${sidebarIconType}-icon`} iconId={`${item.icon}`} />
             )}
             <span className={`text-white ${item.lanClass && item.lanClass}`}>{t(item.title)}</span>
           </Link>

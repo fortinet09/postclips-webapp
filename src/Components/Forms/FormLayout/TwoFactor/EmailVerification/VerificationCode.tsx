@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { Button, Col, Form, Input, Row } from "reactstrap";
 import { verifyOtp } from "@/actions/auth/verifyOtp";
 import { useRouter } from "next/navigation";
+import { fetchAPI } from "@/Clients/postclips/server/ApiClient";
+import { handleApiError } from "@/Clients/postclips/server/errorHandler";
+import { toast } from "react-toastify";
 
 const VerificationCode = ({ email }: { email: string }) => {
   const router = useRouter();
@@ -32,7 +35,6 @@ const VerificationCode = ({ email }: { email: string }) => {
         setError("Invalid OTP format. Must be 6 digits.");
       }
     } catch (err) {
-      console.error("Failed to read clipboard:", err);
       setError("Failed to read clipboard.");
     }
   };
@@ -40,14 +42,24 @@ const VerificationCode = ({ email }: { email: string }) => {
   const handleVerify = async () => {
     try {
       const otpCode = otp.join("");
-      const result = await verifyOtp(email, otpCode);
-      if (result?.success) {
+      const result = await fetchAPI("POST", "/auth/verify-otp", { email, otp: otpCode });
+
+      if (result.success && result.data) {
+        const { token: newToken, user: userData } = result.data;
+
+        // Set token in cookies
+        document.cookie = `auth_token=${newToken}; path=/; max-age=2592000`; // 30 days
+        document.cookie = `user_data=${JSON.stringify(userData)}; path=/; max-age=2592000`;
+        
+        toast.success("Verification successful!");
         router.push("/home");
       } else {
-        setError("Invalid OTP code");
+        const errorMessage = handleApiError(result.error);
+        setError(errorMessage);
       }
     } catch (error) {
-      console.error("OTP verification failed:", error);
+      const errorMessage = handleApiError(error);
+      setError(errorMessage);
     }
   };
 

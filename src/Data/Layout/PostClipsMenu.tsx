@@ -8,7 +8,7 @@ export const PostClipsMenuListAdmin: MenuItem[] | undefined = [
     Items: [
       {
         path: "/home",
-        icon: "home",
+        icon: "fill-home",
         type: "link",
         title: "Dashboard",
         id: 1,
@@ -19,6 +19,13 @@ export const PostClipsMenuListAdmin: MenuItem[] | undefined = [
         type: "link",
         title: "Users",
         id: 2,
+      },
+      {
+        path: "/clips",
+        icon: "bookmark",
+        type: "link",
+        title: "Clips",
+        id: 3,
       },
     ],
   },

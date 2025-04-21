@@ -12,18 +12,17 @@ import { setCurrentState } from "@/Redux/Reducers/(postclips)/auth/HeaderSlice";
 import { useDispatch } from "react-redux";
 
 const Campaigns = () => {
-  const { session } = useAuth();
+  const { token } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   useEffect(() => {
-    if (session?.access_token) {
+    if (token) {
       const fetchCampaigns = async () => {
         try {
           setIsLoading(true);
           const response = await fetchAPI(
-            session.access_token,
             "GET",
             "/campaigns/brand"
           );
@@ -48,7 +47,7 @@ const Campaigns = () => {
       };
       fetchCampaigns();
     }
-  }, [session]);
+  }, [token]);
 
   return (
     <Container fluid>

@@ -14,17 +14,9 @@ import { useAuth } from "@/Providers/SessionProvider";
 
 const SidebarMenuList = () => {
   const [activeMenu, setActiveMenu] = useState([]);
-  const { pinedMenu } = useAppSelector((state) => state.layout);
-  const shouldHideMenu = (mainMenu: MenuItem) => {
-    return mainMenu?.Items?.map((data) => data.title).every((titles) =>
-      pinedMenu.includes(titles || "")
-    );
-  };
-  const { t } = useTranslation("common");
   const { selectedRole } = useAuth(); // Get userRole from context
 
   let menuList;
-  console.log({ selectedRole });
   if (selectedRole === "ADMIN") {
     menuList = PostClipsMenuListAdmin;
   } else if (selectedRole === "BRAND") {
@@ -32,8 +24,6 @@ const SidebarMenuList = () => {
   } else if (selectedRole === "CLIPPER") {
     menuList = PostClipsMenuListClipper;
   }
-
-  console.log({menuList});
 
   return (
     <>

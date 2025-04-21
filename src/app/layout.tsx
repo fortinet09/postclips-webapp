@@ -59,7 +59,7 @@ export default async function RootLayout({
         >
           <NoSsr>
             <SessionProvider >
-              <MainProvider>{children}</MainProvider>
+                <MainProvider>{children}</MainProvider>
             </SessionProvider>
           </NoSsr>
         </body>

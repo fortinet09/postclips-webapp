@@ -8,6 +8,8 @@ export const verifyOtp = async (email: string, otp: string) => {
       type: "email",
     });
 
+    console.log("verifyOtp", { error, data });
+
     if (error) {
       return { error: true };
     } else if (data) {

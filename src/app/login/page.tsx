@@ -1,5 +1,6 @@
 "use client";
 import UserForm from "@/Components/Auth/UserForm";
+import { ToastContainer } from "react-toastify";
 import { Col, Container, Row } from "reactstrap";
 
 const UserLogin = () => {
@@ -12,6 +13,7 @@ const UserLogin = () => {
           </div>
         </Col>
       </Row>
+      <ToastContainer />
     </Container>
   );
 };
