@@ -3,25 +3,12 @@ import Link from "next/link";
 import { BreadcrumbsProps } from "@/Types/CommonComponent.type";
 import SVG from "../SVG";
 
-const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ parent, title }) => {
+const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ title }) => {
   return (
     <Container fluid>
       <div className="page-title">
         <Row>
-          {/* <Col sm={6} className="p-0">
-            <h3>{mainTitle}</h3>
-          </Col> */}
-          {/* <Col sm={6} className="p-0"> */}
-            <Breadcrumb>
-              {/* <BreadcrumbItem>
-                <Link href={`/dashboard/default`}>
-                  <SVG iconId="stroke-home" className="stroke-icon" />
-                </Link>
-              </BreadcrumbItem> */}
-              <BreadcrumbItem>{parent}</BreadcrumbItem>
-              <BreadcrumbItem active>{title}</BreadcrumbItem>
-            </Breadcrumb>
-          {/* </Col> */}
+          <h5 className="f-w-400">{title}</h5>
         </Row>
       </div>
     </Container>

@@ -1,37 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 type HeaderState = {
-  mainPage: {
-    name: string;
-    route: string;
-  };
-  currentPage: {
-    name: string;
-    route: string;
-  } | null;
+  currentPage: string;
 };
 
 const initialState: HeaderState = {
-  mainPage: {
-    name: "",
-    route: "",
-  },
-  currentPage: {
-    name: "",
-    route: "",
-  },
+  currentPage: "",
 };
 
 const headerSlice = createSlice({
   name: "header",
   initialState,
   reducers: {
-    setCurrentState(state, action) {
-      state.mainPage = action.payload.mainPage;
-      state.currentPage = action.payload.currentPage;
+    setHeaderState(state, action) {
+      state.currentPage = action.payload;
     },
   },
 });
 
-export const { setCurrentState } = headerSlice.actions;
+export const { setHeaderState } = headerSlice.actions;
 export default headerSlice.reducer;

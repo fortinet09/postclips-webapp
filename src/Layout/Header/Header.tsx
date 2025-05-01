@@ -11,7 +11,7 @@ import Breadcrumbs from "@/CommonComponent/BreadCrumbs";
 
 const Header = () => {
   const { toggleSidebar } = useAppSelector((state) => state.layout);
-  const { mainPage, currentPage } = useAppSelector((state) => state.header);
+  const { currentPage } = useAppSelector((state) => state.header);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -24,11 +24,7 @@ const Header = () => {
         <HeaderLogo />
         {/* <SearchInput /> */}
         <Col xxl={5} xl={4} md={4} className="left-header col-auto box-col-6 horizontal-wrapper p-0" >
-          {/* <div className="left-menu-header"> */}
-          {/* <ul className="header-left"> */}
-          {/* <Breadcrumbs parent={mainPage.name} title={currentPage?.name || ""} /> */}
-          {/* </ul> */}
-          {/* </div> */}
+          <Breadcrumbs title={currentPage} />
         </Col>
         <RightHeaderIcon />
       </Row>

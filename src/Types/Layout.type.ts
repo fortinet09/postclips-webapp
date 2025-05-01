@@ -18,7 +18,7 @@ export interface MenuItem {
 }
 
 export interface MenuListType {
-    menu?: MenuItem[] | undefined;
+    menu: MenuItem[] | undefined;
     level: number;
     className?: string;
     setActiveMenu: Function;

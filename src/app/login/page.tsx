@@ -1,20 +1,29 @@
 "use client";
 import UserForm from "@/Components/Auth/UserForm";
 import { ToastContainer } from "react-toastify";
-import { Col, Container, Row } from "reactstrap";
+import Image from "next/image";
 
 const UserLogin = () => {
   return (
-    <Container fluid className="p-0">
-      <Row className="m-0">
-        <Col xs={12} className="p-0">
-          <div className="login-card login-dark">
+    <>
+      <div className="login-page">
+        <div className="login-page__left">
+          <div className="login-page__center-content">
             <UserForm />
           </div>
-        </Col>
-      </Row>
+        </div>
+        <div className="login-page__right">
+          <Image
+            src="/assets/images/(postclips)/login/img.svg"
+            alt="PostClips Demo"
+            fill
+            className="next-image-full"
+            priority
+          />
+        </div>
+      </div>
       <ToastContainer />
-    </Container>
+    </>
   );
 };
 

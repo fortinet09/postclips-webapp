@@ -101,3 +101,16 @@
 @import "./postclips-general.scss";
 
 @import "./postclips-landing.scss";
+
+// Postclips
+// -- General
+@import "(postclips)/general/index.scss";
+
+// -- Login
+@import "(postclips)/login/index.scss";
+
+// -- Sidebar
+@import "(postclips)/sidebar/index.scss";
+
+// -- Campaigns
+@import "(postclips)/campaigns/index.scss";

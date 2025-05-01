@@ -1500,7 +1500,7 @@ body {
 							.sidebar-links {
 								.sidebar-link.active {
 									svg {
-										stroke: var(--theme-default);
+										// stroke: var(--theme-default);
 									}
 								}
 								.simplebar-wrapper {
@@ -1689,8 +1689,8 @@ body {
 																	color: var(--theme-default);
 																}
 																svg {
-																	color: var(--theme-default);
-																	stroke: var(--theme-default);
+																	// color: var(--theme-default);
+																	// stroke: var(--theme-default);
 																}
 															}
 														}

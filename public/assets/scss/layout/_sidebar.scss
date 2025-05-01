@@ -1673,7 +1673,7 @@
                     .simplebar-mask {
                       .simplebar-content-wrapper {
                         .simplebar-content {
-                          padding: 23px !important;
+                          padding: 15px !important;
 
                           >li {
                             transition: all 0.3s ease;
@@ -1844,7 +1844,8 @@
                     letter-spacing: 0.7px;
                     text-transform: capitalize;
                     color: $sidebar-fill-icon-color;
-                    padding: 4px 8px;
+                    // padding: 4px 8px;
+                    padding: 0px 10px;
                   }
 
                   &.link-nav {
@@ -1936,7 +1937,7 @@
                         }
 
                         a {
-                          padding: 6px 0 !important;
+                          padding: 12px 15px !important;
                           position: relative;
                           color: #222222;
                           transition: all 0.3s ease;
@@ -1957,7 +1958,9 @@
 
                           &.active {
                             span {
-                              color: $black;
+                              // color: $black;
+                              color: #FFFFFF;
+                              font-weight: 600;
                             }
                           }
                         }
@@ -2186,6 +2189,7 @@
                           &.active {
                             transition: all 0.5s ease;
                             position: relative;
+                            background-color: #161616;
                           }
                         }
                       }
@@ -2199,7 +2203,7 @@
           .simplebar-content {
             display: flex;
             flex-direction: column;
-            padding: 23px !important;
+            padding: 15px !important;
           }
         }
       }
@@ -2290,7 +2294,7 @@
                           &.active {
                             svg {
                               &.stroke-icon {
-                                stroke: var(--theme-default);
+                                // stroke: var(--theme-default);
                               }
 
                               &.fill-icon {
@@ -2376,7 +2380,7 @@
 
                           svg {
                             color: var(--theme-default);
-                            stroke: var(--theme-default);
+                            // stroke: var(--theme-default);
                           }
                         }
                       }
@@ -2619,7 +2623,9 @@
                   margin: 0 10px;
 
                   span {
-                    color: var(--theme-default);
+                    // color: var(--theme-default);
+                    color: #FFFFFF;
+                    font-weight: 600;
                   }
 
                   ~.sidebar-submenu,

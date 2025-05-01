@@ -1,127 +1,166 @@
-import { ImagePath, VerificationCodeTitle, Verify } from "@/Constant";
+"use client";
 import Image from "next/image";
-import React, { useState } from "react";
-import { Button, Col, Form, Input, Row } from "reactstrap";
-import { verifyOtp } from "@/actions/auth/verifyOtp";
-import { useRouter } from "next/navigation";
-import { fetchAPI } from "@/Clients/postclips/server/ApiClient";
+import { useState, useEffect } from "react";
+import { Form, Input } from "reactstrap";
+import { useAuth } from "@/Providers/SessionProvider";
 import { handleApiError } from "@/Clients/postclips/server/errorHandler";
 import { toast } from "react-toastify";
 
 const VerificationCode = ({ email }: { email: string }) => {
-  const router = useRouter();
+  const { verifyOtp, signIn } = useAuth();
   const [otp, setOtp] = useState(Array(6).fill(""));
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setInterval(() => {
+        setResendTimer(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    } else {
+      setCanResend(true);
+    }
+  }, [resendTimer]);
 
   const handleChange = (e: string, index: number) => {
     if (e.length > 1) return;
     const tempOtp = [...otp];
     tempOtp[index] = e;
     setOtp(tempOtp);
+
+    // Auto-focus next input
+    if (e && index < 5) {
+      const nextInput = document.querySelector(`input[name=otp-${index + 1}]`) as HTMLInputElement;
+      if (nextInput) nextInput.focus();
+    }
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    pasteCode(e.clipboardData.getData("text").trim());
-  };
-
-  const pasteCode = async (clipboardText?: string) => {
-    try {
-      let pasteData = clipboardText || (await navigator.clipboard.readText()).trim();
-      
-      if (pasteData.length === 6 && /^\d{6}$/.test(pasteData)) {
-        setOtp(pasteData.split(""));
-      } else {
-        setError("Invalid OTP format. Must be 6 digits.");
-      }
-    } catch (err) {
-      setError("Failed to read clipboard.");
+    const pastedData = e.clipboardData.getData("text").trim();
+    if (pastedData.length === 6 && /^\d{6}$/.test(pastedData)) {
+      setOtp(pastedData.split(""));
     }
   };
 
-  const handleVerify = async () => {
+  const handlePasteCode = async () => {
     try {
-      const otpCode = otp.join("");
-      const result = await fetchAPI("POST", "/auth/verify-otp", { email, otp: otpCode });
-
-      if (result.success && result.data) {
-        const { token: newToken, user: userData } = result.data;
-
-        // Set token in cookies
-        document.cookie = `auth_token=${newToken}; path=/; max-age=2592000`; // 30 days
-        document.cookie = `user_data=${JSON.stringify(userData)}; path=/; max-age=2592000`;
-        
-        toast.success("Verification successful!");
-        router.push("/home");
+      const clipboardText = await navigator.clipboard.readText();
+      const pastedData = clipboardText.trim();
+      if (pastedData.length === 6 && /^\d{6}$/.test(pastedData)) {
+        setOtp(pastedData.split(""));
+        toast.success("Code pasted successfully!");
       } else {
-        const errorMessage = handleApiError(result.error);
-        setError(errorMessage);
+        toast.error("Invalid code format. Please copy a 6-digit code.");
       }
     } catch (error) {
-      const errorMessage = handleApiError(error);
-      setError(errorMessage);
+      toast.error("Could not access clipboard. Please paste manually.");
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!canResend) return;
+    
+    setLoading(true);
+    try {
+      const result = await signIn(email);
+      if (result?.showVerification) {
+        setResendTimer(60);
+        setCanResend(false);
+        toast.success("New code sent successfully!");
+      }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const otpCode = otp.join("");
+    if (otpCode.length !== 6) {
+      toast.error("Please enter a valid 6-digit code");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await verifyOtp(email, otpCode);
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Row>
-      <div className="card-wrapper h-100">
-        <div className="authenticate">
-          <h4>{VerificationCodeTitle}</h4>
-          <Image
-            className="img-fluid"
-            src={`${ImagePath}/forms/authenticate.png`}
-            width={197}
-            height={200}
-            alt="authenticate"
-          />
-          <span>{"We've sent a verification code to"}</span>
-          <span>{email}</span>
-          <Form onSubmit={(event) => event.preventDefault()}>
-            <Row>
-              <Col>
-                <h5>{"Your OTP Code here:"}</h5>
-              </Col>
-              <Col className="otp-generate">
-                {otp.map((value, index) => (
-                  <Input
-                    key={index}
-                    value={value}
-                    className="otp-input"
-                    type="number"
-                    onChange={(e) => handleChange(e.target.value, index)}
-                    onPaste={handlePaste}
-                  />
-                ))}
-              </Col>
-              <Col>
-                <Button
-                  color="primary"
-                  className="w-100"
-                  onClick={handleVerify}
-                >
-                  {Verify}
-                </Button>
-              </Col>
-              <Col>
-                <Button
-                  color="secondary"
-                  className="w-100 mt-2"
-                  onClick={() => pasteCode()}
-                >
-                  Paste Code
-                </Button>
-              </Col>
-              {error && <p className="text-danger mt-3 mb-3">{error}</p>}
-              <div>
-                <span>{"Not received your code?"}</span>
-                <span className="text-primary cursor-pointer">Resend</span>
-              </div>
-            </Row>
-          </Form>
-        </div>
+    <div className="login-form">
+      <div className="login-form__header">
+        <Image
+          src="/assets/images/(postclips)/logos/logo.svg"
+          alt="PostClips"
+          width={143}
+          height={32}
+          priority
+        />
       </div>
-    </Row>
+      <div className="login-form__content">
+        <h4 className="text-white">Enter Verification Code</h4>
+        <p>We've sent a verification code to {email}</p>
+      </div>
+      <Form className="login-form__inputs" onSubmit={handleVerify}>
+        <div className="otp-inputs">
+          {otp.map((value, index) => (
+            <Input
+              key={index}
+              name={`otp-${index}`}
+              value={value}
+              type="number"
+              maxLength={1}
+              className="otp-input"
+              onChange={(e) => handleChange(e.target.value, index)}
+              onPaste={handlePaste}
+              disabled={loading}
+            />
+          ))}
+        </div>
+        <p className="login-form__paste">
+          <span 
+            className="link"
+            onClick={handlePasteCode}
+            style={{ cursor: 'pointer' }}
+          >
+            Paste code
+          </span>
+        </p>
+        <button
+          type="submit"
+          className="btn-chipped"
+          disabled={loading}
+        >
+          {loading ? "Verifying..." : "VERIFY"}
+        </button>
+        <p className="login-form__terms">
+          Didn't receive a code?{" "}
+          {canResend ? (
+            <span 
+              className="link"
+              onClick={handleResendCode}
+              style={{ cursor: 'pointer' }}
+            >
+              Resend code
+            </span>
+          ) : (
+            <span className="text-muted">
+              Resend in {resendTimer}s
+            </span>
+          )}
+        </p>
+      </Form>
+    </div>
   );
 };
 

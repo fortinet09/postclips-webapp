@@ -1,5 +1,5 @@
 import { useAppSelector } from "@/Redux/Hooks";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import {
   PostClipsMenuListAdmin,
   PostClipsMenuListBrand,
@@ -14,9 +14,13 @@ import { useAuth } from "@/Providers/SessionProvider";
 
 const SidebarMenuList = () => {
   const [activeMenu, setActiveMenu] = useState([]);
-  const { selectedRole } = useAuth(); // Get userRole from context
+  const { selectedRole, loading } = useAuth();
 
   let menuList;
+  if (loading) {
+    return null; // or a loading spinner if you prefer
+  }
+
   if (selectedRole === "ADMIN") {
     menuList = PostClipsMenuListAdmin;
   } else if (selectedRole === "BRAND") {

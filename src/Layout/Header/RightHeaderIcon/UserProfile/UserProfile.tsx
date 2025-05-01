@@ -8,10 +8,26 @@ import { LogOut } from "react-feather";
 import { useRouter } from "next/navigation";
 
 const UserProfile = () => {
-  const { user, selectedRole, brand } = useAuth();
+  const { user, selectedRole } = useAuth();
   const router = useRouter();
+
   const handleLogout = () => {
-    supabase.auth.signOut();
+    // Remove auth cookies
+    document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "user_data=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    // Clear any other auth-related cookies
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      if (name.startsWith("auth_") || name.startsWith("user_")) {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      }
+    }
+
+    // Route to login page
     router.push("/login");
   };
 
@@ -33,9 +49,9 @@ const UserProfile = () => {
         </div> */}
       </div>
       <ul className="profile-dropdown onhover-show-div pb-3" style={{ boxShadow: "0px 0px 15px 0px #7c7c7c" }}>
-        <div className="text-center pt-2 pb-2 mb-2" style={{ fontSize: "14px", fontWeight: "bold", borderBottom: "1px solid #e0e0e0", paddingBottom: "10px" }}>
+        {/* <div className="text-center pt-2 pb-2 mb-2" style={{ fontSize: "14px", fontWeight: "bold", borderBottom: "1px solid #e0e0e0", paddingBottom: "10px" }}>
           {brand?.name}
-        </div>
+        </div> */}
         {userProfileData.map((item, index) => (
           <li key={index}>
             <Link href={`/${item.link}`}>
