@@ -22,8 +22,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  console.log("===== updateSession", { token, isProtectedRoute });
-
   // If user has token and is on login page, verify token and redirect to appropriate page
   if (token && request.nextUrl.pathname.includes("/login")) {
     try {

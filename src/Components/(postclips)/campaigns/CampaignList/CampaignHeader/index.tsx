@@ -5,7 +5,7 @@ import { ProductListHeaderProp } from '@/Types/ECommerce.type';
 import { Href } from '@/Constant';
 import Link from 'next/link';
 import CampaignList from './CampaignList';
-import CreateCampaignModal from '../../CampaignCreation/CreateCampaignModal';
+import CreateCampaignModal from '../../CreateCampaignModal';
 
 const CampaignHeader = ({ linkTitle }: ProductListHeaderProp) => {
     const [modal, setModal] = useState(false);

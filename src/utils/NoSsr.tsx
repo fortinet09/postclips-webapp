@@ -1,11 +1,22 @@
 "use client";
-import dynamic from "next/dynamic";
-import React, { FC, ReactNode } from "react";
+import { useEffect, useState, FC, ReactNode } from "react";
 
 interface NoSsrProps {
   children: ReactNode;
 }
 
-const NoSsr: FC<NoSsrProps> = (props) => <React.Fragment>{props.children}</React.Fragment>;
+const NoSsr: FC<NoSsrProps> = ({ children }) => {
+  const [isMounted, setIsMounted] = useState(false);
 
-export default dynamic(() => Promise.resolve(NoSsr), { ssr: false });
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
+  return <>{children}</>;
+};
+
+export default NoSsr;

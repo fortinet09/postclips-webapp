@@ -1,53 +1,43 @@
 import { useAppSelector } from "@/Redux/Hooks";
-import { Fragment, useState, useEffect } from "react";
-import {
-  PostClipsMenuListAdmin,
-  PostClipsMenuListBrand,
-  PostClipsMenuListClipper,
-} from "@/Data/Layout/PostClipsMenu";
-import { MenuList } from "@/Data/Layout/Menu";
-
+import { Fragment, useState, memo, useEffect } from "react";
 import { MenuItem } from "@/Types/Layout.type";
 import Menulist from "./Menulist";
-import { useTranslation } from "react-i18next";
-import { useAuth } from "@/Providers/SessionProvider";
 
-const SidebarMenuList = () => {
-  const [activeMenu, setActiveMenu] = useState([]);
-  const { selectedRole, loading } = useAuth();
+const SidebarMenuList = memo(() => {
+  const [isClient, setIsClient] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string[]>([]);
+  const { menuList, loading } = useAppSelector((state) => state.sidebar);
 
-  let menuList;
-  if (loading) {
-    return null; // or a loading spinner if you prefer
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // On server-side or before hydration, render a placeholder
+  if (!isClient) {
+    return <div className="sidebar-placeholder" />;
   }
 
-  if (selectedRole === "ADMIN") {
-    menuList = PostClipsMenuListAdmin;
-  } else if (selectedRole === "BRAND") {
-    menuList = PostClipsMenuListBrand;
-  } else if (selectedRole === "CLIPPER") {
-    menuList = PostClipsMenuListClipper;
+  // After hydration, handle the actual menu rendering
+  if (loading || !menuList) {
+    return <div className="sidebar-placeholder" />;
   }
 
   return (
     <>
-      {menuList &&
-        menuList.map((mainMenu: MenuItem, index) => (
-          <Fragment key={index}>
-            {/* <li className={`sidebar-main-title ${shouldHideMenu(mainMenu) ? "d-none" : ""}`}>
-              <div>
-                <h6 className={mainMenu.lanClass ? mainMenu.lanClass : ""}>{t(mainMenu.title)}</h6>
-              </div>
-            </li> */}
-            <Menulist
-              menu={mainMenu.Items}
-              activeMenu={activeMenu}
-              setActiveMenu={setActiveMenu}
-              level={0}
-            />
-          </Fragment>
-        ))}
+      {menuList.map((mainMenu: MenuItem, index) => (
+        <Fragment key={mainMenu.title || index}>
+          <Menulist
+            menu={mainMenu.Items}
+            activeMenu={activeMenu}
+            setActiveMenu={setActiveMenu}
+            level={0}
+          />
+        </Fragment>
+      ))}
     </>
   );
-};
+});
+
+SidebarMenuList.displayName = 'SidebarMenuList';
+
 export default SidebarMenuList;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useCampaigns } from '@/Hooks/useCampaigns';
 import EmptyCampaigns from './EmptyCampaigns';
 import {
@@ -19,6 +19,8 @@ import {
 } from 'reactstrap';
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import useEmblaCarousel from 'embla-carousel-react';
+import CreateCampaignModal from './CreateCampaignModal';
+import { useRouter } from 'next/navigation';
 
 interface CampaignsProps { }
 
@@ -42,14 +44,42 @@ const formatPercentage = (num: number): string => {
     return num.toFixed(1) + '%';
 };
 
+const CampaignSkeleton = () => (
+    <Col>
+        <Card className="campaign-card skeleton-card">
+            <div className="skeleton-img"></div>
+            <CardBody>
+                <div className="skeleton-title"></div>
+                <div className="campaign-metrics">
+                    <div className="metric-box metric-box-right-chip">
+                        <div className="skeleton-label"></div>
+                        <div className="skeleton-value"></div>
+                    </div>
+                    <div className="metric-box metric-box-left-chip">
+                        <div className="skeleton-label"></div>
+                        <div className="skeleton-value"></div>
+                    </div>
+                </div>
+            </CardBody>
+        </Card>
+    </Col>
+);
+
 const Campaigns: React.FC<CampaignsProps> = () => {
-    const { campaigns, topCampaigns, totalAnalytics, loading, error, refetchCampaigns } = useCampaigns();
-    const [emblaRef, emblaApi] = useEmblaCarousel({
-        align: 'center',
+    const router = useRouter();
+    const { campaigns, topCampaigns, totalAnalytics, loading, error, refetchCampaigns, handleSearch } = useCampaigns();
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const [emblaRef, emblaApi] = useEmblaCarousel({ 
         loop: true,
-        startIndex: 1,
-        containScroll: 'trimSnaps'
+        align: 'center',
+        skipSnaps: false,
+        dragFree: false,
+        containScroll: false
     });
+    const [activeTab, setActiveTab] = useState('active');
+    const [modal, setModal] = useState(false);
+    const toggle = () => setModal(!modal);
 
     const scrollPrev = useCallback(() => {
         if (emblaApi) {
@@ -63,49 +93,59 @@ const Campaigns: React.FC<CampaignsProps> = () => {
         }
     }, [emblaApi]);
 
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchValue(value);
+        handleSearch(value);
+    };
+
     // Set up selected slide tracking
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const [selectedIndex, setSelectedIndex] = React.useState(0);
     const [currentStatus, setCurrentStatus] = React.useState('active');
 
     useEffect(() => {
         if (!emblaApi) return;
 
-        // Update selected index when slide changes
         const onSelect = () => {
             setSelectedIndex(emblaApi.selectedScrollSnap());
         };
 
         emblaApi.on('select', onSelect);
-        // Initialize it
+        emblaApi.on('reInit', onSelect);
         onSelect();
 
         return () => {
             emblaApi.off('select', onSelect);
+            emblaApi.off('reInit', onSelect);
         };
     }, [emblaApi]);
+
+    useEffect(() => {
+        if (emblaApi) {
+            emblaApi.reInit();
+        }
+    }, [topCampaigns, emblaApi]);
 
     useEffect(() => {
         refetchCampaigns(currentStatus);
     }, [currentStatus]);
 
-    if (loading) {
-        return <Container fluid className="campaigns px-4"><div>Loading...</div></Container>;
-    }
+    const handleCampaignClick = (campaign: any) => {
+        if (campaign.status === 'draft') {
+            router.push(`/brand/campaigns/detail/${campaign.id}`);
+        }
+    };
 
     if (error) {
         return <Container fluid className="campaigns px-4"><div>Error: {error}</div></Container>;
     }
 
-    if (!campaigns || !Array.isArray(campaigns) || campaigns.length === 0) {
-        return <EmptyCampaigns />;
-    }
-
     return (
-        <Container fluid className="campaigns px-4">
-            <div className="top-campaigns mb-4">
-                <div className="section-title mb-3">Top performing campaigns</div>
-                <div className="carousel-container">
-                    {topCampaigns.length > 0 && (
+        <Container fluid className="campaigns px-4 pt-5">
+            {topCampaigns && topCampaigns.length > 0 && (
+                <div className="top-campaigns mb-4">
+                    <div className="section-title mb-3">Top performing campaigns</div>
+                    <div className="carousel-container">
                         <>
                             <div className="embla" ref={emblaRef}>
                                 <div className="embla__container">
@@ -150,132 +190,196 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                                 </>
                             )}
                         </>
-                    )}
+                    </div>
                 </div>
-            </div>
+            )}
 
-            <div className="analytics mb-4">
-                <div className="section-title d-flex justify-content-between align-items-center mb-3">
-                    Analytics <span className="view-all">VIEW ALL</span>
+            {totalAnalytics && (
+                <div className="analytics mb-4">
+                    <div className="section-title d-flex justify-content-between align-items-center mb-3">
+                        Analytics <span className="view-all">VIEW ALL</span>
+                    </div>
+                    <Row className="analytics-grid">
+                        <Col md={3}>
+                            <Card className="analytics-card first-card">
+                                <CardBody>
+                                    <div className="analytics-title">Total views generated</div>
+                                    <strong>{formatNumber(totalAnalytics.total_views)}</strong>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                        <Col md={3}>
+                            <Card className="analytics-card middle-card">
+                                <CardBody>
+                                    <div className="analytics-title">Total clips posted</div>
+                                    <strong>{formatNumber(totalAnalytics.total_clips)}</strong>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                        <Col md={3}>
+                            <Card className="analytics-card middle-card">
+                                <CardBody>
+                                    <div className="analytics-title">Average views per clip</div>
+                                    <strong>{formatAverageViews(totalAnalytics.average_views_per_clip)}</strong>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                        <Col md={3}>
+                            <Card className="analytics-card last-card">
+                                <CardBody>
+                                    <div className="analytics-title">Total link clicks</div>
+                                    <strong>{formatNumber(totalAnalytics.total_link_clicks)}</strong>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
                 </div>
-                <Row className="analytics-grid">
-                    <Col md={3}>
-                        <Card className="analytics-card first-card">
-                            <CardBody>
-                                <div className="analytics-title">Total views generated</div>
-                                <strong>{formatNumber(totalAnalytics.total_views)}</strong>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                    <Col md={3}>
-                        <Card className="analytics-card middle-card">
-                            <CardBody>
-                                <div className="analytics-title">Total clips posted</div>
-                                <strong>{formatNumber(totalAnalytics.total_clips)}</strong>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                    <Col md={3}>
-                        <Card className="analytics-card middle-card">
-                            <CardBody>
-                                <div className="analytics-title">Average views per clip</div>
-                                <strong>{formatAverageViews(totalAnalytics.average_views_per_clip)}</strong>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                    <Col md={3}>
-                        <Card className="analytics-card last-card">
-                            <CardBody>
-                                <div className="analytics-title">Total link clicks</div>
-                                <strong>{formatNumber(totalAnalytics.total_link_clicks)}</strong>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
-            </div>
+            )}
 
             <div className="campaigns-list">
                 <div className="section-title mb-3">Campaigns</div>
                 <div className="campaigns-header mb-4">
-                    <Nav tabs>
-                        <NavItem>
-                            <NavLink
-                                active={currentStatus === 'active'}
-                                onClick={() => setCurrentStatus('active')}
-                            >
-                                Active
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                active={currentStatus === 'in_review'}
-                                onClick={() => setCurrentStatus('in_review')}
-                            >
-                                Waiting for approval
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                active={currentStatus === 'draft'}
-                                onClick={() => setCurrentStatus('draft')}
-                            >
-                                Drafts
-                            </NavLink>
-                        </NavItem>
-                    </Nav>
+                    <div className={`campaigns-filters ${(isSearchFocused || searchValue) ? 'filters-hidden' : ''}`}>
+                        <Nav tabs>
+                            <NavItem>
+                                <NavLink
+                                    className={activeTab === 'active' ? 'active' : ''}
+                                    onClick={() => {
+                                        setActiveTab('active');
+                                        refetchCampaigns('active');
+                                    }}
+                                >
+                                    Active
+                                </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink
+                                    className={activeTab === 'in_review' ? 'active' : ''}
+                                    onClick={() => {
+                                        setActiveTab('in_review');
+                                        refetchCampaigns('in_review');
+                                    }}
+                                >
+                                    Waiting for review
+                                </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink
+                                    className={activeTab === 'draft' ? 'active' : ''}
+                                    onClick={() => {
+                                        setActiveTab('draft');
+                                        refetchCampaigns('draft');
+                                    }}
+                                >
+                                    Draft
+                                </NavLink>
+                            </NavItem>
+                        </Nav>
+                    </div>
                     <div className="actions">
-                        <Input type="search" placeholder="Search" className="search-input me-2" />
-                        <Button
-                            color="primary"
-                            className="btn-chipped"
-                        >
+                        <Input
+                            type="search"
+                            placeholder="Search"
+                            className={`input-dark search-input me-2 ${(isSearchFocused || searchValue) ? 'search-expanded' : ''}`}
+                            onFocus={() => setIsSearchFocused(true)}
+                            onBlur={() => setIsSearchFocused(false)}
+                            value={searchValue}
+                            onChange={handleSearchChange}
+                        />
+                        <Button className="btn-chipped" onClick={toggle}>
                             CREATE CAMPAIGN
                         </Button>
                     </div>
                 </div>
 
-                <Row className="campaigns-grid">
-                    {campaigns.map((campaign) => (
-                        <Col key={campaign.id}>
-                            <Card className="campaign-card">
-                                <CardImg top src={campaign.profile_picture || '/placeholder-campaign.jpg'} alt={campaign.title} />
-                                <CardBody>
-                                    <h3>{campaign.title}</h3>
-                                    <div className="campaign-metrics">
-                                        <div className="metric-box metric-box-right-chip">
-                                            <span>Budget</span>
-                                            <strong>$0k/0k</strong>
-                                            {/* <Progress
-                                                value={0}
-                                                className="campaign-progress"
-                                                style={{ height: '1px' }}
-                                            /> */}
+                {loading ? (
+                    <Row className="campaigns-grid">
+                        {[1, 2, 3].map((i) => (
+                            <CampaignSkeleton key={i} />
+                        ))}
+                    </Row>
+                ) : campaigns && campaigns.length > 0 ? (
+                    <Row className="campaigns-grid">
+                        {campaigns.map((campaign) => (
+                            <Col key={campaign.id}>
+                                <Card 
+                                    className={`campaign-card ${campaign.status === 'draft' ? 'cursor-pointer' : ''}`}
+                                    onClick={() => handleCampaignClick(campaign)}
+                                    style={{ cursor: campaign.status === 'draft' ? 'pointer' : 'default' }}
+                                >
+                                    {
+                                        campaign.profile_picture && (
+                                            <CardImg top src={campaign.profile_picture || '/placeholder-campaign.jpg'} alt={campaign.title} />
+                                        )
+                                    }
+                                    <CardBody>
+                                        <h3>{campaign.title}</h3>
+                                        <div className="campaign-metrics">
+                                            <div className="metric-box metric-box-right-chip">
+                                                <span>Budget</span>
+                                                <strong className="d-flex align-items-center">
+                                                    <span className="m-0 metric-primary-value">
+                                                        {formatNumber(campaign.analytics.total_payments)}
+                                                    </span>
+                                                    /{formatNumber(campaign.total_budget)}
+                                                </strong>
+                                                <Progress
+                                                    value={Math.min(campaign.analytics.budget_percentage, 100)}
+                                                    style={{
+                                                        height: '2px',
+                                                        backgroundColor: '#E5E5E5',
+                                                        borderRadius: 0
+                                                    }}
+                                                    className="metric-progress"
+                                                    barStyle={{
+                                                        background: 'linear-gradient(90deg, #00E7FF 0%, #003FDD 100%)'
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="metric-box metric-box-left-chip">
+                                                <span>Views</span>
+                                                <strong className="d-flex align-items-center">
+                                                    <span className="m-0 metric-primary-value">
+                                                        {formatNumber(campaign.analytics.total_views)}
+                                                    </span>
+                                                    /{formatNumber(campaign.targeted_amount_of_views)}
+                                                </strong>
+                                                <Progress
+                                                    value={Math.min(campaign.analytics.views_percentage, 100)}
+                                                    style={{
+                                                        height: '2px',
+                                                        backgroundColor: '#E5E5E5',
+                                                        borderRadius: 0
+                                                    }}
+                                                    className="metric-progress"
+                                                    barStyle={{
+                                                        background: 'linear-gradient(90deg, #00E7FF 0%, #003FDD 100%)'
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="metric-box metric-box-left-chip">
-                                            <span>Views</span>
-                                            <strong className="d-flex align-items-center">
-                                                <span className="m-0" style={{ fontSize: '16px' }}>
-                                                    {formatNumber(campaign.analytics.total_views)}
-                                                </span>
-                                                /{formatNumber(campaign.targeted_amount_of_views)}
-                                            </strong>
-                                            <Progress
-                                                value={Math.min(campaign.analytics.views_percentage, 100)}
-                                                style={{
-                                                    height: '2px',
-                                                    backgroundColor: '#E5E5E5',
-                                                    borderRadius: 0
-                                                }}
-                                                className="metric-progress"
-                                            />
-                                        </div>
-                                    </div>
-                                </CardBody>
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
+                                    </CardBody>
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
+                ) : (
+                    <div className="empty-campaigns">
+                        <div className="empty-campaigns__content">
+                            <h2>No campaigns found</h2>
+                            <p>There are no campaigns in this status yet</p>
+                            <Button
+                                className="btn-chipped"
+                                onClick={toggle}
+                            >
+                                CREATE CAMPAIGN
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
+
+            <CreateCampaignModal modal={modal} toggle={toggle} />
         </Container>
     );
 };

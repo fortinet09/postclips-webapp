@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Button } from 'reactstrap';
+import CreateCampaignModal from './CreateCampaignModal';
 
 interface EmptyCampaignsProps {}
 
 const EmptyCampaigns: React.FC<EmptyCampaignsProps> = () => {
+    const [modal, setModal] = useState(false);
+    const toggle = () => setModal(!modal);
+
     return (
         <Container fluid className="empty-campaigns">
             <div className="empty-campaigns__content">
@@ -12,10 +16,12 @@ const EmptyCampaigns: React.FC<EmptyCampaignsProps> = () => {
                 <Button
                     color="primary"
                     className="btn-chipped"
+                    onClick={toggle}
                 >
                     CREATE CAMPAIGN
                 </Button>
             </div>
+            <CreateCampaignModal modal={modal} toggle={toggle} />
         </Container>
     );
 };

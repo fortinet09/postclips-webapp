@@ -19,9 +19,6 @@ export type ApiResponse<T = any> = {
 const apiClient = axios.create({
   baseURL: process.env.BACKEND_URL, // Use backend URL (DO NOT expose in NEXT_PUBLIC)
   timeout: 60000, // Increased from 10000 to 30000 (30 seconds)
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 /**
@@ -42,13 +39,15 @@ export const fetchAPI = async <T = any>(
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value;
 
-    console.log("fetchAPI", { token, method, url, data, config });
-
-    // Attach Authorization header
-    const headers = {
-      ...config?.headers,
+    // Prepare headers
+    const headers: Record<string, string> = {
       Authorization: `Bearer ${token}`,
     };
+
+    // Only set Content-Type if not FormData
+    if (!(data instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     // Make API request
     const response = await apiClient({
@@ -56,7 +55,10 @@ export const fetchAPI = async <T = any>(
       url,
       data,
       ...config,
-      headers,
+      headers: {
+        ...headers,
+        ...config?.headers,
+      },
     });
 
     if (response.status === 200) {
@@ -75,7 +77,7 @@ export const fetchAPI = async <T = any>(
       error: "Could not fetch data",
     };
   } catch (error: any) {
-    console.error("API Request Error:", error.response?.data || error.message);
+    console.log("API error", { error });
     if (error.message === "UNAUTHORIZED" || error.error === "Unauthorized") {
       redirect("/login");
     }

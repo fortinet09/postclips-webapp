@@ -69,7 +69,7 @@ export const PostClipsMenuListBrand: MenuItem[] | undefined = [
         path: "/brand/settings",
         icon: "settings",
         type: "link",
-        title: "Settings",
+        title: "Account & Settings",
         id: 4,
       },
     ],

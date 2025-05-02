@@ -16,26 +16,40 @@ import TodoSlice from "./Reducers/TodoSlice";
 
 // Postclips
 import HeaderSlice from "./Reducers/(postclips)/auth/HeaderSlice";
+import SidebarSlice from "./Reducers/(postclips)/auth/SidebarSlice";
 
-const Store = configureStore({
-  reducer: {
-    layout: LayoutSlice,
-    headerBookMark: HeaderBookmarkSlice,
-    letterbox: LetterBoxSlice,
-    fileManager: FileManagerSlice,
-    chat: ChatSlice,
-    project: ProjectSlice,
-    bookmark: BookmarkSlice,
-    contact: ContactSlice,
-    todos: TodoSlice,
-    tasks: TasksSlice,
-    product: ProductReducer,
-    filter: FilterReducer,
-    searchResult: SearchResultSlice,
-    themeCustomizer: ThemeCustomizerSlice,
-    header: HeaderSlice,
-  },
-});
+const reducer = {
+  layout: LayoutSlice,
+  headerBookMark: HeaderBookmarkSlice,
+  letterbox: LetterBoxSlice,
+  fileManager: FileManagerSlice,
+  chat: ChatSlice,
+  project: ProjectSlice,
+  bookmark: BookmarkSlice,
+  contact: ContactSlice,
+  todos: TodoSlice,
+  tasks: TasksSlice,
+  product: ProductReducer,
+  filter: FilterReducer,
+  searchResult: SearchResultSlice,
+  themeCustomizer: ThemeCustomizerSlice,
+  header: HeaderSlice,
+  sidebar: SidebarSlice,
+};
+
+// Create store with hydration handling
+function makeStore() {
+  return configureStore({
+    reducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: false,
+      }),
+  });
+}
+
+// Create store instance
+const Store = makeStore();
 
 export default Store;
 

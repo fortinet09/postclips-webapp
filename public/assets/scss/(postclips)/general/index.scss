@@ -16,7 +16,12 @@ body {
 }
 
 // Typography
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
   font-weight: 700;
 }
@@ -28,14 +33,15 @@ p {
 a {
   color: inherit;
   text-decoration: none;
-  
+
   &:hover {
     text-decoration: none;
   }
 }
 
 // Form elements
-input, button {
+input,
+button {
   font-family: inherit;
 }
 
@@ -49,6 +55,8 @@ input, button {
   border-radius: 4px;
   color: white;
   font-size: 15px;
+  font-family: 'Lexend', 'Lexend Fallback';
+  font-style: normal;
 
   &::placeholder {
     color: rgba(255, 255, 255, 0.4);
@@ -74,15 +82,13 @@ input, button {
   font-size: 15px;
   padding: 0 24px;
   cursor: pointer;
-  transition: opacity 0.2s;
-  clip-path: polygon(
-    8px 0,
-    100% 0,
-    100% calc(100% - 8px),
-    calc(100% - 8px) 100%,
-    0 100%,
-    0 8px
-  );
+  transition: all 0.2s ease;
+  clip-path: polygon(8px 0,
+      100% 0,
+      100% calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      0 100%,
+      0 8px);
 
   &:hover {
     opacity: 0.9;
@@ -91,6 +97,24 @@ input, button {
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  // White variant
+  &.btn-chipped-white {
+    background: white !important;
+    color: black !important;
+    font-weight: 600 !important;
+  }
+
+  // Gray variant
+  &.btn-chipped-gray {
+    background: rgba(255, 255, 255, 0.16) !important;
+    color: white !important;
+    font-weight: 500 !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2) !important;
+    }
   }
 }
 
@@ -118,20 +142,20 @@ input, button {
   width: 100%;
   margin: 0 auto;
   padding: 0 24px;
-  
+
   @media (min-width: 640px) {
     max-width: 640px;
     padding: 0 32px;
   }
-  
+
   @media (min-width: 768px) {
     max-width: 768px;
   }
-  
+
   @media (min-width: 1024px) {
     max-width: 1024px;
   }
-  
+
   @media (min-width: 1280px) {
     max-width: 1280px;
   }
@@ -149,7 +173,7 @@ input, button {
   font-size: 15px;
   transition: all 0.2s ease;
   cursor: pointer;
-  
+
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
@@ -187,11 +211,11 @@ input, button {
 // Form elements
 .form-input {
   @apply bg-gray-800 border-gray-700 text-white rounded-lg py-3 px-4 w-full;
-  
+
   &:focus {
     @apply border-blue-500 ring-1 ring-blue-500 outline-none;
   }
-  
+
   &::placeholder {
     @apply text-gray-400;
   }
@@ -235,11 +259,11 @@ input, button {
 // Dark mode support
 .dark {
   @apply bg-gray-900 text-white;
-  
+
   .card {
     @apply bg-gray-800;
   }
-  
+
   .border-base {
     @apply border-gray-700;
   }

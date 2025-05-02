@@ -8,7 +8,7 @@ import { LogOut } from "react-feather";
 import { useRouter } from "next/navigation";
 
 const UserProfile = () => {
-  const { user, selectedRole } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   const handleLogout = () => {

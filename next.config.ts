@@ -8,7 +8,12 @@ const nextConfig: NextConfig = {
       "sb.postclips.com"
     ],
   },
-  reactStrictMode: false
+  reactStrictMode: false,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb'
+    }
+  }
 };
 
 export default nextConfig;

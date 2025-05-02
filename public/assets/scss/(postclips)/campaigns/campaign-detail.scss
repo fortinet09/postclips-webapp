@@ -1,0 +1,63 @@
+// Mobile preview drawer
+.preview-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1A1A1A;
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+
+    &.open {
+        transform: translateY(0);
+    }
+}
+
+.preview-toggle-button {
+    position: fixed;
+    width: 30%;
+    top: 70px;
+    right: -10px;
+    z-index: 999;
+    display: none;
+}
+
+// Hide preview container on mobile and show toggle button
+@media (max-width: 767px) {
+    .preview-container {
+        display: none;
+    }
+
+    .preview-toggle-button {
+        display: block;
+    }
+
+    .preview-drawer {
+        padding: 20px;
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+
+            h3 {
+                margin: 0;
+            }
+
+            .close-button {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+            }
+        }
+    }
+}

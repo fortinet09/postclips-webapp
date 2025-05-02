@@ -6,6 +6,10 @@ import { Brand } from "@/Types/(postclips)/Brand";
 import { toast } from "react-toastify";
 import { handleApiError } from "@/Clients/postclips/server/errorHandler";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/Redux/Store";
+import { setSelectedRole } from "@/Redux/Reducers/(postclips)/auth/SidebarSlice";
+import { initializeSidebar } from "@/Redux/Reducers/(postclips)/auth/SidebarSlice";
 
 interface AuthContextProps {
   user: UserMetadata | null;
@@ -13,7 +17,6 @@ interface AuthContextProps {
   loading: boolean;
   initialized: boolean;
   errorOtp: string | null;
-  selectedRole: string | null;
   userRoles: string[];
   config: {
     direct_clips_posting: boolean;
@@ -54,7 +57,6 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
   initialized: false,
   errorOtp: null,
-  selectedRole: null,
   userRoles: [],
   config: null,
   signIn: async () => { },
@@ -70,11 +72,11 @@ export const SessionProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const hasInitialized = useRef(false);
   const [errorOtp, setErrorOtp] = useState<string | null>(null);
   const [user, setUser] = useState<UserMetadata | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [config, setConfig] = useState<{
     direct_clips_posting: boolean;
@@ -85,21 +87,21 @@ export const SessionProvider = ({
   const [initialized, setInitialized] = useState(false);
   const router = useRouter();
 
-  const fetchUserConfig = async (authToken: string) => {
-    try {
-      const result = await fetchAPI("GET", "/config", undefined, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+  // const fetchUserConfig = async (authToken: string) => {
+  //   try {
+  //     const result = await fetchAPI("GET", "/config", undefined, {
+  //       headers: {
+  //         Authorization: `Bearer ${authToken}`,
+  //       },
+  //     });
 
-      if (result.success && result.data) {
-        setConfig(result.data);
-      }
-    } catch (error) {
-      handleApiError(error);
-    }
-  };
+  //     if (result.success && result.data) {
+  //       setConfig(result.data);
+  //     }
+  //   } catch (error) {
+  //     handleApiError(error);
+  //   }
+  // };
 
   const refreshUser = async () => {
     try {
@@ -109,7 +111,7 @@ export const SessionProvider = ({
       if (result.success && result.data) {
         const { user: userData } = result.data;
         setUser(userData);
-        await fetchUserConfig(token!);
+        // await fetchUserConfig(token!);
         return true;
       } else {
         handleApiError(result.error);
@@ -141,24 +143,25 @@ export const SessionProvider = ({
         .find((row) => row.startsWith("user_data="))
         ?.split("=")[1];
 
+      if (!isMounted) return;
+
       setToken(storedToken || null);
       const userData = storedUserData ? JSON.parse(decodeURIComponent(storedUserData)) : null;
       setUser(userData);
 
       if (storedToken) {
         try {
-          // Fetch user roles
+          dispatch(initializeSidebar());
           const { data: rolesData, error: rolesError } = await fetchAPI("GET", "/auth/roles");
+          if (!isMounted) return;
+          
           if (rolesError) {
             handleApiError(rolesError);
-          } else if (rolesData?.roles) {
+          } else if (rolesData?.roles?.length > 0) {
             setUserRoles(rolesData.roles);
-            // Set the primary role (assuming the first role is the primary one)
-            if (rolesData.roles.length > 0) {
-              setSelectedRole(rolesData.roles[0]);
-            }
+            dispatch(setSelectedRole(rolesData.roles[0]));
           }
-          await fetchUserConfig(storedToken);
+          // await fetchUserConfig(storedToken);
         } catch (error) {
           handleApiError(error);
         }
@@ -175,7 +178,7 @@ export const SessionProvider = ({
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [dispatch]);
 
   const signIn = async (email: string) => {
     setLoading(true);
@@ -186,12 +189,12 @@ export const SessionProvider = ({
 
       if (result.success && result.data) {
         const { token: newToken, user: userData } = result.data;
-        
+
         document.cookie = `auth_token=${newToken}; path=/; max-age=2592000`;
         document.cookie = `user_data=${JSON.stringify(userData)}; path=/; max-age=2592000`;
         setToken(newToken);
         setUser(userData);
-        
+
         toast.success("OTP sent successfully!");
         return { email, showVerification: true };
       } else {
@@ -220,7 +223,7 @@ export const SessionProvider = ({
         document.cookie = `user_data=${JSON.stringify(userData)}; path=/; max-age=2592000`;
         setToken(newToken);
         setUser(userData);
-        await fetchUserConfig(newToken);
+        // await fetchUserConfig(newToken);
 
         // Fetch user roles after successful verification
         const { data: rolesData, error: rolesError } = await fetchAPI("GET", "/auth/roles");
@@ -228,10 +231,9 @@ export const SessionProvider = ({
           handleApiError(rolesError);
         } else if (rolesData?.roles) {
           setUserRoles(rolesData.roles);
-          // Set the primary role (assuming the first role is the primary one)
           if (rolesData.roles.length > 0) {
             const primaryRole = rolesData.roles[0];
-            setSelectedRole(primaryRole);
+            dispatch(setSelectedRole(primaryRole));
             console.log("OTP Verified roles", rolesData.roles, "primary role", primaryRole);
 
             // Check user role and redirect accordingly
@@ -289,7 +291,6 @@ export const SessionProvider = ({
         loading,
         initialized,
         errorOtp,
-        selectedRole,
         userRoles,
         config,
         signIn,

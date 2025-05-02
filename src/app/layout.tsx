@@ -4,7 +4,6 @@ import "../../src/index.scss";
 import { Lexend, Roboto } from "next/font/google";
 import { detectLanguage } from "./i18n/server";
 import { I18nProvider } from "./i18n/i18n-context";
-import { SessionProvider } from "@/Providers/SessionProvider";
 
 const lexend = Lexend({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -57,11 +56,11 @@ export default async function RootLayout({
           suppressHydrationWarning={true}
           className={`${lexend.className || roboto.className} dark-only`}
         >
-          <NoSsr>
-            <SessionProvider >
-                <MainProvider>{children}</MainProvider>
-            </SessionProvider>
-          </NoSsr>
+          {/* <NoSsr> */}
+            <MainProvider>
+              <div id="app-root">{children}</div>
+            </MainProvider>
+          {/* </NoSsr> */}
         </body>
       </html>
     </I18nProvider>
