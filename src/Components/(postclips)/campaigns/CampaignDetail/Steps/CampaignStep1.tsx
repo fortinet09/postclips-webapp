@@ -2,38 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Form, FormGroup, Label, Input, Button, Row, Col, Container } from 'reactstrap';
 import { useCampaigns, PreviewImage, ExampleClip } from '@/Hooks/useCampaigns';
 import { toast } from 'react-toastify';
+import { Campaign } from '@/Types/(postclips)/Campaign';
 
 interface CampaignStep1Props {
-    campaign: {
-        id: string;
-        title: string;
-        description: string;
-        profile_picture: string | null;
-        targeted_social_networks: string[];
-        end_date: string | null;
-        targeted_amount_of_views: number;
-        amount_cpm_payout: number;
-        status: string;
-        rules: string[];
-        brand_message: string | null;
-        total_budget: number;
-        preview_images: {
-            id: string;
-            image_url: string;
-            created_at: string;
-            campaign_id: string;
-        }[];
-        example_clips: {
-            id: string;
-            clip_url: string;
-            created_at: string;
-            campaign_id: string;
-        }[];
-    };
+    campaign: Campaign;
+    handleSaveDraft: () => void;
     onNextStep: () => void;
 }
 
-const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) => {
+const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft, onNextStep }) => {
     const [images, setImages] = useState<File[]>([]);
     const [previewImages, setPreviewImages] = useState<PreviewImage[]>(
         campaign.preview_images.map(img => ({
@@ -58,7 +35,14 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
         brand_message: campaign.brand_message,
         targeted_amount_of_views: campaign.targeted_amount_of_views || '',
         amount_cpm_payout: campaign.amount_cpm_payout || '',
-        total_budget: campaign.total_budget || ''
+        total_budget: campaign.total_budget || '',
+        start_date: campaign.start_date || '',
+        end_date: campaign.end_date || ''
+    });
+    const [rawValues, setRawValues] = useState({
+        targeted_amount_of_views: campaign.targeted_amount_of_views?.toString() || '',
+        amount_cpm_payout: campaign.amount_cpm_payout?.toString() || '',
+        total_budget: campaign.total_budget?.toString() || ''
     });
 
     const { updateCampaignDraft, uploadPreviewImage, deletePreviewImage, uploadExampleClip, deleteExampleClip } = useCampaigns();
@@ -70,47 +54,57 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
     const formatNumberWithCommas = (value: number | string) => {
         if (value === '') return '';
         const num = typeof value === 'string' ? parseFloat(value) : value;
-        return num.toLocaleString();
+        if (isNaN(num)) return value;
+        return num.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
     };
 
     const handleFormChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const value = e.target.value;
-        const cleanValue = value.replace(/,/g, '');
-        setFormData(prev => ({
-            ...prev,
-            [field]: cleanValue
-        }));
-    };
 
-    const handleSaveDraft = async () => {
-        try {
-            const dataToSave = {
-                ...formData,
-                targeted_amount_of_views: formData.targeted_amount_of_views === '' ? 0 : parseFloat(formData.targeted_amount_of_views as string),
-                amount_cpm_payout: formData.amount_cpm_payout === '' ? 0 : parseFloat(formData.amount_cpm_payout as string),
-                total_budget: formData.total_budget === '' ? 0 : parseFloat(formData.total_budget as string)
-            };
-            await updateCampaignDraft(campaign.id, dataToSave);
-            toast.success('Draft saved successfully');
-        } catch (error) {
-            toast.error('Error saving campaign draft');
+        // Handle number fields
+        if (['targeted_amount_of_views', 'amount_cpm_payout', 'total_budget'].includes(field)) {
+            // Remove all non-numeric characters except decimal point
+            const cleanValue = value.replace(/[^\d.]/g, '');
+            // Ensure only one decimal point
+            const parts = cleanValue.split('.');
+            const formattedValue = parts.length > 1 ? `${parts[0]}.${parts[1]}` : parts[0];
+
+            setRawValues(prev => ({
+                ...prev,
+                [field]: formattedValue
+            }));
+
+            setFormData(prev => ({
+                ...prev,
+                [field]: formattedValue
+            }));
+        } else {
+            // Handle text fields
+            setFormData(prev => ({
+                ...prev,
+                [field]: value
+            }));
         }
     };
 
-    const handleNextStep = async () => {
-        try {
-            const dataToSave = {
-                ...formData,
-                targeted_amount_of_views: formData.targeted_amount_of_views === '' ? 0 : parseFloat(formData.targeted_amount_of_views as string),
-                amount_cpm_payout: formData.amount_cpm_payout === '' ? 0 : parseFloat(formData.amount_cpm_payout as string),
-                total_budget: formData.total_budget === '' ? 0 : parseFloat(formData.total_budget as string)
-            };
-            const response = await updateCampaignDraft(campaign.id, dataToSave);
-            if (response.success) {
-                onNextStep();
-            }
-        } catch (error) {
-            toast.error('Error saving campaign draft');
+    const handleDateChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (value) {
+            // Format the date to match the database format
+            const formattedDate = `${value}T00:00:00+00:00`;
+
+            setFormData(prev => ({
+                ...prev,
+                [field]: formattedDate
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [field]: ''
+            }));
         }
     };
 
@@ -220,7 +214,7 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
             if (previewImages.length <= 1) return;
 
             const interval = setInterval(() => {
-                setCurrentImageIndex((prevIndex) => 
+                setCurrentImageIndex((prevIndex) =>
                     prevIndex === previewImages.length - 1 ? 0 : prevIndex + 1
                 );
             }, 5000);
@@ -401,32 +395,17 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
 
                     <Form>
                         <div className="preview-images mb-4">
-                            <Label className="text-white d-flex align-items-center gap-2">
+                            <Label className="campaign-label d-flex align-items-center gap-2">
                                 Preview image
-                                <span>(i)</span>
                             </Label>
                             <p className="mb-3">
                                 You can upload up to 3 images, which will be displayed randomly to clippers to increase engagement
                             </p>
-                            <div className="d-flex gap-3">
+                            <div className="media-upload-grid">
                                 {[0, 1, 2].map((index) => (
                                     <div
                                         key={index}
                                         className="upload-box"
-                                        style={{
-                                            width: '200px',
-                                            height: '300px',
-                                            background: '#1A1A1A',
-                                            border: '1px dashed rgba(255, 255, 255, 0.1)',
-                                            borderRadius: '8px',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            cursor: uploadingImageIndex === index ? 'wait' : 'pointer',
-                                            position: 'relative',
-                                            overflow: 'hidden'
-                                        }}
                                     >
                                         {uploadingImageIndex === index ? (
                                             <div className="uploading-indicator">
@@ -512,7 +491,7 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
                         </div>
 
                         <FormGroup className="mb-4">
-                            <Label for="title" className="text-white">Title</Label>
+                            <Label for="title" className="campaign-label">Title</Label>
                             <Input
                                 type="text"
                                 name="title"
@@ -524,14 +503,14 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
                         </FormGroup>
 
                         <FormGroup className="mb-4">
-                            <Label for="description" className="text-white">
+                            <Label for="description" className="campaign-label">
                                 Description <span>(optional)</span>
                             </Label>
                             <Input
                                 type="textarea"
                                 name="description"
                                 id="description"
-                                className="input-dark"
+                                className="input-text-area-dark"
                                 rows={4}
                                 value={formData.description}
                                 onChange={handleFormChange('description')}
@@ -539,66 +518,76 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
                         </FormGroup>
 
                         <FormGroup className="mb-4">
-                            <Label for="targetedViews" className="text-white">Targeted Views</Label>
+                            <Label for="targetedViews" className="campaign-label">Targeted Views</Label>
                             <Input
                                 type="text"
                                 name="targetedViews"
                                 id="targetedViews"
                                 className="input-dark"
-                                value={formatNumberWithCommas(formData.targeted_amount_of_views)}
+                                value={rawValues.targeted_amount_of_views}
                                 onChange={handleFormChange('targeted_amount_of_views')}
                                 placeholder="Enter targeted views"
                             />
                         </FormGroup>
 
                         <FormGroup className="mb-4">
-                            <Label for="cpmPayout" className="text-white">CPM Payout</Label>
+                            <Label for="cpmPayout" className="campaign-label">CPM Payout</Label>
                             <Input
                                 type="text"
                                 name="cpmPayout"
                                 id="cpmPayout"
                                 className="input-dark"
-                                value={formatNumberWithCommas(formData.amount_cpm_payout)}
+                                value={rawValues.amount_cpm_payout}
                                 onChange={handleFormChange('amount_cpm_payout')}
                                 placeholder="Enter CPM payout"
                             />
                         </FormGroup>
 
                         <FormGroup className="mb-4">
-                            <Label for="totalBudget" className="text-white">Total Budget</Label>
+                            <Label for="totalBudget" className="campaign-label">Total Budget</Label>
                             <Input
                                 type="text"
                                 name="totalBudget"
                                 id="totalBudget"
                                 className="input-dark"
-                                value={formatNumberWithCommas(formData.total_budget)}
+                                value={rawValues.total_budget}
                                 onChange={handleFormChange('total_budget')}
                                 placeholder="Enter total budget"
                             />
                         </FormGroup>
 
                         <FormGroup className="mb-4">
-                            <Label className="text-white">Example clips</Label>
+                            <Label for="startDate" className="campaign-label">Start Date</Label>
+                            <Input
+                                type="date"
+                                name="startDate"
+                                id="startDate"
+                                className="input-dark date-picker"
+                                value={formData.start_date ? formData.start_date.split('T')[0] : ''}
+                                onChange={handleDateChange('start_date')}
+                            />
+                        </FormGroup>
+
+                        <FormGroup className="mb-4">
+                            <Label for="endDate" className="campaign-label">End Date</Label>
+                            <Input
+                                type="date"
+                                name="endDate"
+                                id="endDate"
+                                className="input-dark date-picker"
+                                value={formData.end_date ? formData.end_date.split('T')[0] : ''}
+                                onChange={handleDateChange('end_date')}
+                            />
+                        </FormGroup>
+
+                        <FormGroup className="mb-4">
+                            <Label className="campaign-label">Example clips</Label>
                             <p className="mb-3">Provide video references to help clippers</p>
-                            <div className="d-flex gap-3">
+                            <div className="media-upload-grid">
                                 {[0, 1, 2].map((index) => (
                                     <div
                                         key={index}
                                         className="upload-box"
-                                        style={{
-                                            width: '200px',
-                                            height: '300px',
-                                            background: '#1A1A1A',
-                                            border: '1px dashed rgba(255, 255, 255, 0.1)',
-                                            borderRadius: '8px',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            cursor: uploadingClipIndex === index ? 'wait' : 'pointer',
-                                            position: 'relative',
-                                            overflow: 'hidden'
-                                        }}
                                     >
                                         {uploadingClipIndex === index ? (
                                             <div className="uploading-indicator">
@@ -687,23 +676,24 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
                         </FormGroup>
 
                         <FormGroup className="mb-4">
-                            <Label for="messageToClippers" className="text-white">
+                            <Label for="messageToClippers" className="campaign-label">
                                 Message to clippers <span>(optional)</span>
                             </Label>
                             <Input
                                 type="textarea"
                                 name="messageToClippers"
                                 id="messageToClippers"
-                                className="input-dark"
-                                rows={3}
-                                maxLength={40}
+                                className="input-text-area-dark"
+                                rows={6}
+                                maxLength={200}
                                 value={formData.brand_message || ''}
                                 onChange={handleFormChange('brand_message')}
                             />
                             <div className="text-end">
-                                <small>0/40</small>
+                                <small>{formData.brand_message?.length || 0}/200</small>
                             </div>
                         </FormGroup>
+
 
                         <div className="d-flex justify-content-between mt-5 mb-5">
                             <Button
@@ -722,7 +712,7 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, onNextStep }) =
                                     maxWidth: '200px',
                                     width: '100%'
                                 }}
-                                onClick={handleNextStep}
+                                onClick={() => onNextStep()}
                             >
                                 NEXT
                             </Button>

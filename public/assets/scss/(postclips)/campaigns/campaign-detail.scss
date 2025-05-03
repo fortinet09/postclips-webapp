@@ -61,3 +61,195 @@
         }
     }
 }
+
+// Form labels
+.campaign-label {
+    color: white !important;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+// Date picker styling
+.date-picker {
+    background-color: #161616 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+
+    &::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
+
+    &::-webkit-datetime-edit {
+        color: white;
+    }
+
+    &::-webkit-datetime-edit-fields-wrapper {
+        color: white;
+    }
+
+    &::-webkit-datetime-edit-text {
+        color: white;
+    }
+
+    &::-webkit-datetime-edit-month-field {
+        color: white;
+    }
+
+    &::-webkit-datetime-edit-day-field {
+        color: white;
+    }
+
+    &::-webkit-datetime-edit-year-field {
+        color: white;
+    }
+}
+
+// Media upload placeholder card
+.media-upload-placeholder {
+  background: #242424;
+  border-radius: 16px;
+  padding: 40px 24px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 0 24px rgba(0,0,0,0.2);
+  margin-bottom: 32px;
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-upload-info-banner {
+  background: #00E7FF1A;
+  color: #5FE1C5;
+  border-radius: 8px;
+  padding: 16px 24px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.media-upload-info-banner__icon {
+  font-size: 28px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-upload-info-banner__text {
+  text-align: left;
+}
+
+.media-upload-info-banner__title {
+  font-weight: 600;
+  color: #00E7FF;
+}
+
+.media-upload-info-banner__desc {
+  color: white;
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+.delete-media-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.delete-media-btn[disabled] {
+  cursor: wait;
+  opacity: 0.5;
+}
+
+.uploaded-media-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.media-upload-headline {
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.media-upload-description {
+  color: #B0B0B0;
+  font-size: 16px;
+  margin-bottom: 32px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.media-upload-dropdown .dropdown-toggle {
+  background: transparent !important;
+  color: #00E7FF !important;
+  border: none !important;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.media-upload-dropdown .dropdown-menu {
+  background: #222 !important;
+  min-width: 180px;
+}
+
+.media-upload-dropdown .dropdown-item {
+  color: #5FE1C5 !important;
+  font-weight: 600;
+}
+
+// Upload grid and box
+.media-upload-grid {
+  display: flex;
+  gap: 24px;
+}
+
+.upload-box {
+  width: 200px;
+  height: 300px;
+  background: #1A1A1A;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}

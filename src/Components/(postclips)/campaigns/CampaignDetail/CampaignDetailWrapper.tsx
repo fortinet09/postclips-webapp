@@ -5,34 +5,10 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import CampaignDetail from '@/Components/(postclips)/campaigns/CampaignDetail/CampaignDetail';
 import { useCallback } from 'react';
+import { Campaign } from '@/Types/(postclips)/Campaign';
 
 interface CampaignDetailWrapperProps {
-    campaign: {
-        id: string;
-        title: string;
-        description: string;
-        profile_picture: string | null;
-        targeted_social_networks: string[];
-        end_date: string | null;
-        targeted_amount_of_views: number;
-        amount_cpm_payout: number;
-        status: string;
-        rules: string[];
-        brand_message: string | null;
-        total_budget: number;
-        preview_images: {
-            id: string;
-            image_url: string;
-            created_at: string;
-            campaign_id: string;
-        }[];
-        example_clips: {
-            id: string;
-            clip_url: string;
-            created_at: string;
-            campaign_id: string;
-        }[];
-    };
+    campaign: Campaign
 }
 
 const CampaignDetailWrapper: React.FC<CampaignDetailWrapperProps> = ({ campaign }) => {

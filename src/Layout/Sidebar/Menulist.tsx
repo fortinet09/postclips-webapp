@@ -11,8 +11,16 @@ const Menulist: React.FC<MenuListType> = ({ menu, setActiveMenu, activeMenu, lev
   const pathname = usePathname();
   const { t } = useTranslation("common");
   const dispatch = useAppDispatch();
-  const ActiveNavLinkUrl = (path?: string) => {
-    return pathname === path;
+
+  const ActiveNavLinkUrl = (item: any) => {
+    if (!item) return false;
+    if (pathname === item.path) return true;
+    if (item.otherPaths && Array.isArray(item.otherPaths)) {
+      return item.otherPaths.some((otherPath: string) =>
+        pathname === otherPath || pathname.startsWith(otherPath + "/")
+      );
+    }
+    return false;
   };
 
   const shouldSetActive = ({ item }: SidebarItemTypes) => {
@@ -42,7 +50,7 @@ const Menulist: React.FC<MenuListType> = ({ menu, setActiveMenu, activeMenu, lev
   return (
     <>
       {menu?.map((item, index) => {
-        const isActive = ActiveNavLinkUrl(item.path);
+        const isActive = ActiveNavLinkUrl(item);
         return (
           <li key={index} className={`${level === 0 ? "sidebar-list" : ""} ${isActive ? "active" : ""}`}>
             <Link

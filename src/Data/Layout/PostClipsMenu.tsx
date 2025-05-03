@@ -46,6 +46,7 @@ export const PostClipsMenuListBrand: MenuItem[] | undefined = [
     Items: [
       {
         path: "/brand/campaigns",
+        otherPaths: ["/brand/campaigns/detail"],
         icon: "campaigns",
         type: "link",
         title: "Campaigns",

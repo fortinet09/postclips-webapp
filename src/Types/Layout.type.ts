@@ -8,6 +8,7 @@ export interface MenuItem {
     lanClass?: string;
     menucontent?: string;
     Items?: MenuItem[];
+    otherPaths?: string[];
     id?: number;
     icon?: string;
     type?: string;

@@ -69,6 +69,30 @@ button {
   }
 }
 
+// Input styles
+.input-text-area-dark {
+  width: 100%;
+  height: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0F0F0F;
+  padding: 10px;
+  border-radius: 4px;
+  color: white;
+  font-size: 15px;
+  font-family: 'Lexend', 'Lexend Fallback';
+  font-style: normal;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  &:focus {
+    border-color: rgba(255, 255, 255, 0.16);
+    outline: none;
+    box-shadow: none;
+  }
+}
+
 // Chipped button style
 .btn-chipped {
   position: relative;
