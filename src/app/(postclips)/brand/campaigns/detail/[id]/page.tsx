@@ -2,6 +2,7 @@ import React from "react";
 import { fetchAPI } from "@/Clients/postclips/server/ApiClient";
 import CampaignDetailWrapper from "@/Components/(postclips)/campaigns/CampaignDetail/CampaignDetailWrapper";
 import CampaignNotFound from "@/Components/(postclips)/campaigns/CampaignNotFound";
+import { Campaign } from "@/Types/(postclips)/Campaign";
 
 interface PageProps {
     params: {
@@ -14,33 +15,6 @@ interface CampaignResponse {
     success: boolean;
     message: string;
     data: Campaign | null;
-}
-
-interface Campaign {
-    id: string;
-    title: string;
-    description: string;
-    profile_picture: string | null;
-    targeted_social_networks: string[];
-    end_date: string | null;
-    targeted_amount_of_views: number;
-    amount_cpm_payout: number;
-    status: string;
-    rules: string[];
-    brand_message: string | null;
-    total_budget: number;
-    preview_images: {
-        id: string;
-        image_url: string;
-        created_at: string;
-        campaign_id: string;
-    }[];
-    example_clips: {
-        id: string;
-        clip_url: string;
-        created_at: string;
-        campaign_id: string;
-    }[];
 }
 
 async function getCampaign(campaignId: string): Promise<Campaign | null> {
