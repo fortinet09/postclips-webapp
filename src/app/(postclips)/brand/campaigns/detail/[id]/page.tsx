@@ -4,12 +4,12 @@ import CampaignDetailWrapper from "@/Components/(postclips)/campaigns/CampaignDe
 import CampaignNotFound from "@/Components/(postclips)/campaigns/CampaignNotFound";
 import { Campaign } from "@/Types/(postclips)/Campaign";
 
-interface PageProps {
+type PageProps = {
     params: {
         id: string;
     };
-    searchParams: { [key: string]: string | string[] | undefined };
-}
+    searchParams?: { [key: string]: string | string[] | undefined };
+};
 
 interface CampaignResponse {
     success: boolean;
