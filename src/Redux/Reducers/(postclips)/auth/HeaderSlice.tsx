@@ -10,8 +10,8 @@ type HeaderState = {
 const initialState: HeaderState = {
   currentPage: "",
   currentStep: 1,
-  totalSteps: 3, // Now 3 steps
-  steps: ["Campaign Details", "Upload Media", "Review & Publish"],
+  totalSteps: 5, // Updated to 5 steps
+  steps: ["Campaign Details", "Upload Media", "Design Accounts", "Customize Clips", "Payment & Submit"],
 };
 
 const headerSlice = createSlice({

@@ -51,6 +51,10 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft
         console.log("campaign", { campaign });
     }, [campaign]);
 
+    useEffect(() => {
+        console.log("previewImages", { previewImages });
+    }, [previewImages]);
+
     const formatNumberWithCommas = (value: number | string) => {
         if (value === '') return '';
         const num = typeof value === 'string' ? parseFloat(value) : value;

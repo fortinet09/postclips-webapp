@@ -8,6 +8,9 @@ import { useAppDispatch, useAppSelector } from "@/Redux/Hooks";
 import { setStep } from "@/Redux/Reducers/(postclips)/auth/HeaderSlice";
 import CampaignStep1 from './Steps/CampaignStep1';
 import CampaignStep2 from './Steps/CampaignStep2';
+import CampaignStep3 from './Steps/CampaignStep3';
+import CampaignStep4 from './Steps/CampaignStep4';
+import CampaignStep5 from './Steps/CampaignStep5';
 import { Campaign } from '@/Types/(postclips)/Campaign';
 
 interface CampaignDetailProps {
@@ -61,6 +64,12 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaign }) => {
                 return <CampaignStep1 campaign={campaign} handleSaveDraft={handleSaveDraft} onNextStep={() => handleStep('next')} />;
             case 2:
                 return <CampaignStep2 campaign={campaign} handleSaveDraft={handleSaveDraft} onNextStep={() => handleStep('next')} onPreviousStep={() => handleStep('previous')} />;
+            case 3:
+                return <CampaignStep3 campaign={campaign} handleSaveDraft={handleSaveDraft} onNextStep={() => handleStep('next')} onPreviousStep={() => handleStep('previous')} />;
+            case 4:
+                return <CampaignStep4 campaign={campaign} handleSaveDraft={handleSaveDraft} onNextStep={() => handleStep('next')} onPreviousStep={() => handleStep('previous')} />;
+            case 5:
+                return <CampaignStep5 campaign={campaign} handleSaveDraft={handleSaveDraft} onPreviousStep={() => handleStep('previous')} />;
             default:
                 return <CampaignStep1 campaign={campaign} handleSaveDraft={handleSaveDraft} onNextStep={() => handleStep('next')} />;
         }

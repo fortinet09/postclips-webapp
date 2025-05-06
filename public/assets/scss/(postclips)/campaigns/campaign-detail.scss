@@ -1,3 +1,8 @@
+.campaign-subtitle{
+  font-size: 1.3rem;
+  color: #FFFFFF;
+}
+
 // Mobile preview drawer
 .preview-drawer {
     position: fixed;
@@ -252,4 +257,147 @@
 .upload-icon {
   font-size: 2rem;
   margin-bottom: 8px;
+}
+
+// Media list styles for campaign content
+.media-list {
+  margin-top: 24px;
+}
+.media-list-header {
+  display: flex;
+  align-items: center;
+  padding: 0 0 16px 0;
+  color: #aaa;
+  font-weight: 500;
+  border-bottom: 1px solid #222;
+}
+.media-list-header__drag {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.media-list-header__thumb {
+  width: 180px;
+}
+.media-list-header__spacer {
+  flex: 1;
+}
+.media-list-header__season {
+  width: 120px;
+  text-align: right;
+}
+.media-list-header__actions {
+  width: 100px;
+}
+.media-list-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #222;
+
+  &.dragging {
+    background: #FFFFFF14;
+    border: 1px dashed #00e0ff;
+    cursor: grabbing;
+  }
+}
+.media-list-row__drag {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  cursor: grab;
+}
+.media-list-row__drag:active {
+  cursor: grabbing;
+}
+.media-list-row__thumb {
+  width: 180px;
+}
+.media-list-row__img {
+  width: 120px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.media-list-row__info {
+  flex: 1;
+  min-width: 0;
+}
+.media-list-row__title {
+  font-weight: 600;
+  color: #fff;
+  font-size: 18px;
+}
+.media-list-row__desc {
+  color: #aaa;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
+}
+.media-list-row__season {
+  width: 120px;
+  text-align: right;
+  color: #aaa;
+}
+.media-list-row__actions {
+  width: 100px;
+  display: flex;
+  gap: 5px;
+  justify-content: flex-end;
+}
+.media-list-add {
+  margin-top: 32px;
+  text-align: left;
+}
+.add-video-btn {
+  color: #00e0ff !important;
+  font-weight: 700;
+  background: none !important;
+  border: none !important;
+  font-size: 20px !important;
+}
+.add-video-btn__arrow {
+  font-size: 18px;
+}
+.campaign-content-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.icon-btn {
+  background: #FFFFFF14;
+  width: 36px;
+  height: 36px;
+  border-radius: 99px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background 0.2s;
+  padding: 0;
+  cursor: pointer;
+}
+.icon-btn svg {
+  color: #fff;
+  stroke: #fff;
+}
+.icon-btn:hover {
+  background: #00e0ff33;
+}
+
+// Add a grab cursor to indicate draggable items
+.media-list-row {
+  cursor: grab;
+  
+  &:active {
+    cursor: grabbing;
+  }
 }

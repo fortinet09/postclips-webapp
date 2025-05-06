@@ -84,6 +84,18 @@ export interface MediaResponse {
   url: string;
 }
 
+export interface CampaignContent {
+  id: string;
+  title: string;
+  description?: string;
+  content_type: string;
+  content_url: string;
+  thumbnail_url?: string;
+  season?: string;
+  duration?: number;
+  created_at: string;
+}
+
 export const useCampaigns = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [topCampaigns, setTopCampaigns] = useState<Campaign[]>([]);
@@ -347,9 +359,9 @@ export const useCampaigns = () => {
 
   const uploadMedia = useCallback(async (campaignId: string, file: File): Promise<ApiResponse<{ data: MediaResponse }>> => {
     try {
-      // Check file size (15MB limit)
-      if (file.size > 15 * 1024 * 1024) {
-        toast.error('Media file size must be less than 15MB');
+      // Check file size (50MB limit)
+      if (file.size > 50 * 1024 * 1024) {
+        toast.error('Media file size must be less than 50MB');
         return {
           success: false,
           error: 'File size exceeds limit'
@@ -409,6 +421,272 @@ export const useCampaigns = () => {
     }
   }, []);
 
+  const uploadCampaignContent = useCallback(async (campaignId: string, data: {
+    title: string;
+    description?: string;
+    content_type: string;
+    content_url?: string;
+    file?: File;
+    thumbnail_url?: string;
+    season?: string;
+  }): Promise<ApiResponse<{ data: CampaignContent }>> => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      
+      if (data.file) {
+        // Check file size (50MB limit)
+        if (data.file.size > 50 * 1024 * 1024) {
+          toast.error('Media file size must be less than 50MB');
+          return {
+            success: false,
+            error: 'File size exceeds limit'
+          };
+        }
+        formData.append('media', data.file);
+      }
+
+      // Add other data as JSON string
+      formData.append('data', JSON.stringify({
+        title: data.title,
+        description: data.description,
+        content_type: data.content_type,
+        content_url: data.content_url,
+        thumbnail_url: data.thumbnail_url,
+        season: data.season
+      }));
+
+      const response = await fetchAPI("POST", `/campaigns/${campaignId}/content`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.success) {
+        toast.success('Content uploaded successfully!');
+      } else {
+        const errorMessage = handleApiError(response.error);
+        toast.error(errorMessage);
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteCampaignContent = useCallback(async (contentId: string): Promise<ApiResponse> => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("DELETE", `/campaigns/content/${contentId}`);
+
+      if (response.success) {
+        toast.success('Content deleted successfully!');
+      } else {
+        const errorMessage = handleApiError(response.error);
+        toast.error(errorMessage);
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchCampaignContent = useCallback(async (campaignId: string): Promise<CampaignContent[]> => {
+    try {
+      const response = await fetchAPI('GET', `/campaigns/${campaignId}/content`);
+      if (response.success && response.data?.data) {
+        return response.data.data;
+      }
+      return [];
+    } catch (err) {
+      return [];
+    }
+  }, []);
+
+  const reorderCampaignContent = useCallback(async (campaignId: string, contentIds: string[]): Promise<ApiResponse> => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("POST", `/campaigns/${campaignId}/content/reorder`, {
+        contentIds
+      });
+
+      if (response.success) {
+        toast.success('Content reordered successfully!');
+      } else {
+        const errorMessage = handleApiError(response.error);
+        toast.error(errorMessage);
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Brand Account Usernames
+  const getBrandAccountUsernames = useCallback(async (brandId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("GET", `/campaigns/brand/${brandId}/account-usernames`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addBrandAccountUsername = useCallback(async (brandId: string, username: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("POST", `/campaigns/brand/${brandId}/account-usernames`, { username });
+      if (response.success) {
+        toast.success('Username added!');
+      } else {
+        toast.error('Failed to add username');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteBrandAccountUsername = useCallback(async (brandId: string, username: string): Promise<ApiResponse> => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("DELETE", `/campaigns/brand/${brandId}/account-usernames`, { username });
+      if (response.success) {
+        toast.success('Username deleted successfully');
+      } else {
+        toast.error('Failed to delete username');
+      }
+      return response;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Brand Account Bios
+  const getBrandAccountBios = useCallback(async (brandId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("GET", `/campaigns/brand/${brandId}/account-bios`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const setBrandAccountBios = useCallback(async (brandId: string, biosData: any) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("POST", `/campaigns/brand/${brandId}/account-bios`, biosData);
+      if (response.success) {
+        toast.success('Bios updated!');
+      } else {
+        toast.error('Failed to update bios');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Brand Account Pictures
+  const getBrandAccountPictures = useCallback(async (brandId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("GET", `/campaigns/brand/${brandId}/account-pictures`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addBrandAccountPicture = useCallback(async (brandId: string, file: File) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('picture', file);
+      const response = await fetchAPI("POST", `/campaigns/brand/${brandId}/account-pictures`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (response.success) {
+        toast.success('Profile picture uploaded!');
+      } else {
+        toast.error('Failed to upload picture');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteBrandAccountPicture = useCallback(async (brandId: string, pictureId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("DELETE", `/campaigns/brand/${brandId}/account-pictures/${pictureId}`);
+      if (response.success) {
+        toast.success('Profile picture deleted!');
+      } else {
+        toast.error('Failed to delete picture');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCampaigns('active', null);
 
@@ -434,6 +712,18 @@ export const useCampaigns = () => {
     uploadExampleClip,
     deleteExampleClip,
     uploadMedia,
-    deleteMedia
+    deleteMedia,
+    uploadCampaignContent,
+    deleteCampaignContent,
+    fetchCampaignContent,
+    reorderCampaignContent,
+    getBrandAccountUsernames,
+    addBrandAccountUsername,
+    deleteBrandAccountUsername,
+    getBrandAccountBios,
+    setBrandAccountBios,
+    getBrandAccountPictures,
+    addBrandAccountPicture,
+    deleteBrandAccountPicture,
   };
 };

@@ -41,7 +41,7 @@ async function verifyPermissions(campaignId: string): Promise<boolean> {
 }
 
 export default async function CampaignDetailPage({ params }: PageProps) {
-    const { id } = params;
+    const { id } = await params;
 
     // Validate campaign ID
     if (!id || typeof id !== 'string') {

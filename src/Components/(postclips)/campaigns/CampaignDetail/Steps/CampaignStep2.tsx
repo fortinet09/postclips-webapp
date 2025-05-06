@@ -1,9 +1,28 @@
-import React, { useState } from 'react';
-import { Container, Form, FormGroup, Label, Input, Button, Row, Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import { useCampaigns, MediaResponse } from '@/Hooks/useCampaigns';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Container, Form, FormGroup, Label, Input, Button, Row, Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Spinner } from 'reactstrap';
+import { useCampaigns, CampaignContent } from '@/Hooks/useCampaigns';
 import { toast } from 'react-toastify';
 import { Campaign } from '@/Types/(postclips)/Campaign';
 import Image from 'next/image';
+import AddCampaignContentModal from '../Content/AddCampaignContentModal';
+import { Edit2, Trash2, Move } from 'react-feather';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface CampaignStep2Props {
     campaign: Campaign;
@@ -12,68 +31,189 @@ interface CampaignStep2Props {
     onPreviousStep: () => void;
 }
 
-const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft, onNextStep, onPreviousStep }) => {
-    const [mediaFiles, setMediaFiles] = useState<File[]>([]);
-    const [uploadingMediaIndex, setUploadingMediaIndex] = useState<number | null>(null);
-    const [deletingMediaId, setDeletingMediaId] = useState<string | null>(null);
-    const [uploadedMedia, setUploadedMedia] = useState<MediaResponse[]>([]);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+interface SortableItemProps {
+    id: string;
+    children: React.ReactNode;
+}
 
-    const { uploadMedia, deleteMedia } = useCampaigns();
+const SortableItem = ({ id, children }: SortableItemProps) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            {children}
+        </div>
+    );
+};
+
+const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft, onNextStep, onPreviousStep }) => {
+    const [uploadedContent, setUploadedContent] = useState<CampaignContent[]>([]);
+    const [contentLoading, setContentLoading] = useState(true);
+    const [uploadingContentIndex, setUploadingContentIndex] = useState<number | null>(null);
+    const [deletingContentId, setDeletingContentId] = useState<string | null>(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [showLinkInput, setShowLinkInput] = useState(false);
+    const [linkUrl, setLinkUrl] = useState('');
+    const [linkTitle, setLinkTitle] = useState('');
+    const [linkDescription, setLinkDescription] = useState('');
+    const [modalOpen, setModalOpen] = useState(false);
+    const [isVideo, setIsVideo] = useState(true);
+
+    const { uploadCampaignContent, deleteCampaignContent, fetchCampaignContent, reorderCampaignContent } = useCampaigns();
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const fetchAndSetCampaignContent = useCallback(async () => {
+        setContentLoading(true);
+        const content = await fetchCampaignContent(campaign.id);
+        setUploadedContent(content);
+        setContentLoading(false);
+    }, [campaign.id, fetchCampaignContent]);
+
+    const handleUploadResult = (result: { success: boolean }) => {
+        if (result.success) {
+            fetchAndSetCampaignContent();
+        }
+    };
+
+    useEffect(() => {
+        fetchAndSetCampaignContent();
+    }, [fetchAndSetCampaignContent]);
 
     const handleMediaChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             const file = event.target.files[0];
-            setMediaFiles(prev => {
-                const newFiles = [...prev];
-                newFiles[index] = file;
-                return newFiles;
-            });
+            setUploadingContentIndex(index);
 
-            setUploadingMediaIndex(index);
-            uploadMedia(campaign.id, file).then((response: { success: boolean; data?: { data: MediaResponse } }) => {
+            uploadCampaignContent(campaign.id, {
+                title: file.name,
+                content_type: 'file',
+                file: file
+            }).then((response) => {
                 if (response.success && response.data?.data) {
-                    const media = response.data.data;
-                    setUploadedMedia(prev => {
-                        const newMedia = [...prev];
-                        newMedia[index] = media;
-                        return newMedia;
+                    const content = response.data.data;
+                    setUploadedContent(prev => {
+                        const newContent = [...prev];
+                        newContent[index] = content;
+                        return newContent;
                     });
-                    toast.success('Media uploaded successfully');
+                    toast.success('Content uploaded successfully');
                 }
             }).catch((error: Error) => {
-                toast.error('Error uploading media');
-                console.error('Error uploading media:', error);
+                toast.error('Error uploading content');
+                console.error('Error uploading content:', error);
             }).finally(() => {
-                setUploadingMediaIndex(null);
+                setUploadingContentIndex(null);
             });
         }
     };
 
-    const handleDeleteMedia = async (index: number) => {
-        const media = uploadedMedia[index];
-        if (!media || deletingMediaId === media.id) return;
+    const handleAddLink = async () => {
+        if (!linkUrl || !linkTitle) {
+            toast.error('Please provide both title and URL');
+            return;
+        }
 
         try {
-            setDeletingMediaId(media.id);
-            await deleteMedia(media.id);
-            setUploadedMedia(prev => {
-                const newMedia = [...prev];
-                newMedia.splice(index, 1);
-                return newMedia;
+            const response = await uploadCampaignContent(campaign.id, {
+                title: linkTitle,
+                description: linkDescription,
+                content_type: 'link',
+                content_url: linkUrl
             });
-            toast.success('Media deleted successfully');
+
+            if (response.success && response.data?.data) {
+                const content = response.data.data;
+                setUploadedContent(prev => [...prev, content]);
+                toast.success('Link added successfully');
+                setShowLinkInput(false);
+                setLinkUrl('');
+                setLinkTitle('');
+                setLinkDescription('');
+            }
         } catch (error) {
-            toast.error('Error deleting media');
-            console.error('Error deleting media:', error);
-        } finally {
-            setDeletingMediaId(null);
+            toast.error('Error adding link');
+            console.error('Error adding link:', error);
         }
     };
 
-    // Placeholder for Add via Link (to be implemented)
-    const handleAddViaLink = () => {
-        toast.info('Add via link not implemented yet.');
+    const handleDeleteContent = async (index: number, e?: React.MouseEvent) => {
+        if (e) e.preventDefault();
+        const content = uploadedContent[index];
+        if (!content || deletingContentId === content.id) return;
+
+        try {
+            setDeletingContentId(content.id);
+            const response = await deleteCampaignContent(content.id);
+            if (response.success) {
+                await fetchAndSetCampaignContent();
+                toast.success('Content deleted successfully');
+            } else {
+                toast.error('Error deleting content');
+            }
+        } catch (error) {
+            toast.error('Error deleting content');
+            console.error('Error deleting content:', error);
+        } finally {
+            setDeletingContentId(null);
+        }
+    };
+
+    const handleAddContent = async (data: any) => {
+        if (isVideo) {
+            return await uploadCampaignContent(campaign.id, {
+                title: data.title,
+                description: data.description,
+                content_type: 'file',
+                file: data.video,
+                season: data.season,
+            });
+        } else {
+            return await uploadCampaignContent(campaign.id, {
+                title: data.title,
+                content_type: 'link',
+                content_url: data.content_url,
+                thumbnail_url: data.thumbnail_url,
+                season: data.season,
+            });
+        }
+    };
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+        const { active, over } = event;
+        
+        if (over && active.id !== over.id) {
+            setUploadedContent((items) => {
+                const oldIndex = items.findIndex((item) => item.id === active.id);
+                const newIndex = items.findIndex((item) => item.id === over.id);
+                
+                const newItems = arrayMove(items, oldIndex, newIndex);
+                
+                // Update ordering in backend
+                const contentIds = newItems.map(item => item.id);
+                reorderCampaignContent(campaign.id, contentIds);
+                
+                return newItems;
+            });
+        }
     };
 
     return (
@@ -83,7 +223,73 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                     <h1 className="text-white mb-4">Upload Media</h1>
 
                     <Form>
-                        {uploadedMedia.length === 0 ? (
+                        {contentLoading ? (
+                            <div className="campaign-content-loading">
+                                <Spinner color="light" />
+                            </div>
+                        ) : uploadedContent.length > 0 ? (
+                            <div className="media-list">
+                                <div className="media-list-header">
+                                    <div className="media-list-header__drag"></div>
+                                    <div className="media-list-header__thumb">Video</div>
+                                    <div className="media-list-header__spacer"></div>
+                                    <div className="media-list-header__season">Season</div>
+                                    <div className="media-list-header__actions"></div>
+                                </div>
+                                <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={handleDragEnd}
+                                >
+                                    <SortableContext
+                                        items={uploadedContent.map(item => item.id)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
+                                        {uploadedContent.map((item) => (
+                                            <SortableItem key={item.id} id={item.id}>
+                                                <div className="media-list-row">
+                                                    <div className="media-list-row__drag">
+                                                        <Move size={20} />
+                                                    </div>
+                                                    <div className="media-list-row__thumb">
+                                                        <img
+                                                            src={item.thumbnail_url || '/assets/images/default-thumb.jpg'}
+                                                            alt={item.title}
+                                                            className="media-list-row__img"
+                                                        />
+                                                    </div>
+                                                    <div className="media-list-row__info">
+                                                        <div className="media-list-row__title">{item.title}</div>
+                                                        <div className="media-list-row__desc">{item.description}</div>
+                                                    </div>
+                                                    <div className="media-list-row__season">{item.season || 'Not assigned'}</div>
+                                                    <div className="media-list-row__actions">
+                                                        <button className="icon-btn" onClick={e => handleDeleteContent(uploadedContent.findIndex(i => i.id === item.id), e)}>
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </SortableItem>
+                                        ))}
+                                    </SortableContext>
+                                </DndContext>
+                                <div className="media-list-add">
+                                    <Dropdown isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
+                                        <DropdownToggle className="add-video-btn">
+                                            ADD VIDEO <span className="add-video-btn__arrow">▼</span>
+                                        </DropdownToggle>
+                                        <DropdownMenu dark>
+                                            <DropdownItem onClick={() => { setIsVideo(true); setModalOpen(true); }}>
+                                                UPLOAD FILE
+                                            </DropdownItem>
+                                            <DropdownItem onClick={() => { setIsVideo(false); setModalOpen(true); }}>
+                                                ADD VIA LINK
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </div>
+                            </div>
+                        ) : (
                             <>
                                 {/* Info Banner */}
                                 <div className="media-upload-info-banner">
@@ -118,102 +324,68 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                                             ADD VIDEO
                                         </DropdownToggle>
                                         <DropdownMenu dark>
-                                            <DropdownItem onClick={() => document.getElementById('media-0')?.click()}>
+                                            <DropdownItem onClick={() => { setIsVideo(true); setModalOpen(true); }}>
                                                 UPLOAD FILE
                                             </DropdownItem>
-                                            <DropdownItem onClick={handleAddViaLink}>
+                                            <DropdownItem onClick={() => { setIsVideo(false); setModalOpen(true); }}>
                                                 ADD VIA LINK
                                             </DropdownItem>
                                         </DropdownMenu>
                                     </Dropdown>
-                                    {/* Hidden file input for upload */}
-                                    <input
-                                        type="file"
-                                        id="media-0"
-                                        accept="video/*"
-                                        style={{ display: 'none' }}
-                                        onChange={handleMediaChange(0)}
-                                    />
                                 </div>
                             </>
-                        ) : (
-                            <div className="media-upload mb-4">
-                                <Label className="text-white d-flex align-items-center gap-2">
-                                    Media Files
-                                    <span>(i)</span>
-                                </Label>
-                                <p className="mb-3">
-                                    Upload media files for your campaign. You can upload up to 5 files.
-                                </p>
-                                <div className="media-upload-grid">
-                                    {[0, 1, 2, 3, 4].map((index) => (
-                                        <div
-                                            key={index}
-                                            className="upload-box"
-                                        >
-                                            {uploadingMediaIndex === index ? (
-                                                <div className="uploading-indicator">
-                                                    <div className="spinner-border text-light" role="status">
-                                                        <span className="visually-hidden">Loading...</span>
-                                                    </div>
-                                                    <div className="mt-2">Uploading...</div>
-                                                </div>
-                                            ) : uploadedMedia[index]?.url ? (
-                                                <>
-                                                    <video
-                                                        src={uploadedMedia[index].url}
-                                                        className="uploaded-media-video"
-                                                        muted
-                                                        loop
-                                                        playsInline
-                                                        autoPlay
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        className="delete-media-btn"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            handleDeleteMedia(index);
-                                                        }}
-                                                        disabled={deletingMediaId === uploadedMedia[index]?.id}
-                                                    >
-                                                        {deletingMediaId === uploadedMedia[index]?.id ? (
-                                                            <div className="spinner-border spinner-border-sm" role="status">
-                                                                <span className="visually-hidden">Loading...</span>
-                                                            </div>
-                                                        ) : (
-                                                            '×'
-                                                        )}
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Input
-                                                        type="file"
-                                                        id={`media-${index}`}
-                                                        accept="video/*"
-                                                        onChange={handleMediaChange(index)}
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: 0,
-                                                            left: 0,
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            opacity: 0,
-                                                            cursor: 'pointer'
-                                                        }}
-                                                    />
-                                                    <div className="upload-content">
-                                                        <div className="upload-icon d-flex align-items-center justify-content-center mb-2">
-                                                            ↑
-                                                        </div>
-                                                        <div>Upload media</div>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                    ))}
+                        )}
+
+                        {showLinkInput && (
+                            <div className="link-input-container mb-4">
+                                <FormGroup>
+                                    <Label for="linkTitle">Title</Label>
+                                    <Input
+                                        type="text"
+                                        id="linkTitle"
+                                        value={linkTitle}
+                                        onChange={(e) => setLinkTitle(e.target.value)}
+                                        placeholder="Enter title"
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="linkUrl">URL</Label>
+                                    <Input
+                                        type="url"
+                                        id="linkUrl"
+                                        value={linkUrl}
+                                        onChange={(e) => setLinkUrl(e.target.value)}
+                                        placeholder="Enter video URL"
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="linkDescription">Description (Optional)</Label>
+                                    <Input
+                                        type="textarea"
+                                        id="linkDescription"
+                                        value={linkDescription}
+                                        onChange={(e) => setLinkDescription(e.target.value)}
+                                        placeholder="Enter description"
+                                    />
+                                </FormGroup>
+                                <div className="d-flex gap-2">
+                                    <Button
+                                        color="primary"
+                                        onClick={handleAddLink}
+                                    >
+                                        Add Link
+                                    </Button>
+                                    <Button
+                                        color="secondary"
+                                        onClick={() => {
+                                            setShowLinkInput(false);
+                                            setLinkUrl('');
+                                            setLinkTitle('');
+                                            setLinkDescription('');
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
                                 </div>
                             </div>
                         )}
@@ -243,7 +415,14 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                     </Form>
                 </Col>
             </Row>
-        </Container >
+            <AddCampaignContentModal
+                isOpen={modalOpen}
+                toggle={() => setModalOpen(false)}
+                onSave={handleAddContent}
+                isVideo={isVideo}
+                onUploadResult={handleUploadResult}
+            />
+        </Container>
     );
 };
 

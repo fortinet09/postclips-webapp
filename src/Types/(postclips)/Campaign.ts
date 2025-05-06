@@ -2,6 +2,7 @@ export interface Campaign {
     id: string;
     title: string;
     description: string;
+    brand_id: string;
     profile_picture: string | null;
     targeted_social_networks: string[];
     targeted_amount_of_views: number;
