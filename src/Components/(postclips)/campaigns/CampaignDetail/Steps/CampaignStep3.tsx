@@ -4,8 +4,7 @@ import { Campaign } from '@/Types/(postclips)/Campaign';
 import { useCampaigns } from '@/Hooks/useCampaigns';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
-import { Plus } from 'react-feather';
-// import PhoneMockup from "@/Components/PhoneMockup";
+import { Edit2, Plus, Trash } from 'react-feather';
 
 const PLATFORMS = [
     { key: 'tiktok', label: 'TikTok', icon: '/assets/images/(postclips)/socials/pc_tiktok.svg' },
@@ -22,9 +21,12 @@ interface CampaignStep3Props {
     onPreviousStep: () => void;
 }
 
-interface BioLink {
+interface Bio {
+    id: string;
     bio: string;
     link: string;
+    platforms: string[];
+    created_at?: string;
 }
 
 interface BrandAccountPicture {
@@ -37,28 +39,31 @@ const MAX_BIOS = 20;
 const MAX_PICTURES = 20;
 
 // Platform-specific UI components
-const ProfilePicture = ({ src }: { src: string }) => (
-    <div style={{
-        width: '64px',
-        height: '64px',
-        borderRadius: '50%',
-        overflow: 'hidden',
-        border: '2px solid #232323',
-        flexShrink: 0
-    }}>
-        <Image
-            src={src}
-            alt="Profile"
-            width={64}
-            height={64}
-            style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover'
-            }}
-        />
-    </div>
-);
+const ProfilePicture = ({ src }: { src: string }) => {
+    const imageSrc = src || '/assets/images/(postclips)/profile-placeholder.png';
+    return (
+        <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            overflow: 'hidden',
+            border: '2px solid #232323',
+            flexShrink: 0
+        }}>
+            <Image
+                src={imageSrc}
+                alt="Profile"
+                width={64}
+                height={64}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                }}
+            />
+        </div>
+    );
+};
 
 const TikTokPreview = ({ username, bio, link, picture }: { username: string; bio: string; link: string; picture: string }) => (
     <div style={{
@@ -93,7 +98,7 @@ const TikTokPreview = ({ username, bio, link, picture }: { username: string; bio
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
                 <ProfilePicture src={picture} />
                 <div style={{ marginLeft: 12 }}>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>{username}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{username}</div>
                     <div style={{ fontSize: 13, color: '#888' }}>{bio}</div>
                 </div>
             </div>
@@ -101,15 +106,15 @@ const TikTokPreview = ({ username, bio, link, picture }: { username: string; bio
             {/* Stats */}
             <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
                 <div>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>0</div>
+                    <div className="skeleton-box" style={{ width: 40, height: 20, marginBottom: 4 }} />
                     <div style={{ fontSize: 14, color: '#888' }}>Following</div>
                 </div>
                 <div>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>0</div>
+                    <div className="skeleton-box" style={{ width: 40, height: 20, marginBottom: 4 }} />
                     <div style={{ fontSize: 14, color: '#888' }}>Followers</div>
                 </div>
                 <div>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>0</div>
+                    <div className="skeleton-box" style={{ width: 40, height: 20, marginBottom: 4 }} />
                     <div style={{ fontSize: 14, color: '#888' }}>Likes</div>
                 </div>
             </div>
@@ -117,7 +122,7 @@ const TikTokPreview = ({ username, bio, link, picture }: { username: string; bio
             {/* Video Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
                 {[1, 2, 3, 4, 5, 6].map(i => (
-                    <div key={i} style={{ aspectRatio: '9/16', background: '#232323', borderRadius: 4 }} />
+                    <div key={`video-grid-${i}`} style={{ aspectRatio: '9/16', background: '#232323', borderRadius: 4 }} />
                 ))}
             </div>
         </div>
@@ -125,7 +130,8 @@ const TikTokPreview = ({ username, bio, link, picture }: { username: string; bio
 );
 
 const InstagramPreview = ({ username, bio, link, picture }: { username: string; bio: string; link: string; picture: string }) => (
-    <div style={{ width: '100%', height: '100%', background: '#000', color: '#fff',
+    <div style={{
+        width: '100%', height: '100%', background: '#000', color: '#fff',
         borderRadius: 32,
         overflow: 'hidden'
     }}>
@@ -156,7 +162,7 @@ const InstagramPreview = ({ username, bio, link, picture }: { username: string; 
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
                 <ProfilePicture src={picture} />
                 <div style={{ marginLeft: 12 }}>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>{username}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{username}</div>
                     <div style={{ fontSize: 13, color: '#888' }}>{bio}</div>
                 </div>
             </div>
@@ -164,15 +170,15 @@ const InstagramPreview = ({ username, bio, link, picture }: { username: string; 
             {/* Stats */}
             <div style={{ display: 'flex', gap: 24, marginBottom: 24 }}>
                 <div>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>0</div>
+                    <div className="skeleton-box" style={{ width: 40, height: 20, marginBottom: 4 }} />
                     <div style={{ fontSize: 14, color: '#888' }}>Posts</div>
                 </div>
                 <div>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>0</div>
+                    <div className="skeleton-box" style={{ width: 40, height: 20, marginBottom: 4 }} />
                     <div style={{ fontSize: 14, color: '#888' }}>Followers</div>
                 </div>
                 <div>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>0</div>
+                    <div className="skeleton-box" style={{ width: 40, height: 20, marginBottom: 4 }} />
                     <div style={{ fontSize: 14, color: '#888' }}>Following</div>
                 </div>
             </div>
@@ -180,7 +186,7 @@ const InstagramPreview = ({ username, bio, link, picture }: { username: string; 
             {/* Photo Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
                 {[1, 2, 3, 4, 5, 6].map(i => (
-                    <div key={i} style={{ aspectRatio: '1/1', background: '#232323' }} />
+                    <div key={`photo-grid-${i}`} style={{ aspectRatio: '1/1', background: '#232323' }} />
                 ))}
             </div>
         </div>
@@ -188,7 +194,8 @@ const InstagramPreview = ({ username, bio, link, picture }: { username: string; 
 );
 
 const FacebookPreview = ({ username, bio, link, picture }: { username: string; bio: string; link: string; picture: string }) => (
-    <div style={{ width: '100%', height: '100%', background: '#18191A', color: '#fff',
+    <div style={{
+        width: '100%', height: '100%', background: '#18191A', color: '#fff',
         borderRadius: 32,
         overflow: 'hidden'
     }}>
@@ -219,7 +226,7 @@ const FacebookPreview = ({ username, bio, link, picture }: { username: string; b
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
                 <ProfilePicture src={picture} />
                 <div style={{ marginLeft: 12 }}>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>{username}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{username}</div>
                     <div style={{ fontSize: 13, color: '#888' }}>{bio}</div>
                 </div>
             </div>
@@ -228,11 +235,11 @@ const FacebookPreview = ({ username, bio, link, picture }: { username: string; b
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                 <div style={{ flex: 1, background: '#232323', borderRadius: 8, padding: 12 }}>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>Posts</div>
-                    <div style={{ fontSize: 20, fontWeight: 700 }}>0</div>
+                    <div className="skeleton-box" style={{ width: 40, height: 24, marginTop: 4 }} />
                 </div>
                 <div style={{ flex: 1, background: '#232323', borderRadius: 8, padding: 12 }}>
                     <div style={{ fontSize: 14, fontWeight: 600 }}>Friends</div>
-                    <div style={{ fontSize: 20, fontWeight: 700 }}>0</div>
+                    <div className="skeleton-box" style={{ width: 40, height: 24, marginTop: 4 }} />
                 </div>
             </div>
 
@@ -248,7 +255,8 @@ const FacebookPreview = ({ username, bio, link, picture }: { username: string; b
 );
 
 const TwitterPreview = ({ username, bio, link, picture }: { username: string; bio: string; link: string; picture: string }) => (
-    <div style={{ width: '100%', height: '100%', background: '#000', color: '#fff',
+    <div style={{
+        width: '100%', height: '100%', background: '#000', color: '#fff',
         borderRadius: 32,
         overflow: 'hidden'
     }}>
@@ -279,7 +287,7 @@ const TwitterPreview = ({ username, bio, link, picture }: { username: string; bi
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
                 <ProfilePicture src={picture} />
                 <div style={{ marginLeft: 12 }}>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>{username}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{username}</div>
                     <div style={{ fontSize: 13, color: '#888' }}>{bio}</div>
                 </div>
             </div>
@@ -287,10 +295,10 @@ const TwitterPreview = ({ username, bio, link, picture }: { username: string; bi
             {/* Stats */}
             <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
                 <div style={{ fontSize: 14 }}>
-                    <span style={{ fontWeight: 600 }}>0</span> Following
+                    <span className="skeleton-box" style={{ display: 'inline-block', width: 30, height: 16, verticalAlign: 'middle' }} /> Following
                 </div>
                 <div style={{ fontSize: 14 }}>
-                    <span style={{ fontWeight: 600 }}>0</span> Followers
+                    <span className="skeleton-box" style={{ display: 'inline-block', width: 30, height: 16, verticalAlign: 'middle' }} /> Followers
                 </div>
             </div>
 
@@ -305,7 +313,8 @@ const TwitterPreview = ({ username, bio, link, picture }: { username: string; bi
 );
 
 const YouTubePreview = ({ username, bio, link, picture }: { username: string; bio: string; link: string; picture: string }) => (
-    <div style={{ width: '100%', height: '100%', background: '#0F0F0F', color: '#fff',
+    <div style={{
+        width: '100%', height: '100%', background: '#0F0F0F', color: '#fff',
         borderRadius: 32,
         overflow: 'hidden'
     }}>
@@ -336,7 +345,7 @@ const YouTubePreview = ({ username, bio, link, picture }: { username: string; bi
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
                 <ProfilePicture src={picture} />
                 <div style={{ marginLeft: 12 }}>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>{username}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{username}</div>
                     <div style={{ fontSize: 13, color: '#888' }}>{bio}</div>
                 </div>
             </div>
@@ -344,17 +353,17 @@ const YouTubePreview = ({ username, bio, link, picture }: { username: string; bi
             {/* Stats */}
             <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
                 <div style={{ fontSize: 14 }}>
-                    <span style={{ fontWeight: 600 }}>0</span> subscribers
+                    <span className="skeleton-box" style={{ display: 'inline-block', width: 40, height: 16, verticalAlign: 'middle' }} /> subscribers
                 </div>
                 <div style={{ fontSize: 14 }}>
-                    <span style={{ fontWeight: 600 }}>0</span> videos
+                    <span className="skeleton-box" style={{ display: 'inline-block', width: 30, height: 16, verticalAlign: 'middle' }} /> videos
                 </div>
             </div>
 
             {/* Video Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                 {[1, 2, 3, 4].map(i => (
-                    <div key={i} style={{ aspectRatio: '16/9', background: '#232323', borderRadius: 8 }} />
+                    <div key={`youtube-grid-${i}`} style={{ aspectRatio: '16/9', background: '#232323', borderRadius: 8 }} />
                 ))}
             </div>
         </div>
@@ -368,6 +377,7 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
         deleteBrandAccountUsername,
         getBrandAccountBios,
         setBrandAccountBios,
+        deleteBrandAccountBio,
         getBrandAccountPictures,
         addBrandAccountPicture,
         deleteBrandAccountPicture,
@@ -376,30 +386,20 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
 
     // Loading state
     const [loading, setLoading] = useState(true);
+    const [loadingError, setLoadingError] = useState<string | null>(null);
 
     // Usernames
     const [usernames, setUsernames] = useState<string[]>([]);
     const [usernameInput, setUsernameInput] = useState('');
 
     // Bios
-    const [useSameBio, setUseSameBio] = useState(true);
-    const [bios, setBios] = useState<BioLink[]>([{ bio: '', link: '' }]);
-    const [platformBios, setPlatformBios] = useState<Record<string, BioLink[]>>({
-        tiktok: [{ bio: '', link: '' }],
-        instagram: [{ bio: '', link: '' }],
-        facebook: [{ bio: '', link: '' }],
-        twitter: [{ bio: '', link: '' }],
-        youtube: [{ bio: '', link: '' }],
-    });
+    const [bios, setBios] = useState<Bio[]>([]);
     const [bioModalOpen, setBioModalOpen] = useState(false);
-    const [bioModalData, setBioModalData] = useState<Record<string, BioLink[]>>({
-        tiktok: [{ bio: '', link: '' }],
-        instagram: [{ bio: '', link: '' }],
-        facebook: [{ bio: '', link: '' }],
-        twitter: [{ bio: '', link: '' }],
-        youtube: [{ bio: '', link: '' }],
+    const [bioModalData, setBioModalData] = useState<{ bio: string; link: string; platforms: string[] }>({
+        bio: '',
+        link: '',
+        platforms: []
     });
-    const [bioModalSame, setBioModalSame] = useState(true);
 
     // Profile pictures
     const [pictures, setPictures] = useState<BrandAccountPicture[]>([]);
@@ -418,35 +418,59 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
 
     // Fetch all data on mount
     useEffect(() => {
-        if (!brandId) return;
-        setLoading(true);
-        Promise.all([
-            getBrandAccountUsernames(brandId),
-            getBrandAccountBios(brandId),
-            getBrandAccountPictures(brandId)
-        ]).then(([usernamesRes, biosRes, picturesRes]) => {
-            if (usernamesRes.success && Array.isArray(usernamesRes.data)) {
-                setUsernames(usernamesRes.data.map((u: any) => u.username));
+        const fetchData = async () => {
+            if (!brandId) {
+                setLoadingError('No brand ID provided');
+                setLoading(false);
+                return;
             }
-            if (biosRes.success && biosRes.data) {
-                setUseSameBio(biosRes.data.use_same_bio ?? true);
-                if (biosRes.data.use_same_bio) {
-                    setBios([{ bio: biosRes.data.global_bio || '', link: biosRes.data.global_link || '' }]);
+
+            try {
+                setLoading(true);
+                setLoadingError(null);
+
+                // Fetch all data in parallel
+                const [usernamesRes, biosRes, picturesRes] = await Promise.all([
+                    getBrandAccountUsernames(brandId),
+                    getBrandAccountBios(brandId),
+                    getBrandAccountPictures(brandId)
+                ]);
+
+                // Handle usernames
+                if (usernamesRes.success && Array.isArray(usernamesRes.data)) {
+                    setUsernames(usernamesRes.data.map((u: any) => u.username));
                 } else {
-                    setPlatformBios({
-                        tiktok: [{ bio: biosRes.data.tiktok_bio || '', link: biosRes.data.tiktok_link || '' }],
-                        instagram: [{ bio: biosRes.data.instagram_bio || '', link: biosRes.data.instagram_link || '' }],
-                        facebook: [{ bio: biosRes.data.facebook_bio || '', link: biosRes.data.facebook_link || '' }],
-                        twitter: [{ bio: biosRes.data.twitter_bio || '', link: biosRes.data.twitter_link || '' }],
-                        youtube: [{ bio: biosRes.data.youtube_bio || '', link: biosRes.data.youtube_link || '' }],
-                    });
+                    console.error('Failed to fetch usernames:', usernamesRes);
                 }
+
+                // Handle bios
+                if (biosRes.success && biosRes.data?.data && Array.isArray(biosRes.data.data)) {
+                    const formattedBios = biosRes.data.data.map((bio: any) => ({
+                        ...bio,
+                        platforms: Array.isArray(bio.platforms) ? bio.platforms : []
+                    }));
+                    setBios(formattedBios);
+                } else {
+                    console.error('Failed to fetch bios:', biosRes);
+                }
+
+                // Handle pictures
+                if (picturesRes.success && Array.isArray(picturesRes.data)) {
+                    setPictures(picturesRes.data);
+                } else {
+                    console.error('Failed to fetch pictures:', picturesRes);
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setLoadingError('Failed to load data. Please try again.');
+            } finally {
+                setLoading(false);
             }
-            if (picturesRes.success && Array.isArray(picturesRes.data)) {
-                setPictures(picturesRes.data);
-            }
-        }).finally(() => setLoading(false));
-    }, [brandId]);
+        };
+
+        fetchData();
+    }, [brandId, getBrandAccountUsernames, getBrandAccountBios, getBrandAccountPictures]);
 
     // Username tag input logic
     const handleUsernameInput = (e: React.ChangeEvent<HTMLInputElement>) => setUsernameInput(e.target.value);
@@ -474,8 +498,53 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
         }
     };
 
-    const updateBio = (idx: number, field: keyof BioLink, value: string) => {
-        setBios(bios.map((b, i) => i === idx ? { ...b, [field]: value } : b));
+    // Bio modal handlers
+    const handleModalBioChange = (field: 'bio' | 'link', value: string) => {
+        setBioModalData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handlePlatformToggle = (platform: string) => {
+        setBioModalData(prev => ({
+            ...prev,
+            platforms: prev.platforms.includes(platform)
+                ? prev.platforms.filter(p => p !== platform)
+                : [...prev.platforms, platform]
+        }));
+    };
+
+    const handleModalSave = async () => {
+        if (!brandId || !bioModalData.bio || bioModalData.platforms.length === 0) {
+            toast.error('Please fill in all required fields');
+            return;
+        }
+
+        try {
+            const res = await setBrandAccountBios(brandId, bioModalData);
+            if (res.success && res.data?.data) {
+                // Ensure platforms is an array and has a unique ID
+                const newBio = {
+                    ...res.data.data,
+                    platforms: Array.isArray(res.data.data.platforms) ? res.data.data.platforms : []
+                };
+                setBios(prevBios => [...prevBios, newBio]);
+                setBioModalOpen(false);
+                setBioModalData({ bio: '', link: '', platforms: [] });
+            }
+        } catch (error) {
+            toast.error('An error occurred while saving bio');
+        }
+    };
+
+    const handleDeleteBio = async (bioId: string) => {
+        if (!brandId) return;
+        try {
+            const res = await deleteBrandAccountBio(brandId, bioId);
+            if (res.success) {
+                setBios(bios.filter(b => b.id !== bioId));
+            }
+        } catch (error) {
+            toast.error('An error occurred while deleting bio');
+        }
     };
 
     // Profile picture logic
@@ -511,89 +580,6 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
         }
     };
 
-    // Modal bio logic
-    const handleModalBioChange = (platform: string, idx: number, field: keyof BioLink, value: string) => {
-        setBioModalData(prev => ({
-            ...prev,
-            [platform]: prev[platform].map((b, i) => i === idx ? { ...b, [field]: value } : b)
-        }));
-    };
-
-    const handleModalSave = async () => {
-        if (!brandId) return;
-
-        try {
-            const biosData = bioModalSame ? {
-                use_same_bio: true,
-                global_bio: bioModalData.tiktok[0]?.bio || '',
-                global_link: bioModalData.tiktok[0]?.link || '',
-            } : {
-                use_same_bio: false,
-                tiktok_bio: bioModalData.tiktok[0]?.bio || '',
-                tiktok_link: bioModalData.tiktok[0]?.link || '',
-                instagram_bio: bioModalData.instagram[0]?.bio || '',
-                instagram_link: bioModalData.instagram[0]?.link || '',
-                facebook_bio: bioModalData.facebook[0]?.bio || '',
-                facebook_link: bioModalData.facebook[0]?.link || '',
-                twitter_bio: bioModalData.twitter[0]?.bio || '',
-                twitter_link: bioModalData.twitter[0]?.link || '',
-                youtube_bio: bioModalData.youtube[0]?.bio || '',
-                youtube_link: bioModalData.youtube[0]?.link || '',
-            };
-
-            const res = await setBrandAccountBios(brandId, biosData);
-            if (res.success) {
-                setPlatformBios(bioModalData);
-                setUseSameBio(bioModalSame);
-                setBioModalOpen(false);
-            }
-        } catch (error) {
-            toast.error('An error occurred while saving bios');
-        }
-    };
-
-    // Modal open handler
-    const openBioModal = () => {
-        setBioModalData(platformBios);
-        setBioModalSame(useSameBio);
-        setBioModalOpen(true);
-    };
-
-    const closeBioModal = () => setBioModalOpen(false);
-
-    // Save all changes before proceeding
-    const handleSaveAndNext = async () => {
-        if (!brandId) return;
-
-        try {
-            // Save bios
-            const biosData = useSameBio ? {
-                use_same_bio: true,
-                global_bio: bios[0]?.bio || '',
-                global_link: bios[0]?.link || '',
-            } : {
-                use_same_bio: false,
-                tiktok_bio: platformBios.tiktok[0]?.bio || '',
-                tiktok_link: platformBios.tiktok[0]?.link || '',
-                instagram_bio: platformBios.instagram[0]?.bio || '',
-                instagram_link: platformBios.instagram[0]?.link || '',
-                facebook_bio: platformBios.facebook[0]?.bio || '',
-                facebook_link: platformBios.facebook[0]?.link || '',
-                twitter_bio: platformBios.twitter[0]?.bio || '',
-                twitter_link: platformBios.twitter[0]?.link || '',
-                youtube_bio: platformBios.youtube[0]?.bio || '',
-                youtube_link: platformBios.youtube[0]?.link || '',
-            };
-
-            const res = await setBrandAccountBios(brandId, biosData);
-            if (res.success) {
-                onNextStep();
-            }
-        } catch (error) {
-            console.error('Error saving changes:', error);
-        }
-    };
-
     // Helper to get a random item from an array
     const getRandom = (arr: any[]) => arr.length ? arr[Math.floor(Math.random() * arr.length)] : '';
 
@@ -607,17 +593,18 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
         let link = '';
         let platform = 'tiktok';
 
-        if (useSameBio) {
-            // If using global bio, pick a random platform
-            platform = getRandom(PLATFORMS.map(p => p.key));
-            bio = getRandom(bios.map(b => b.bio).filter(Boolean)) || 'Your bio here';
-            link = getRandom(bios.map(b => b.link).filter(Boolean)) || '';
+        if (bios.length > 0) {
+            const randomBio = getRandom(bios);
+            if (randomBio) {
+                bio = randomBio.bio;
+                link = randomBio.link || '';
+                platform = randomBio.platforms?.[0] || 'tiktok';
+            }
         } else {
-            // If using platform-specific bios, pick a random platform and its bio
-            platform = getRandom(PLATFORMS.map(p => p.key));
-            const currentPlatformBios = platformBios[platform as keyof typeof platformBios] || [];
-            bio = getRandom(currentPlatformBios.map((b: BioLink) => b.bio).filter(Boolean)) || 'Your bio here';
-            link = getRandom(currentPlatformBios.map((b: BioLink) => b.link).filter(Boolean)) || '';
+            // If no bios, pick a random platform
+            platform = getRandom(PLATFORMS.map(p => p.key)) || 'tiktok';
+            bio = 'Your bio here';
+            link = '';
         }
 
         setPreview({ username, bio, link, picture, platform });
@@ -625,14 +612,28 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
 
     // Initialize preview on load or when data changes
     useEffect(() => {
-        randomizePreview();
-        // eslint-disable-next-line
-    }, [usernames, bios, platformBios, pictures, useSameBio]);
+        if (!loading) {
+            randomizePreview();
+        }
+    }, [usernames, bios, pictures, loading]);
 
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 400 }}>
                 <Spinner color="primary" />
+            </div>
+        );
+    }
+
+    if (loadingError) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 400 }}>
+                <div className="text-center">
+                    <div className="text-danger mb-3">{loadingError}</div>
+                    <Button color="primary" onClick={() => window.location.reload()}>
+                        Retry
+                    </Button>
+                </div>
             </div>
         );
     }
@@ -647,8 +648,8 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
                         <div className="mb-2 text-secondary" style={{ fontSize: 14 }}>Add up to 20 unique usernames</div>
                         <div className="input-dark d-flex flex-wrap align-items-center" style={{ minHeight: 48, gap: 8, padding: 8, height: "auto" }}>
                             {usernames.map((u, idx) => (
-                                <Badge key={u} color="primary" pill style={{ background: '#232323', color: '#fff', fontWeight: 600, fontSize: 15, padding: '8px 12px' }}>
-                                    {u} <span style={{ cursor: 'pointer', marginLeft: 8 }} onClick={() => removeUsername(idx)}>&times;</span>
+                                <Badge key={u} color="primary" pill className="account-badge">
+                                    {u} <span className="account-badge__close" onClick={() => removeUsername(idx)}>&times;</span>
                                 </Badge>
                             ))}
                             {usernames.length < MAX_USERNAMES && (
@@ -666,120 +667,102 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
                     </div>
 
                     <div className="mb-4">
-                        <div className="d-flex align-items-center justify-content-between mb-1">
-                            <div className="campaign-label">Bio & link in bio</div>
-                            <div className="form-switch">
-                                <Input type="switch" checked={useSameBio} onChange={() => setUseSameBio(!useSameBio)} id="sameBioSwitch" />
-                                <Label for="sameBioSwitch" className="ms-2" style={{ color: '#fff', fontWeight: 400, fontSize: 15 }}>Use same bio for all platforms</Label>
-                            </div>
+                        <div className="campaign-label mb-1">Bio & link in bio</div>
+                        <div className="mb-3 text-secondary" style={{ fontSize: 14 }}>Add up to 20 unique bios & links in bio</div>
+                        <Button className="add-bio-button" onClick={() => setBioModalOpen(true)}>
+                            <Edit2 size={16} />
+                            Add bio
+                        </Button>
+
+                        {/* List of existing bios */}
+                        <div className="mt-3">
+                            {bios.map((bio) => (
+                                <div key={bio.id} className="bio-card">
+                                    <div className="bio-card__header">
+                                        <div>
+                                            <div className="bio-card__title">Bio</div>
+                                            <div className="bio-card__content">{bio.bio}</div>
+                                            <div className="bio-card__title">Link</div>
+                                            <div className="bio-card__content bio-card__content--link">{bio.link || 'No link set'}</div>
+                                            <div className="bio-card__title">Platforms</div>
+                                            <div className="bio-card__platforms">
+                                                {Array.isArray(bio.platforms) && bio.platforms.map((platform, index) => (
+                                                    <Badge
+                                                        key={`${bio.id}-${platform}-${index}`}
+                                                        color="primary"
+                                                        pill
+                                                        className="social-badge"
+                                                    >
+                                                        {platform}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <Button
+                                            color="link"
+                                            className="bio-card__delete"
+                                            onClick={() => handleDeleteBio(bio.id)}
+                                        >
+                                            <Trash size={16} color="#F64B4B" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <div className="mb-2 text-secondary" style={{ fontSize: 14 }}>Add up to 20 unique bios & links in bio</div>
-                        {useSameBio ? (
-                            <FormGroup>
-                                <Label className="campaign-label">Bio</Label>
-                                <Input
-                                    type="textarea"
-                                    placeholder="Bio text"
-                                    value={bios[0]?.bio || ''}
-                                    onChange={e => updateBio(0, 'bio', e.target.value)}
-                                    className="input-dark mb-2"
-                                    maxLength={40}
-                                />
-                                <div className="text-end mb-2" style={{ color: '#00E7FF', fontSize: 13 }}>{(bios[0]?.bio?.length || 0)}/40</div>
-                                <Label className="campaign-label">Link in bio</Label>
-                                <Input
-                                    type="text"
-                                    placeholder="Link in bio"
-                                    value={bios[0]?.link || ''}
-                                    onChange={e => updateBio(0, 'link', e.target.value)}
-                                    className="input-dark"
-                                />
-                            </FormGroup>
-                        ) : (
-                            <>
-                                <Button color="dark" outline className="w-100" style={{ borderRadius: 8, border: '1px solid #232323', color: '#fff', fontWeight: 600 }} onClick={openBioModal}>
-                                    Add bio
-                                </Button>
-                                {/* Modal for per-platform bios */}
-                                <Modal isOpen={bioModalOpen} toggle={closeBioModal} size="lg" centered>
-                                    <ModalHeader toggle={closeBioModal}>Add bio</ModalHeader>
-                                    <ModalBody>
+
+                        {/* Bio Modal */}
+                        <Modal isOpen={bioModalOpen} toggle={() => setBioModalOpen(false)} size="lg" centered>
+                            <ModalHeader toggle={() => setBioModalOpen(false)}>Add bio</ModalHeader>
+                            <ModalBody>
+                                <FormGroup>
+                                    <Label className="campaign-label">Bio</Label>
+                                    <Input
+                                        type="textarea"
+                                        maxLength={40}
+                                        className="input-dark mb-2"
+                                        placeholder="Bio text"
+                                        value={bioModalData.bio}
+                                        onChange={e => handleModalBioChange('bio', e.target.value)}
+                                    />
+                                    <div className="text-end mb-2" style={{ color: '#00E7FF', fontSize: 13 }}>{bioModalData.bio.length}/40</div>
+                                    <Label className="campaign-label">Link in bio</Label>
+                                    <Input
+                                        type="text"
+                                        className="input-dark mb-4"
+                                        placeholder="Link in bio"
+                                        value={bioModalData.link}
+                                        onChange={e => handleModalBioChange('link', e.target.value)}
+                                    />
+                                    <Label className="campaign-label mb-3">Select platforms</Label>
+                                    <div className="d-flex flex-wrap gap-3">
                                         {PLATFORMS.map(platform => (
-                                            <div key={platform.key} className="mb-4">
-                                                <div className="d-flex align-items-center mb-2">
+                                            <div key={`platform-${platform.key}`} className="platform-checkbox">
+                                                <Input
+                                                    type="checkbox"
+                                                    id={`platform-${platform.key}`}
+                                                    checked={bioModalData.platforms.includes(platform.key)}
+                                                    onChange={() => handlePlatformToggle(platform.key)}
+                                                />
+                                                <Label for={`platform-${platform.key}`}>
                                                     <Image
                                                         src={platform.icon}
                                                         alt={platform.label}
                                                         width={24}
                                                         height={24}
-                                                        className="me-2"
                                                     />
-                                                    <span style={{ fontWeight: 600, color: '#fff' }}>{platform.label}</span>
-                                                </div>
-                                                <Label className="campaign-label">Bio</Label>
-                                                <Input
-                                                    type="textarea"
-                                                    maxLength={40}
-                                                    className="input-dark mb-2"
-                                                    placeholder="Bio text"
-                                                    value={bioModalData[platform.key]?.[0]?.bio || ''}
-                                                    onChange={e => handleModalBioChange(platform.key, 0, 'bio', e.target.value)}
-                                                />
-                                                <div className="text-end mb-2" style={{ color: '#00E7FF', fontSize: 13 }}>{(bioModalData[platform.key]?.[0]?.bio?.length || 0)}/40</div>
-                                                <Label className="campaign-label">Link in bio</Label>
-                                                <Input
-                                                    type="text"
-                                                    className="input-dark"
-                                                    placeholder="Link in bio"
-                                                    value={bioModalData[platform.key]?.[0]?.link || ''}
-                                                    onChange={e => handleModalBioChange(platform.key, 0, 'link', e.target.value)}
-                                                />
+                                                    {platform.label}
+                                                </Label>
                                             </div>
                                         ))}
-                                    </ModalBody>
-                                    <ModalFooter className="d-flex justify-content-between">
-                                        <Button color="secondary" className="btn-chipped btn-chipped-gray" onClick={closeBioModal} style={{ maxWidth: '200px', width: '100%' }}>Back</Button>
-                                        <Button color="primary" className="btn-chipped btn-chipped-white" onClick={handleModalSave} style={{ maxWidth: '200px', width: '100%' }}>Save</Button>
-                                    </ModalFooter>
-                                </Modal>
-                            </>
-                        )}
-                    </div>
-
-                    {!useSameBio && (
-                        <div className="mb-4">
-                            <div className="campaign-label mb-3">Platform-specific bios</div>
-                            <div>
-                                {PLATFORMS.map((platform, idx) => (
-                                    <div key={platform.key} style={{
-                                        background: '#232323',
-                                        borderRadius: 8,
-                                        width: '100%',
-                                        padding: '18px 20px',
-                                        marginBottom: idx !== PLATFORMS.length - 1 ? 16 : 0,
-                                        display: 'flex',
-                                        alignItems: 'flex-start',
-                                        gap: 16
-                                    }}>
-                                        <Image
-                                            src={platform.icon}
-                                            alt={platform.label}
-                                            width={28}
-                                            height={28}
-                                            style={{ marginRight: 12, flexShrink: 0 }}
-                                        />
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ color: '#fff', fontWeight: 600, fontSize: 16, marginBottom: 4 }}>{platform.label}</div>
-                                            <div style={{ color: '#888', fontSize: 13 }}>Bio</div>
-                                            <div style={{ color: '#fff', fontSize: 14, marginBottom: 6 }}>{platformBios[platform.key]?.[0]?.bio || 'No bio set'}</div>
-                                            <div style={{ color: '#888', fontSize: 13 }}>Link in bio</div>
-                                            <div style={{ color: '#fff', fontSize: 14 }}>{platformBios[platform.key]?.[0]?.link || 'No link set'}</div>
-                                        </div>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                                </FormGroup>
+                            </ModalBody>
+                            <ModalFooter className="d-flex justify-content-between">
+                                <Button color="secondary" className="btn-chipped btn-chipped-gray" onClick={() => setBioModalOpen(false)} style={{ maxWidth: '200px', width: '100%' }}>Back</Button>
+                                <Button color="primary" className="btn-chipped btn-chipped-white" onClick={handleModalSave} style={{ maxWidth: '200px', width: '100%' }}>Save</Button>
+                            </ModalFooter>
+                        </Modal>
+                    </div>
 
                     <div className="mb-4">
                         <div className="campaign-label mb-1">Profile pictures</div>
@@ -835,9 +818,13 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
                                 maxWidth: '200px',
                                 width: '100%'
                             }}
-                            onClick={handleSaveAndNext}
+                            onClick={() => {
+                                // Save all changes before proceeding
+                                handleSaveDraft();
+                                onNextStep();
+                            }}
                         >
-                            SAVE & NEXT
+                            NEXT
                         </Button>
                     </div>
                 </Col>
@@ -860,12 +847,14 @@ const CampaignStep3: React.FC<CampaignStep3Props> = ({ campaign, handleSaveDraft
                         <div style={{ color: '#fff', fontWeight: 600, marginBottom: 12 }}>Clipper's account preview</div>
                         <div style={{ marginBottom: 16 }}>
                             <div className="d-flex align-items-center gap-2">
-                                <Image
-                                    src={PLATFORMS.find(p => p.key === preview.platform)?.icon || ''}
-                                    alt={PLATFORMS.find(p => p.key === preview.platform)?.label || ''}
-                                    width={24}
-                                    height={24}
-                                />
+                                {PLATFORMS.find(p => p.key === preview.platform)?.icon && (
+                                    <Image
+                                        src={PLATFORMS.find(p => p.key === preview.platform)?.icon || ''}
+                                        alt={PLATFORMS.find(p => p.key === preview.platform)?.label || ''}
+                                        width={24}
+                                        height={24}
+                                    />
+                                )}
                                 <span style={{ color: '#fff', fontSize: 14 }}>
                                     {PLATFORMS.find(p => p.key === preview.platform)?.label || ''}
                                 </span>

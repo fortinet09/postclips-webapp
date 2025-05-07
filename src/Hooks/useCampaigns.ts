@@ -96,6 +96,53 @@ export interface CampaignContent {
   created_at: string;
 }
 
+export interface UpdateCampaignViewsData {
+  targeted_amount_of_views: number;
+  amount_cpm_payout: number;
+}
+
+export interface CampaignBillingPlan {
+  id: string;
+  campaign_id: string;
+  plan_type: '1_month' | '3_month' | '6_month';
+  price_per_month: number;
+  discount_percent: number;
+  payment_method: 'stripe' | 'invoice';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CampaignPaymentMethod {
+  id: string;
+  campaign_id: string;
+  payment_method: 'stripe' | 'invoice';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BrandPaymentMethod {
+  id: string;
+  brand_id: string;
+  stripe_payment_method_id: string;
+  stripe_customer_id: string;
+  last_four: string;
+  brand: string;
+  exp_month: number;
+  exp_year: number;
+  name: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface SaveCardData {
+  card_number: string;
+  exp_month: string;
+  exp_year: string;
+  cvc: string;
+  name: string;
+}
+
 export const useCampaigns = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [topCampaigns, setTopCampaigns] = useState<Campaign[]>([]);
@@ -611,14 +658,33 @@ export const useCampaigns = () => {
     }
   }, []);
 
-  const setBrandAccountBios = useCallback(async (brandId: string, biosData: any) => {
+  const setBrandAccountBios = useCallback(async (brandId: string, biosData: { bio: string; link: string; platforms: string[] }) => {
     try {
       setLoading(true);
       const response = await fetchAPI("POST", `/campaigns/brand/${brandId}/account-bios`, biosData);
       if (response.success) {
-        toast.success('Bios updated!');
+        toast.success('Bio added successfully!');
       } else {
-        toast.error('Failed to update bios');
+        toast.error('Failed to add bio');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteBrandAccountBio = useCallback(async (brandId: string, bioId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("DELETE", `/campaigns/brand/${brandId}/account-bios/${bioId}`);
+      if (response.success) {
+        toast.success('Bio deleted successfully!');
+      } else {
+        toast.error('Failed to delete bio');
       }
       return response;
     } catch (err) {
@@ -687,6 +753,342 @@ export const useCampaigns = () => {
     }
   }, []);
 
+  // Campaign Captions
+  const getCampaignCaptions = useCallback(async (campaignId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("GET", `/campaigns/${campaignId}/captions`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addCampaignCaption = useCallback(async (campaignId: string, caption: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("POST", `/campaigns/${campaignId}/captions`, { caption });
+      if (response.success) {
+        toast.success('Caption added!');
+      } else {
+        toast.error('Failed to add caption');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteCampaignCaption = useCallback(async (campaignId: string, captionId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("DELETE", `/campaigns/${campaignId}/captions/${captionId}`);
+      if (response.success) {
+        toast.success('Caption deleted!');
+      } else {
+        toast.error('Failed to delete caption');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // --- Campaign Tags ---
+  const getCampaignTags = useCallback(async (campaignId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("GET", `/campaigns/${campaignId}/tags`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addCampaignTag = useCallback(async (campaignId: string, tag: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("POST", `/campaigns/${campaignId}/tags`, { tag });
+      if (response.success) {
+        toast.success('Tag added!');
+      } else {
+        toast.error('Failed to add tag');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteCampaignTag = useCallback(async (campaignId: string, tagId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("DELETE", `/campaigns/${campaignId}/tags/${tagId}`);
+      if (response.success) {
+        toast.success('Tag deleted!');
+      } else {
+        toast.error('Failed to delete tag');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // --- Campaign Outros ---
+  const getCampaignOutros = useCallback(async (campaignId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("GET", `/campaigns/${campaignId}/outros`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addCampaignOutro = useCallback(async (campaignId: string, file: File) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('outro', file);
+      const response = await fetchAPI("POST", `/campaigns/${campaignId}/outros`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (response.success) {
+        toast.success('Outro uploaded!');
+      } else {
+        toast.error('Failed to upload outro');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteCampaignOutro = useCallback(async (campaignId: string, outroId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("DELETE", `/campaigns/${campaignId}/outros/${outroId}`);
+      if (response.success) {
+        toast.success('Outro deleted!');
+      } else {
+        toast.error('Failed to delete outro');
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateCampaignViews = useCallback(async (campaignId: string, data: UpdateCampaignViewsData): Promise<ApiResponse> => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("PUT", `/campaigns/${campaignId}/views`, data);
+
+      if (response.success) {
+        // 
+      } else {
+        const errorMessage = handleApiError(response.error);
+        toast.error(errorMessage);
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, [currentStatus, fetchCampaigns]);
+
+  const getCampaignBillingPlan = useCallback(async (campaignId: string): Promise<ApiResponse<{ data: CampaignBillingPlan }>> => {
+    try {
+      const response = await fetchAPI("GET", `/campaigns/${campaignId}/billing-plan`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, []);
+
+  const getCampaignPaymentMethod = useCallback(async (campaignId: string): Promise<ApiResponse<{ data: CampaignPaymentMethod }>> => {
+    try {
+      const response = await fetchAPI("GET", `/campaigns/${campaignId}/payment-method`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, []);
+
+  const upsertCampaignBillingPlan = useCallback(async (
+    campaignId: string,
+    data: {
+      plan_type: '1_month' | '3_month' | '6_month',
+      price_per_month: number,
+      discount_percent: number,
+      payment_method: 'stripe' | 'invoice',
+    }
+  ): Promise<ApiResponse<CampaignBillingPlan>> => {
+    try {
+      const response = await fetchAPI("PUT", `/campaigns/${campaignId}/billing-plan`, data);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, []);
+
+  const saveCampaignCard = useCallback(async (campaignId: string, paymentMethodId: string): Promise<ApiResponse> => {
+    try {
+      setLoading(true);
+      const response = await fetchAPI("POST", `/campaigns/${campaignId}/save-card`, { paymentMethodId });
+
+      if (response.success) {
+        toast.success('Card saved successfully!');
+      } else {
+        const errorMessage = handleApiError(response.error);
+        toast.error(errorMessage);
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return {
+        success: false,
+        error: errorMessage
+      };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getBrandPaymentMethods = useCallback(async (brandId: string): Promise<ApiResponse<{ data: BrandPaymentMethod[] }>> => {
+    try {
+      const response = await fetchAPI("GET", `/campaigns/brands/${brandId}/payment-methods`);
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, []);
+
+  const setDefaultPaymentMethod = useCallback(async (brandId: string, paymentMethodId: string): Promise<ApiResponse> => {
+    try {
+      const response = await fetchAPI("POST", `/campaigns/brands/${brandId}/payment-methods/default`, {
+        paymentMethodId
+      });
+      if (response.success) {
+        toast.success('Default payment method updated');
+      } else {
+        const errorMessage = handleApiError(response.error);
+        toast.error(errorMessage);
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, []);
+
+  const deletePaymentMethod = useCallback(async (brandId: string, paymentMethodId: string): Promise<ApiResponse> => {
+    try {
+      const response = await fetchAPI("DELETE", `/campaigns/brands/${brandId}/payment-methods/${paymentMethodId}`);
+      if (response.success) {
+        toast.success('Payment method deleted');
+      } else {
+        const errorMessage = handleApiError(response.error);
+        toast.error(errorMessage);
+      }
+      return response;
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  }, []);
+
+  const upsertCampaignPaymentMethod = async (
+    campaignId: string,
+    paymentMethodType: 'stripe' | 'invoice',
+    brandsPaymentMethodId?: string
+  ): Promise<ApiResponse<{ data: CampaignPaymentMethod }>> => {
+    try {
+      const response = await fetchAPI("PUT", `/campaigns/${campaignId}/payment-method`, {
+        paymentMethodType,
+        brandsPaymentMethodId
+      });
+      return response;
+    } catch (error) {
+      toast.error('Failed to update payment method');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update payment method'
+      };
+    }
+  };
+
+  const submitCampaign = async (campaignId: string): Promise<ApiResponse> => {
+    try {
+      const response = await fetchAPI("PUT", `/campaigns/${campaignId}/submit`);
+      if (!response.success) {
+        console.error('Submit campaign error:', response.error, response);
+      }
+      return response;
+    } catch (error) {
+      toast.error('Failed to submit campaign');
+      console.error('Submit campaign exception:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to submit campaign'
+      };
+    }
+  };
+
   useEffect(() => {
     fetchCampaigns('active', null);
 
@@ -722,8 +1124,28 @@ export const useCampaigns = () => {
     deleteBrandAccountUsername,
     getBrandAccountBios,
     setBrandAccountBios,
+    deleteBrandAccountBio,
     getBrandAccountPictures,
     addBrandAccountPicture,
     deleteBrandAccountPicture,
+    getCampaignCaptions,
+    addCampaignCaption,
+    deleteCampaignCaption,
+    getCampaignTags,
+    addCampaignTag,
+    deleteCampaignTag,
+    getCampaignOutros,
+    addCampaignOutro,
+    deleteCampaignOutro,
+    updateCampaignViews,
+    getCampaignBillingPlan,
+    upsertCampaignBillingPlan,
+    saveCampaignCard,
+    getCampaignPaymentMethod,
+    upsertCampaignPaymentMethod,
+    getBrandPaymentMethods,
+    setDefaultPaymentMethod,
+    deletePaymentMethod,
+    submitCampaign,
   };
 };

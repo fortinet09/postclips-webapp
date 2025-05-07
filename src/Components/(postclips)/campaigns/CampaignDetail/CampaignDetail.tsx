@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { Container, Form, FormGroup, Label, Input, Button, Row, Col } from 'reactstrap';
+import { Container, Form, FormGroup, Label, Input, Button, Row, Col, Modal, ModalBody, ModalFooter } from 'reactstrap';
 import { useCampaigns, PreviewImage, ExampleClip } from '@/Hooks/useCampaigns';
 import { toast } from 'react-toastify';
 import { fetchAPI } from "@/Clients/postclips/server/ApiClient";
@@ -12,6 +12,7 @@ import CampaignStep3 from './Steps/CampaignStep3';
 import CampaignStep4 from './Steps/CampaignStep4';
 import CampaignStep5 from './Steps/CampaignStep5';
 import { Campaign } from '@/Types/(postclips)/Campaign';
+import { useRouter } from 'next/navigation';
 
 interface CampaignDetailProps {
     campaign: Campaign
@@ -29,9 +30,14 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaign }) => {
         end_date: campaign.end_date ? new Date(campaign.end_date).toISOString().split('T')[0] : ''
     });
 
-    const { updateCampaignDraft } = useCampaigns();
+    const { updateCampaignDraft, submitCampaign } = useCampaigns();
     const dispatch = useAppDispatch();
     const { currentStep, steps } = useAppSelector((state) => state.header);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const router = useRouter();
+    const [step5State, setStep5State] = useState<any>({});
 
     const handleSaveDraft = async () => {
         try {
@@ -58,6 +64,12 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaign }) => {
         }
     };
 
+    const handleStep5State = (state: any) => setStep5State(state);
+
+    const handleStep5SubmitSuccess = () => {
+        router.push('/brand/campaigns');
+    };
+
     const renderStep = () => {
         switch (currentStep) {
             case 1:
@@ -69,16 +81,14 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaign }) => {
             case 4:
                 return <CampaignStep4 campaign={campaign} handleSaveDraft={handleSaveDraft} onNextStep={() => handleStep('next')} onPreviousStep={() => handleStep('previous')} />;
             case 5:
-                return <CampaignStep5 campaign={campaign} handleSaveDraft={handleSaveDraft} onPreviousStep={() => handleStep('previous')} />;
+                return <CampaignStep5 campaign={campaign} onPreviousStep={() => handleStep('previous')} />;
             default:
                 return <CampaignStep1 campaign={campaign} handleSaveDraft={handleSaveDraft} onNextStep={() => handleStep('next')} />;
         }
     };
 
     return (
-        <>
-            {renderStep()}
-        </>
+        <>{renderStep()}</>
     );
 };
 
