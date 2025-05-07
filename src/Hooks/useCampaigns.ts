@@ -8,10 +8,15 @@ export interface Campaign {
   title: string;
   description: string;
   status: string;
-  profile_picture: string;
   created_at: string;
   targeted_amount_of_views: number;
   total_budget: number;
+  preview_images: {
+    id: string;
+    image_url: string;
+    created_at: string;
+    campaign_id: string;
+  }[];
   analytics: {
     total_views: number;
     total_likes: number;

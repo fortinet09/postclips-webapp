@@ -855,3 +855,39 @@
         }
     }
 }
+
+.campaign-card {
+  background: #242424;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+
+  .card-img-top {
+    height: 240px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .card-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    h3 {
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .campaign-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+}

@@ -1,7 +1,6 @@
-import { Href, ImagePath } from "@/Constant";
+import { ImagePath } from "@/Constant";
 import { userProfileData } from "@/Data/Layout/Header";
 import { useAuth } from "@/Providers/SessionProvider";
-import { supabase } from "@/Clients/supabase/SupabaseClient";
 import Image from "next/image";
 import Link from "next/link";
 import { LogOut } from "react-feather";

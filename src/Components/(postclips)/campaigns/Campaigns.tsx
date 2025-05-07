@@ -131,9 +131,16 @@ const Campaigns: React.FC<CampaignsProps> = () => {
     }, [currentStatus]);
 
     const handleCampaignClick = (campaign: any) => {
-        if (campaign.status === 'draft') {
+        if (campaign.status === 'draft' || campaign.status === 'in_review') {
             router.push(`/brand/campaigns/detail/${campaign.id}`);
         }
+    };
+
+    // Function to get a random preview image
+    const getRandomPreviewImage = (previewImages: any[]) => {
+        if (!previewImages || previewImages.length === 0) return '/placeholder-campaign.jpg';
+        const randomIndex = Math.floor(Math.random() * previewImages.length);
+        return previewImages[randomIndex].image_url;
     };
 
     if (error) {
@@ -156,7 +163,7 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                                         >
                                             <Card className="campaign-card">
                                                 <div className="overlay"></div>
-                                                <CardImg top src={campaign.profile_picture || '/placeholder-campaign.jpg'} alt={campaign.title} />
+                                                <CardImg top src={getRandomPreviewImage(campaign.preview_images)} alt={campaign.title} />
                                                 <CardBody>
                                                     <div className="campaign-title">{campaign.title}</div>
                                                     <div className="campaign-stats">
@@ -303,15 +310,11 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                         {campaigns.map((campaign) => (
                             <Col key={campaign.id}>
                                 <Card 
-                                    className={`campaign-card ${campaign.status === 'draft' ? 'cursor-pointer' : ''}`}
+                                    className={`campaign-card ${(campaign.status === 'draft' || campaign.status === 'in_review') ? 'cursor-pointer' : ''}`}
                                     onClick={() => handleCampaignClick(campaign)}
-                                    style={{ cursor: campaign.status === 'draft' ? 'pointer' : 'default' }}
+                                    style={{ cursor: (campaign.status === 'draft' || campaign.status === 'in_review') ? 'pointer' : 'default' }}
                                 >
-                                    {
-                                        campaign.profile_picture && (
-                                            <CardImg top src={campaign.profile_picture || '/placeholder-campaign.jpg'} alt={campaign.title} />
-                                        )
-                                    }
+                                    <CardImg top src={getRandomPreviewImage(campaign.preview_images)} alt={campaign.title} />
                                     <CardBody>
                                         <h3>{campaign.title}</h3>
                                         <div className="campaign-metrics">
