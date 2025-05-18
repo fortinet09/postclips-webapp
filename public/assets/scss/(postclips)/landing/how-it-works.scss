@@ -1,0 +1,218 @@
+// HowItWorks.scss - Regular CSS class names, not modules
+
+// Container and main layout styles
+.how-it-works-container {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 5rem;
+  margin-top: 8rem;
+}
+
+.how-it-works-highlight {
+  color: #00E7FF;
+}
+
+.featuresList {
+  width: 100%;
+  padding-top: 0vh;
+  padding-bottom: 0vh;
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+
+.visualContainer {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  align-items: center;
+}
+
+.cardContainer {
+  position: relative;
+  aspect-ratio: 1/1;
+  width: 100%;
+  border-radius: 1rem;
+
+  &:has(> .active-card) {
+    background-color: transparent;
+  }
+}
+
+// FeatureTitle styles
+.feature-title {
+  color: #FFFFFF !important;
+  font-size: 2.6rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 30px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  transition-property: color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.feature-subtitle {
+  font-size: 1.5rem;
+  font-weight: normal;
+  text-align: left;
+  color: #FFFFFF99 !important;
+  margin-top: 15px;
+}
+
+.text-black {
+  color: #000000;
+}
+
+.text-gray-300 {
+  color: #d1d5db;
+}
+
+// Visual component styles
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.opacity-100 {
+  opacity: 1;
+}
+
+.max-w-6xl {
+  max-width: 72rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+// FeatureCard styles
+.h-full {
+  height: 100%;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.origin-bottom-left {
+  transform-origin: bottom left;
+}
+
+.bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.active-card {
+  /* This is a marker class used in selectors, no specific styles needed */
+}
+
+.bottom-6 {
+  bottom: 1.5rem;
+}
+
+.right-6 {
+  right: 1.5rem;
+}
+
+.bg-black {
+  background-color: #000000;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.scale-0 {
+  transform: scale(0);
+}
+
+.scale-100 {
+  transform: scale(1);
+}
+
+// Tailwind's arbitrary value pattern styles
+// These would require custom classes for each specific case
+// Left as is in the component markup for simplicity
+
+// Custom classes that may be needed
+.gradient {
+  /* Base styles for gradients */
+}
+
+.show-me-btn {
+  /* Button styles if needed beyond the utilities */
+}
+
+/* Specific visual-id classes if needed */
+// .visual-music {}
+// .visual-todo-list {}
+// etc.

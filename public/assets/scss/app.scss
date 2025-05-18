@@ -100,7 +100,7 @@
 
 @import "./postclips-general.scss";
 
-@import "./postclips-landing.scss";
+@import "./(postclips)/landing/main.scss";
 
 // Postclips
 // -- General
@@ -114,3 +114,6 @@
 
 // -- Campaigns
 @import "(postclips)/campaigns/index.scss";
+
+// -- Clips approval
+@import "(postclips)/clips-approval/index.scss";

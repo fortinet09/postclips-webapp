@@ -4,11 +4,14 @@ import { PostClipsMenuListAdmin, PostClipsMenuListBrand, PostClipsMenuListClippe
 import { cookies } from "next/headers";
 
 export async function updateSession(request: NextRequest) {
+  if (request.nextUrl.pathname === "/") {
+    return NextResponse.next();
+  }
   // Get token from cookies
-  const token = request.cookies.get("auth_token")?.value;
+  const token = request.cookies.get("auth_token")?.value ? request.cookies.get("auth_token")?.value === 'null' ? null : request.cookies.get("auth_token")?.value : null;
 
   // Check if user is trying to access protected routes
-  const isProtectedRoute = 
+  const isProtectedRoute =
     request.nextUrl.pathname.startsWith("/campaigns") ||
     request.nextUrl.pathname.startsWith("/home") ||
     request.nextUrl.pathname.startsWith("/accounts") ||
@@ -22,9 +25,12 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  console.log("Token", { token, pathname: request.nextUrl.pathname });
+
   // If user has token and is on login page, verify token and redirect to appropriate page
   if (token && request.nextUrl.pathname.includes("/login")) {
     try {
+      console.log("Fetching roles 1");
       const { data, error } = await fetchAPI("GET", "/auth/roles");
 
       if (!data) {
@@ -70,6 +76,9 @@ export async function updateSession(request: NextRequest) {
       }
     } catch (error: any) {
       if (error.message === "UNAUTHORIZED" || error.error?.includes("Unauthorized")) {
+        const cookieStore = await cookies();
+        cookieStore.delete("auth_token");
+
         const url = request.nextUrl.clone();
         url.pathname = "/login";
         return NextResponse.redirect(url);

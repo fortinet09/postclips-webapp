@@ -22,7 +22,6 @@ const UserLogin = () => {
           />
         </div>
       </div>
-      <ToastContainer />
     </>
   );
 };

@@ -145,16 +145,17 @@ export const SessionProvider = ({
 
       if (!isMounted) return;
 
-      setToken(storedToken || null);
+      setToken(storedToken ? storedToken !== 'null' ? storedToken : null : null);
       const userData = storedUserData ? JSON.parse(decodeURIComponent(storedUserData)) : null;
       setUser(userData);
 
-      if (storedToken) {
+      if (storedToken && storedToken !== 'null') {
         try {
           dispatch(initializeSidebar());
+          console.log("Fetching roles 2");
           const { data: rolesData, error: rolesError } = await fetchAPI("GET", "/auth/roles");
           if (!isMounted) return;
-          
+
           if (rolesError) {
             handleApiError(rolesError);
           } else if (rolesData?.roles?.length > 0) {
@@ -226,6 +227,7 @@ export const SessionProvider = ({
         // await fetchUserConfig(newToken);
 
         // Fetch user roles after successful verification
+        console.log("Fetching roles 3");
         const { data: rolesData, error: rolesError } = await fetchAPI("GET", "/auth/roles");
         if (rolesError) {
           handleApiError(rolesError);

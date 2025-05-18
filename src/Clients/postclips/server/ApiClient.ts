@@ -35,6 +35,7 @@ export const fetchAPI = async <T = any>(
   config?: AxiosRequestConfig
 ): Promise<ApiResponse<T>> => {
   try {
+    console.log("[fetchAPI] url", url);
     // Get token from cookies
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value;
@@ -77,10 +78,17 @@ export const fetchAPI = async <T = any>(
       error: "Could not fetch data",
     };
   } catch (error: any) {
-    console.log("API error", { error });
-    if (error.message === "UNAUTHORIZED" || error.error === "Unauthorized") {
+    console.log("API error", { error, status: error.response?.status, message: error.response?.data });
+
+    // Check for 401 status code in the response
+    if (error.response?.status === 401 ||
+      error.message === "UNAUTHORIZED" ||
+      error.error === "Unauthorized") {
+      const cookieStore = await cookies();
+      cookieStore.delete("auth_token");
       redirect("/login");
     }
+
     return {
       success: false,
       error: error.response?.data || error.message,

@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchUserRoles = createAsyncThunk(
   "userRoles/fetchUserRoles",
   async (userId: string) => {
+    console.log("Fetching roles 4");
     const response = await fetch(`/api/auth/roles/${userId}`);
     const data = await response.json();
     return data.roles;

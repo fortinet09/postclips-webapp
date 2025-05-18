@@ -13,7 +13,7 @@ type TabType = "in_review" | "approved" | "rejected";
 const Clips = () => {
     console.log("[Clips] Component rendering");
     const [activeTab, setActiveTab] = useState<TabType>("in_review");
-    const { clips, loading, error, refetchClips } = useClips();
+    const { clips, loading, error, fetchClips } = useClips();
     const [currentClipIndex, setCurrentClipIndex] = useState<number>(0);
     const { selectedClip, isModalOpen, openModal, closeModal } = useClipReviewModal();
     const hasFetchedRef = useRef(false);
@@ -23,9 +23,9 @@ const Clips = () => {
         if (activeTab !== tab) {
             setActiveTab(tab);
             setCurrentClipIndex(0);
-            refetchClips(tab);
+            fetchClips({ status: tab });
         }
-    }, [activeTab, refetchClips]);
+    }, [activeTab, fetchClips]);
 
     const handleReviewClick = useCallback((clip: Clip) => {
         console.log("[Clips] Review click:", { clipId: clip.id });
@@ -43,7 +43,7 @@ const Clips = () => {
         });
         
         // Refetch clips to ensure we have the latest data
-        refetchClips(activeTab);
+        fetchClips({ status: activeTab });
         
         const pendingClips = clips.filter(clip => clip.status === "in_review");
         const nextIndex = currentClipIndex + 1;
@@ -56,7 +56,7 @@ const Clips = () => {
             console.log("[Clips] No more clips to review, closing modal");
             closeModal();
         }
-    }, [clips, currentClipIndex, activeTab, openModal, closeModal, refetchClips]);
+    }, [clips, currentClipIndex, activeTab, openModal, closeModal, fetchClips]);
 
     const getNextClip = useCallback((): Clip | null => {
         const pendingClips = clips.filter(clip => clip.status === "in_review");
@@ -88,9 +88,9 @@ const Clips = () => {
         if (!hasFetchedRef.current) {
             console.log("[Clips] Initial fetch");
             hasFetchedRef.current = true;
-            refetchClips(activeTab);
+            fetchClips({ status: activeTab });
         }
-    }, [activeTab, refetchClips]);
+    }, [activeTab, fetchClips]);
 
     return (
         <div className="container-fluid">

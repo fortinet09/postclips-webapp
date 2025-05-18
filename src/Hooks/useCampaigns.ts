@@ -165,16 +165,21 @@ export const useCampaigns = () => {
   const fetchCampaigns = useCallback(async (status: string | null, searchTerm: string | null) => {
     try {
       setLoading(true);
-      const response = await fetchAPI("POST", "/campaigns/brand", {
+      const response = await fetchAPI("POST", "/campaigns/", {
         status: searchTerm ? null : status,
         searchTerm: searchTerm || null
       });
 
-      if (response.success && response.data?.data) {
-        const campaignsData = response.data.data;
-        setTopCampaigns(campaignsData.topCampaigns);
-        setCampaigns(campaignsData.statusCampaigns);
-        setTotalAnalytics(campaignsData.totalAnalytics);
+      if (response.success && response.data?.data?.[0]) {
+        const campaignsData = response.data.data[0];
+        setTopCampaigns(campaignsData.top_campaigns || []);
+        setCampaigns(campaignsData.status_campaigns || []);
+        setTotalAnalytics(campaignsData.total_analytics || {
+          total_views: 0,
+          total_clips: 0,
+          total_link_clicks: 0,
+          average_views_per_clip: 0
+        });
         setError(null);
       } else {
         const errorMessage = handleApiError(response.error);

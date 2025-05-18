@@ -5,6 +5,7 @@ import Store from "@/Redux/Store";
 import { RootLayoutProps } from "@/Types/Layout.type";
 import React, { ErrorInfo } from "react";
 import { Provider } from "react-redux";
+import { ToastContainer } from "react-toastify";
 
 // interface ErrorBoundaryState {
 //   hasError: boolean;
@@ -43,6 +44,7 @@ const MainProvider: React.FC<RootLayoutProps> = ({ children }) => {
         {/* <ErrorBoundary>{children}</ErrorBoundary> */}
         {children}
       </SessionProvider>
+      <ToastContainer />
     </Provider>
   );
 };

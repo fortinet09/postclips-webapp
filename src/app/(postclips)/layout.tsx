@@ -49,7 +49,6 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
           <div className="page-body ">{children}</div>
           {/* <Footer /> */}
         </div>
-        <ToastContainer />
       </div>
       <TapTop />
     </>
