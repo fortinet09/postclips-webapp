@@ -18,7 +18,7 @@ const GroupChatContainer = () => {
 
   return (
     <>
-      <Breadcrumbs mainTitle={GroupChatTitle} parent={ChatTitle} title={GroupChatTitle} />
+      <Breadcrumbs title={GroupChatTitle} />
       <Container fluid>
         <Row className="g-0">
           <LeftSideBar />

@@ -20,7 +20,7 @@ const InvoiceOneContainer = () => {
  });
   return (
     <>
-      <Breadcrumbs mainTitle={InvoiceOne} parent={Invoice} title="" />
+      <Breadcrumbs title="" />
       <Container className="invoice-1">
         <div ref={contentRef}>
           <Table className="table-wrapper" borderless>

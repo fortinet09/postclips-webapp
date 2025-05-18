@@ -10,7 +10,7 @@ import CheckoutDetails from './CheckoutDetails'
 const CheckoutContainer = () => {
     return (
         <>
-            <Breadcrumbs mainTitle={CheckoutTitle} parent={ECommerceTitle} title={CheckoutTitle} />
+            <Breadcrumbs title={CheckoutTitle} />
             <Container fluid>
                 <Card>
                     <CommonCardHeader title={BillingDetails} headClass='pb-0' />

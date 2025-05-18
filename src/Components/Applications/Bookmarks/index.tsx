@@ -7,7 +7,7 @@ import RightAsideBookmark from "./RightAsideBookmark";
 const BookmarksContainer = () => {
     return (
         <>
-            <Breadcrumbs mainTitle={BookmarksTitle} parent={ApplicationsTitle} title={BookmarksTitle} />
+            <Breadcrumbs title={BookmarksTitle} />
             <Container fluid>
                 <div className="email-wrap bookmark-wrap">
                     <Row>

@@ -18,7 +18,7 @@ const PrivateChatContainer = () => {
 
   return (
     <>
-      <Breadcrumbs mainTitle={PrivateChatTitle} parent={ChatTitle} title={PrivateChatTitle} />
+      <Breadcrumbs title={PrivateChatTitle} />
       <Container fluid>
         <Row className="g-0">
           <LeftSideBar />

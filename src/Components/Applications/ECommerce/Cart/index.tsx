@@ -9,7 +9,7 @@ import CommonCardHeader from '@/CommonComponent/CommonCardHeader'
 const CartContainer = () => {
     return (
         <>
-            <Breadcrumbs mainTitle={CartTitle} parent={ECommerceTitle} title={CartTitle} />
+            <Breadcrumbs title={CartTitle} />
             <Container fluid>
                 <Row>
                     <Col sm={12}>

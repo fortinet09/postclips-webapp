@@ -21,7 +21,7 @@ const InvoiceFourContainer = () => {
 
   return (
     <>
-      <Breadcrumbs mainTitle={InvoiceFour} parent={Invoice} title="" />
+      <Breadcrumbs title="" />
       <Container className="invoice-4">
         <div ref={contentRef}>
           <Table borderless style={{ width: 1160, margin: "0 auto" }}>

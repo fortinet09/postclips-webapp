@@ -9,7 +9,7 @@ import { ApplicationsTitle, CalendarBasicTitle, CalendarTitle } from '@/Constant
 const CalendarContainer = () => {
     return (
         <>
-            <Breadcrumbs mainTitle={CalendarBasicTitle} parent={ApplicationsTitle} title={CalendarTitle} />
+            <Breadcrumbs title={CalendarTitle} />
             <Container className='calendar-basic' fluid>
                 <Card>
                     <CardBody>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BreadcrumbsProps } from "@/Types/CommonComponent.type";
 import SVG from "../SVG";
 
-const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ title }) => {
+const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ title, mainTitle, parent }) => {
   return (
     <Container fluid>
       <div className="page-title">

@@ -18,7 +18,7 @@ const ContactsContainer = () => {
     }, []);
     return (
         <>
-            <Breadcrumbs mainTitle={ContactsTitle} parent={ApplicationsTitle} title={ContactsTitle} />
+            <Breadcrumbs title={ContactsTitle} />
             <Container fluid>
                 <div className="email-wrap bookmark-wrap">
                     <Row>

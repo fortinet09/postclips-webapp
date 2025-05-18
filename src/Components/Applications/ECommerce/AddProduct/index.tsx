@@ -14,7 +14,7 @@ const AddProductContainer = () => {
     }, []);
     return (
         <>
-            <Breadcrumbs mainTitle={AddProductTitle} parent={ECommerceTitle} title={AddProductTitle} />
+            <Breadcrumbs title={AddProductTitle} />
             <Container fluid>
                 <Row>
                     <Col xs={12}>
