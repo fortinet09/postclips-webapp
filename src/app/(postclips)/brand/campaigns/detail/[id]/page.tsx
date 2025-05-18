@@ -4,6 +4,12 @@ import CampaignDetailWrapper from "@/Components/(postclips)/campaigns/CampaignDe
 import CampaignNotFound from "@/Components/(postclips)/campaigns/CampaignNotFound";
 import { Campaign } from "@/Types/(postclips)/Campaign";
 
+// This must be matching the Next.js expected type
+type PageProps = {
+    params: Promise<{ id: string }>;
+    searchParams?: { [key: string]: string | string[] | undefined };
+};
+
 interface CampaignResponse {
     success: boolean;
     message: string;
@@ -33,8 +39,10 @@ async function verifyPermissions(campaignId: string): Promise<boolean> {
     }
 }
 
-export default async function CampaignDetailPage({ params }: { params: { id: string } }) {
-    const { id } = params;
+export default async function CampaignDetailPage({ params }: PageProps) {
+    // Resolve the promise to get the actual params
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
 
     // Validate campaign ID
     if (!id || typeof id !== 'string') {
