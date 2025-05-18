@@ -30,6 +30,11 @@
   align-items: center;
 }
 
+.mobile-image-container {
+  display: none;
+  /* Show the mobile image */
+}
+
 @media screen and (max-width: 768px) {
   .visualContainer {
     display: none;
