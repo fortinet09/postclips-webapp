@@ -25,8 +25,7 @@ interface StepData {
     card: React.ComponentType<{ id: string }>;
 }
 
-// Define your steps data
-const stepsData: StepData[] = [
+const stepsClipper: StepData[] = [
     {
         id: "step-1",
         title: "Watch YOUR Favorite Networks",
@@ -61,46 +60,53 @@ const stepsData: StepData[] = [
     },
 ];
 
-const features = [
+// Define network steps data based on the image
+const stepsNetwork: StepData[] = [
     {
-        title: "Use your calendar as a todo list",
-        id: "todo-list",
-        card: Todo,
-        visual: OtherVisual,
+        id: "step-1",
+        title: "DESIGN the Accounts",
+        description:
+            "Choose the username, bio, link in bio, and profile pictures for every account",
+        highlight: "DESIGN",
+        card: Test,
     },
     {
-        title: "Color your calendar to organize",
-        id: "colors",
-        card: Colors,
-        visual: OtherVisual,
+        id: "step-2",
+        title: "CUSTOMIZE your clips",
+        description:
+            "Control every detail— Pick the caption, add your logo, show name, and outro for every post",
+        highlight: "CUSTOMIZE",
+        card: Test,
     },
     {
-        title: "Instantly know if someone is available",
-        id: "availability",
-        card: Availability,
-        visual: OtherVisual,
+        id: "step-3",
+        title: "APPROVE or REJECT Every Clip Submitted",
+        description:
+            "Total control—nothing goes live without your sign-off",
+        highlight: "APPROVE",
+        card: Test,
     },
     {
-        title: "Track what you listened to when",
-        id: "music",
-        card: Music,
-        visual: MusicVisual,
+        id: "step-4",
+        title: "GET UP to Billions of Views",
+        description:
+            "Let our clippers push content across thousands of accounts",
+        highlight: "GET UP",
+        card: Test,
     },
     {
-        title: "Send scheduling links guests love",
-        id: "scheduling-links",
-        card: SchedulingLinks,
-        visual: OtherVisual,
-    },
-    {
-        title: "Always know what your team is up to",
-        id: "team",
-        card: Team,
-        visual: OtherVisual,
+        id: "step-5",
+        title: "Up to 10,000 Accounts Analytics All in 1 Place",
+        description:
+            "[placeholder description]",
+        highlight: "Up to",
+        card: Test,
     },
 ];
 
-const HowItWorks = () => {
+const HowItWorks = ({ type }: { type: "clipper" | "network" }) => {
+    const stepsData = type === "clipper" ? stepsClipper : stepsNetwork;
+
     // Function to create a title with highlighted text
     const createTitleWithHighlight = (title: string, highlight: string) => {
         // Find the word to highlight
@@ -144,14 +150,14 @@ const HowItWorks = () => {
                         <step.card id={step.id} key={step.id} />
                     ))} */}
 
-                        <Image src="/assets/images/(postclips)/landing/how-it-works.svg" alt="Test" fill />
+                        <Image src={type === "clipper" ? "/assets/images/(postclips)/landing/how-it-works.svg" : "/assets/images/(postclips)/landing/how-it-works-network.svg"} alt="Test" fill />
                     </div>
                 </div>
             </div>
 
             <div className="mobile-image-container mb-5">
                 <Image
-                    src="/assets/images/(postclips)/landing/how-it-works.svg"
+                    src={type === "clipper" ? "/assets/images/(postclips)/landing/how-it-works.svg" : "/assets/images/(postclips)/landing/how-it-works-network.svg"}
                     alt="How It Works"
                     width={400}
                     height={400}

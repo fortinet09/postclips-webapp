@@ -21,14 +21,17 @@ export default function Home() {
   const phonesRowRef = useRef<HTMLDivElement | null>(null);
   const [animating, setAnimating] = useState<boolean>(false);
   const [earnings, setEarnings] = useState<number>(0);
+  const [campaignsViews, setCampaignsViews] = useState<number>(0);
   const [clips, setClips] = useState<number>(0);
   const [statsVisible, setStatsVisible] = useState<boolean>(false);
   const statsRef = useRef<HTMLDivElement | null>(null);
   const [direction, setDirection] = useState<'left' | 'right'>('right'); // Track animation direction
+  const [userType, setUserType] = useState<'clipper' | 'network'>('clipper');
 
   // For animation stats
   const earningsTarget = 12547;
-  const clipsTarget = 104;
+  const clipsTarget = 26450;
+  const campaignsViewsTarget = 2150209000;
   const duration = 1800; // ms
 
   // Setup intersection observers for scroll animations
@@ -63,12 +66,13 @@ export default function Home() {
 
       setEarnings(Math.floor(ease(progress) * earningsTarget));
       setClips(Math.floor(ease(progress) * clipsTarget));
-
+      setCampaignsViews(Math.floor(ease(progress) * campaignsViewsTarget));
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
         setEarnings(earningsTarget);
         setClips(clipsTarget);
+        setCampaignsViews(campaignsViewsTarget);
       }
     }
 
@@ -268,6 +272,22 @@ export default function Home() {
         <div className="logo-container">
           <Image src="/assets/images/(postclips)/logos/logo.svg" alt="PostClips Logo" width={120} height={32} priority />
         </div>
+        <div className="landing_user-type-toggle">
+          <div className="landing_toggle-container">
+            <button
+              className={`landing_toggle-btn ${userType === "clipper" ? "landing_active" : ""}`}
+              onClick={() => setUserType("clipper")}
+            >
+              I'm a Clipper
+            </button>
+            <button
+              className={`landing_toggle-btn ${userType === "network" ? "landing_active" : ""}`}
+              onClick={() => setUserType("network")}
+            >
+              I'm a Network
+            </button>
+          </div>
+        </div>
         <div className="header-btn-wrapper">
           <a href="https://apps.apple.com/mx/app/post-clips/id6742848231?l=en-GB" target="_blank" className="btn-chipped">GET THE APP</a>
         </div>
@@ -297,15 +317,28 @@ export default function Home() {
 
       {/* Earnings and Clips Section */}
       <section className="section-earnings">
-        <h2 className="earnings-title">We pay you for every<br />1,000 views you generate</h2>
+        {userType === "clipper" ? (
+          <h2 className="earnings-title">We pay you for every<br />1,000 views you generate</h2>
+        ) : (
+          <h2 className="earnings-title">You just discovered the <br /><span style={{ color: '#00E7FF' }}>CHEAT CODE</span> for getting <br />customers attention</h2>
+        )}
         <div className="earnings-stats-row" ref={statsRef}>
           <div className="earnings-stat-box chipped-top-right">
-            <span className="stat-label">Total earnings</span>
-            <span className="stat-value">${formatNumber(earnings)}</span>
+            {userType === "clipper" ? (
+              <>
+                <span className="stat-label">Total earnings</span>
+                <span className="stat-value">${formatNumber(earnings)}</span>
+              </>
+            ) : (
+              <>
+                <span className="stat-label">Campaigns Views</span>
+                <span className="stat-value">${formatNumber(campaignsViews)}</span>
+              </>
+            )}
           </div>
           <div className="earnings-stat-box chipped-top-right">
             <span className="stat-label">Clips Posted</span>
-            <span className="stat-value">{clips}</span>
+            <span className="stat-value">{formatNumber(clips)}</span>
           </div>
         </div>
 
@@ -345,7 +378,7 @@ export default function Home() {
           </div>
         </div>
 
-        <HowItWorks/>
+        <HowItWorks type={userType} />
 
         <ResponsiveImage
           containerClassName="mb-5"
@@ -377,7 +410,7 @@ export default function Home() {
           mobileSrc="/assets/images/(postclips)/landing/section4-mobile.svg"
           alt=""
         />
-        <FAQs />
+        <FAQs type={userType} />
         <Footer />
       </section>
     </div>
