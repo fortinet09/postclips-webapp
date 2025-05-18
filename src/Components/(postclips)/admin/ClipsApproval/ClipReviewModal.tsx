@@ -13,7 +13,7 @@ interface ClipReviewModalProps {
 }
 
 const ClipReviewModal = ({ clip, nextClip, isOpen, toggle, onTransitionComplete }: ClipReviewModalProps) => {
-    const { approveClip, rejectClip, approving, rejecting } = useClips();
+    // const { approveClip, rejectClip, approving, rejecting } = useClips();
     const [isPlaying, setIsPlaying] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -33,29 +33,29 @@ const ClipReviewModal = ({ clip, nextClip, isOpen, toggle, onTransitionComplete 
             return;
         }
         
-        const success = await approveClip(clip.id, clip.campaign_id);
-        console.log("[ClipReviewModal] approveClip result", { success });
+        // const success = await approveClip(clip.id, clip.campaign_id);
+        // console.log("[ClipReviewModal] approveClip result", { success });
 
-        if (success) {
-            setTransitionType('up');
-            setIsTransitioning(true);
+        // if (success) {
+        //     setTransitionType('up');
+        //     setIsTransitioning(true);
             
-            if (!nextClip) {
-                console.log("[ClipReviewModal] No next clip, closing modal");
-                setTimeout(() => {
-                    toggle();
-                }, 500);
-            } else {
-                console.log("[ClipReviewModal] Moving to next clip", { nextClipId: nextClip.id });
-                setTimeout(() => {
-                    setIsTransitioning(false);
-                    setTransitionType(null);
-                    onTransitionComplete();
-                }, 500);
-            }
-        } else {
-            console.log("[ClipReviewModal] Approval failed, no transition");
-        }
+        //     if (!nextClip) {
+        //         console.log("[ClipReviewModal] No next clip, closing modal");
+        //         setTimeout(() => {
+        //             toggle();
+        //         }, 500);
+        //     } else {
+        //         console.log("[ClipReviewModal] Moving to next clip", { nextClipId: nextClip.id });
+        //         setTimeout(() => {
+        //             setIsTransitioning(false);
+        //             setTransitionType(null);
+        //             onTransitionComplete();
+        //         }, 500);
+        //     }
+        // } else {
+        //     console.log("[ClipReviewModal] Approval failed, no transition");
+        // }
     };
 
     const handleReject = async () => {
@@ -69,29 +69,29 @@ const ClipReviewModal = ({ clip, nextClip, isOpen, toggle, onTransitionComplete 
             return;
         }
 
-        const success = await rejectClip(clip.id);
-        console.log("[ClipReviewModal] rejectClip result", { success });
+        // const success = await rejectClip(clip.id);
+        // console.log("[ClipReviewModal] rejectClip result", { success });
 
-        if (success) {
-            setTransitionType('down');
-            setIsTransitioning(true);
+        // if (success) {
+        //     setTransitionType('down');
+        //     setIsTransitioning(true);
 
-            if (!nextClip) {
-                console.log("[ClipReviewModal] No next clip, closing modal");
-                setTimeout(() => {
-                    toggle();
-                }, 500);
-            } else {
-                console.log("[ClipReviewModal] Moving to next clip", { nextClipId: nextClip.id });
-                setTimeout(() => {
-                    setIsTransitioning(false);
-                    setTransitionType(null);
-                    onTransitionComplete();
-                }, 500);
-            }
-        } else {
-            console.log("[ClipReviewModal] Rejection failed, no transition");
-        }
+        //     if (!nextClip) {
+        //         console.log("[ClipReviewModal] No next clip, closing modal");
+        //         setTimeout(() => {
+        //             toggle();
+        //         }, 500);
+        //     } else {
+        //         console.log("[ClipReviewModal] Moving to next clip", { nextClipId: nextClip.id });
+        //         setTimeout(() => {
+        //             setIsTransitioning(false);
+        //             setTransitionType(null);
+        //             onTransitionComplete();
+        //         }, 500);
+        //     }
+        // } else {
+        //     console.log("[ClipReviewModal] Rejection failed, no transition");
+        // }
     };
 
     const togglePlaybackSpeed = () => {
@@ -196,7 +196,7 @@ const ClipReviewModal = ({ clip, nextClip, isOpen, toggle, onTransitionComplete 
                             
                             <div className="mt-auto pb-3">
                                 <div className="d-flex flex-column gap-3">
-                                    <button
+                                    {/* <button
                                         className="btn btn-primary d-flex align-items-center justify-content-center gap-2 py-3 w-100"
                                         onClick={handleApprove}
                                         disabled={approving || rejecting || isTransitioning}
@@ -219,7 +219,7 @@ const ClipReviewModal = ({ clip, nextClip, isOpen, toggle, onTransitionComplete 
                                             }}
                                         />
                                         REJECT
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
                         </div>
