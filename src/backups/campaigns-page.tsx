@@ -8,7 +8,6 @@ import CampaignTable from "@/Components/(postclips)/campaigns/CampaignList/Campa
 import CampaignHeader from "@/Components/(postclips)/campaigns/CampaignList/CampaignHeader";
 import { fetchAPI } from "@/Clients/postclips/server/ApiClient";
 import { useAuth } from "@/Providers/SessionProvider";
-import { setCurrentState } from "@/Redux/Reducers/(postclips)/auth/HeaderSlice";
 import { useDispatch } from "react-redux";
 
 const Campaigns = () => {
