@@ -407,16 +407,16 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaign }) => {
         );
     };
 
-    const renderStep = () => {
-        switch (currentStep) {
-            case 1:
-                return <CampaignStep1 campaign={campaign} onNextStep={handleNextStep} />;
-            case 2:
-                return <CampaignStep2 />;
-            default:
-                return <CampaignStep1 campaign={campaign} onNextStep={handleNextStep} />;
-        }
-    };
+    // const renderStep = () => {
+    //     switch (currentStep) {
+    //         case 1:
+    //             return <CampaignStep1 campaign={campaign} onNextStep={handleNextStep} />;
+    //         case 2:
+    //             return <CampaignStep2 />;
+    //         default:
+    //             return <CampaignStep1 campaign={campaign} onNextStep={handleNextStep} />;
+    //     }
+    // };
 
     return (
         <Container fluid className="campaign-detail p-4">
