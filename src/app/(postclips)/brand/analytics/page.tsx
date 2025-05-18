@@ -5,7 +5,6 @@ import React from "react";
 import { Card, CardBody, Col, Container, Row } from "reactstrap";
 
 const Analytics = () => {
-  const { session } = useAuth();
 
   return (
     <Container fluid>
