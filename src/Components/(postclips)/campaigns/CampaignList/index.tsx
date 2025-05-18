@@ -10,9 +10,7 @@ const CampaignContainer = () => {
   return (
     <>
       <Breadcrumbs
-        mainTitle={"ASFASFASFAS"}
-        parent={ECommerceTitle}
-        title={ProductListTitle}
+        title={"Campaigns"}
       />
       <Container fluid>
         <Row>
