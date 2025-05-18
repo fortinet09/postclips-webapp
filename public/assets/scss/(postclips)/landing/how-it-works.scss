@@ -30,6 +30,20 @@
   align-items: center;
 }
 
+@media screen and (max-width: 768px) {
+  .visualContainer {
+    display: none;
+    /* Hide the visual container on mobile */
+  }
+
+  .mobile-image-container {
+    display: block;
+    /* Show the mobile image */
+  }
+
+  /* Other mobile-specific styles */
+}
+
 .cardContainer {
   position: relative;
   aspect-ratio: 1/1;

@@ -120,33 +120,44 @@ const HowItWorks = () => {
     };
 
     return (
-        <div className="how-it-works-container">
-            <div className="featuresList">
-                <ul>
-                    {stepsData.map((step) => (
-                        <li key={step.id}>
-                            <FeatureTitle id={step.id}>
-                                <>
-                                    {createTitleWithHighlight(step.title, step.highlight)}
-                                    <span className="feature-subtitle">
-                                        {step.description}
-                                    </span>
-                                </>
-                            </FeatureTitle>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="visualContainer">
-                <div className="cardContainer">
-                    {/* {stepsData.map((step) => (
+        <>
+            <div className="how-it-works-container">
+                <div className="featuresList">
+                    <ul>
+                        {stepsData.map((step) => (
+                            <li key={step.id}>
+                                <FeatureTitle id={step.id}>
+                                    <>
+                                        {createTitleWithHighlight(step.title, step.highlight)}
+                                        <span className="feature-subtitle">
+                                            {step.description}
+                                        </span>
+                                    </>
+                                </FeatureTitle>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="visualContainer">
+                    <div className="cardContainer">
+                        {/* {stepsData.map((step) => (
                         <step.card id={step.id} key={step.id} />
                     ))} */}
 
-                    <Image src="/assets/images/(postclips)/landing/how-it-works.svg" alt="Test" fill />     
+                        <Image src="/assets/images/(postclips)/landing/how-it-works.svg" alt="Test" fill />
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div className="mobile-image-container mb-5">
+                <Image
+                    src="/assets/images/(postclips)/landing/how-it-works.svg"
+                    alt="How It Works"
+                    width={400}
+                    height={400}
+                    className="mobile-steps-image"
+                />
+            </div></>
     );
 };
 
