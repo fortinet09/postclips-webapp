@@ -5,6 +5,14 @@ import { handleApiError } from "@/Clients/postclips/server/errorHandler";
 
 export interface Clip {
   id: string;
+  user_profile: {
+    name: string;
+    profile_picture: string;
+  };
+  social_posts: {
+    post_url: string;
+    platform: string;
+  }[];
   user_id: string;
   campaign_id: string;
   clip_url: string;
