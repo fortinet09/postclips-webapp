@@ -5,9 +5,9 @@ import CampaignNotFound from "@/Components/(postclips)/campaigns/CampaignNotFoun
 import { Campaign } from "@/Types/(postclips)/Campaign";
 
 type PageProps = {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
     searchParams?: { [key: string]: string | string[] | undefined };
 };
 
@@ -41,7 +41,8 @@ async function verifyPermissions(campaignId: string): Promise<boolean> {
 }
 
 export default async function CampaignDetailPage({ params }: PageProps) {
-    const { id } = params; 
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
 
     // Validate campaign ID
     if (!id || typeof id !== 'string') {
