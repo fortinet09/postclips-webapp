@@ -1,237 +1,129 @@
-// HowItWorks.scss - Regular CSS class names, not modules
+.howitworks_section {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
 
-// Container and main layout styles
-.how-it-works-container {
+.howitworks_scrollWrapper {
   display: flex;
+  height: 100%;
   width: 100%;
-  align-items: flex-start;
-  gap: 5rem;
-  margin-top: 8rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  padding: 0 10rem; // responsive side space
+
+  @media (max-width: 768px) {
+    flex-direction: column; // stack on mobile
+    padding: 0 2rem; // smaller horizontal padding for mobile
+  }
 }
 
-.how-it-works-highlight {
-  color: #00E7FF;
-}
 
-.featuresList {
-  width: 100%;
-  padding-top: 0vh;
-  padding-bottom: 0vh;
-  padding-right: 2rem;
-  padding-left: 2rem;
-}
-
-.visualContainer {
+.howitworks_videoColumn {
+  flex: 1;
   position: sticky;
   top: 0;
-  display: flex;
   height: 100vh;
-  width: 100%;
-  align-items: center;
-}
-
-.mobile-image-container {
-  display: none;
-  /* Show the mobile image */
-}
-
-@media screen and (max-width: 768px) {
-  .visualContainer {
-    display: none;
-    /* Hide the visual container on mobile */
-  }
-
-  .mobile-image-container {
-    display: block;
-    /* Show the mobile image */
-  }
-
-  /* Other mobile-specific styles */
-}
-
-.cardContainer {
-  position: relative;
-  aspect-ratio: 1/1;
-  width: 100%;
-  border-radius: 1rem;
-
-  &:has(> .active-card) {
-    background-color: transparent;
-  }
-}
-
-// FeatureTitle styles
-.feature-title {
-  color: #FFFFFF !important;
-  font-size: 2.6rem;
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: 30px;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  transition-property: color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-.feature-subtitle {
-  font-size: 1.5rem;
-  font-weight: normal;
-  text-align: left;
-  color: #FFFFFF99 !important;
-  margin-top: 15px;
-}
-
-.text-black {
-  color: #000000;
-}
-
-.text-gray-300 {
-  color: #d1d5db;
-}
-
-// Visual component styles
-.pointer-events-none {
-  pointer-events: none;
-}
-
-.fixed {
-  position: fixed;
-}
-
-.inset-0 {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.flex {
   display: flex;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-center {
   justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  z-index: 1;
+
+  @media (max-width: 768px) {
+    position: static;
+    height: auto;
+    padding: 1rem 0;
+  }
 }
 
-.opacity-0 {
-  opacity: 0;
-}
 
-.opacity-100 {
-  opacity: 1;
-}
-
-.max-w-6xl {
-  max-width: 72rem;
-}
-
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.absolute {
-  position: absolute;
-}
-
-.shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-// FeatureCard styles
-.h-full {
-  height: 100%;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.rounded-2xl {
+.howitworks_video {
+  max-height: 60vh;
+  width: auto;
   border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-height: none;
+    height: auto;
+  }
 }
 
-.rounded-xl {
-  border-radius: 0.75rem;
+.howitworks_textColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: stretch;
+
+  @media (max-width: 768px) {
+    order: -1; // move text above the video on mobile
+  }
 }
 
-.transition-opacity {
-  transition-property: opacity;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+.howitworks_content {
+  height: 400vh; // 4 full screen steps
 }
 
-.origin-bottom-left {
-  transform-origin: bottom left;
+
+.howitworks_step {
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
-.bg-gradient-to-br {
-  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+.howitworks_title {
+  font-size: 4rem;
+  text-align: left;
+  color: #FFF !important;
+  margin-bottom: 2rem;
+  line-height: 0.7;
+  font-weight: 600;
 }
 
-.active-card {
-  /* This is a marker class used in selectors, no specific styles needed */
+.howitworks_step h2 {
+  font-size: 2rem;
+  text-align: left;
+  color: #FFF !important;
+  margin-bottom: 1rem;
 }
 
-.bottom-6 {
-  bottom: 1.5rem;
+.howitworks_step p {
+  font-size: 1.1rem;
+  text-align: left;
+  max-width: 600px;
+  color: #FFFFFF99 !important;
+  line-height: 1.2;
 }
 
-.right-6 {
-  right: 1.5rem;
+.desktop-only {
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
-.bg-black {
-  background-color: #000000;
+.mobile-only {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+  }
 }
 
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
+.howitworks_videoMobile video {
+  width: 80%;
+  max-width: 400px;
+  padding-bottom: 5rem;
 }
-
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.text-white {
-  color: #ffffff;
-}
-
-.transition-transform {
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-.scale-0 {
-  transform: scale(0);
-}
-
-.scale-100 {
-  transform: scale(1);
-}
-
-// Tailwind's arbitrary value pattern styles
-// These would require custom classes for each specific case
-// Left as is in the component markup for simplicity
-
-// Custom classes that may be needed
-.gradient {
-  /* Base styles for gradients */
-}
-
-.show-me-btn {
-  /* Button styles if needed beyond the utilities */
-}
-
-/* Specific visual-id classes if needed */
-// .visual-music {}
-// .visual-todo-list {}
-// etc.

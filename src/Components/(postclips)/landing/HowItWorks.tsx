@@ -1,38 +1,21 @@
-"use client";
 
-import { useState, useEffect } from 'react';
-import { stagger, useAnimate } from "framer-motion";
-import Image from "next/image";
-
-import {
-    Availability,
-    Colors,
-    Music,
-    SchedulingLinks,
-    Team,
-    Test,
-    Todo,
-} from "./FeatureCard";
-import { OtherVisual, MusicVisual } from "./Visual";
-import { FeatureTitle } from "./FeatureTitle";
-
-// Define TypeScript interfaces
-interface StepData {
+type Step = {
     id: string;
     title: string;
     description: string;
     highlight: string;
-    card: React.ComponentType<{ id: string }>;
-}
+    highlightColor1: string;
+    highlightColor2?: string;
+};
 
-const stepsClipper: StepData[] = [
+const stepsClipper: Step[] = [
     {
         id: "step-1",
         title: "Watch YOUR Favorite Networks",
         description:
             "Browse top content from major networks—Just pick your show or movie & watch right inside our app",
         highlight: "YOUR",
-        card: Test,
+        highlightColor1: "#00E7FF"
     },
     {
         id: "step-2",
@@ -40,7 +23,7 @@ const stepsClipper: StepData[] = [
         description:
             "Select the scenes that will go viral—anything interesting, intense, or meme-worthy",
         highlight: "YOUR",
-        card: Test,
+        highlightColor1: "#75A4FF"
     },
     {
         id: "step-3",
@@ -48,27 +31,28 @@ const stepsClipper: StepData[] = [
         description:
             "Instantly Post to TikTok, Instagram, Facebook, X (Twitter), and YouTube Shorts all from one place",
         highlight: "YOUR",
-        card: Test,
+        highlightColor1: "#00E7FF",
+        highlightColor2: "#003FDD"
     },
     {
         id: "step-4",
-        title: "You Get Paid!",
+        title: "YOU Get Paid!",
         description:
             "Get paid for every 1,000 views you get—the more views, the more you earn!",
-        highlight: "Get Paid!",
-        card: Test,
+        highlight: "YOU",
+        highlightColor1: "#00E7FF",
+        highlightColor2: "#003FDD"
     },
 ];
 
 // Define network steps data based on the image
-const stepsNetwork: StepData[] = [
+const stepsNetwork = [
     {
         id: "step-1",
         title: "DESIGN the Accounts",
         description:
             "Choose the username, bio, link in bio, and profile pictures for every account",
         highlight: "DESIGN",
-        card: Test,
     },
     {
         id: "step-2",
@@ -76,7 +60,6 @@ const stepsNetwork: StepData[] = [
         description:
             "Control every detail— Pick the caption, add your logo, show name, and outro for every post",
         highlight: "CUSTOMIZE",
-        card: Test,
     },
     {
         id: "step-3",
@@ -84,7 +67,6 @@ const stepsNetwork: StepData[] = [
         description:
             "Total control—nothing goes live without your sign-off",
         highlight: "APPROVE",
-        card: Test,
     },
     {
         id: "step-4",
@@ -92,7 +74,6 @@ const stepsNetwork: StepData[] = [
         description:
             "Let our clippers push content across thousands of accounts",
         highlight: "GET UP",
-        card: Test,
     },
     {
         id: "step-5",
@@ -100,71 +81,136 @@ const stepsNetwork: StepData[] = [
         description:
             "[placeholder description]",
         highlight: "Up to",
-        card: Test,
     },
 ];
 
-const HowItWorks = ({ type }: { type: "clipper" | "network" }) => {
-    const stepsData = type === "clipper" ? stepsClipper : stepsNetwork;
 
-    // Function to create a title with highlighted text
-    const createTitleWithHighlight = (title: string, highlight: string) => {
-        // Find the word to highlight
-        const parts = title.split(highlight);
+export const HowItWorks: React.FC = () => {
 
-        if (parts.length === 1) {
-            return <span>{title}</span>;
+    function highlightTitle(
+        text: string,
+        highlight: string,
+        color1: string,
+        color2?: string
+    ): React.ReactNode {
+        const regex = new RegExp(`(${highlight})`, "gi");
+
+        const parts = [];
+        let lastIndex = 0;
+
+        text.replace(regex, (match, _, offset) => {
+            if (lastIndex < offset) {
+                parts.push(<span key={lastIndex}>{text.slice(lastIndex, offset)}</span>);
+            }
+
+            const key = `highlight-${offset}`;
+
+            if (color2) {
+                parts.push(
+                    <span
+                        key={offset}
+                        style={{
+                            position: "relative",
+                            display: "inline-block",
+                            fontWeight: 700,
+                            margin: "0 0.25ch", // ensures spacing before/after
+                        }}
+                    >
+                        <span style={{ opacity: 0 }}>{match}</span>
+                        <span
+                            style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                background: `linear-gradient(to right, ${color1}, ${color2})`,
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {match}
+                        </span>
+                    </span>
+                );
+
+            } else {
+                parts.push(
+                    <span
+                        key={offset}
+                        style={{
+                            color: color1,
+                            fontWeight: 700,
+                            margin: "0 0.25ch",
+                        }}
+                    >
+                        {match}
+                    </span>
+                );
+            }
+
+            lastIndex = offset + match.length;
+            return match;
+        });
+
+        if (lastIndex < text.length) {
+            parts.push(<span key={lastIndex}>{" "}{text.slice(lastIndex)}{" "}</span>);
         }
 
-        return (
-            <>
-                {parts[0]}
-                <span className="how-it-works-highlight">{highlight}</span>
-                {parts[1]}
-            </>
-        );
-    };
+        return parts;
+    }
+
+
+
 
     return (
         <>
-            <div className="how-it-works-container">
-                <div className="featuresList">
-                    <ul>
-                        {stepsData.map((step) => (
-                            <li key={step.id}>
-                                <FeatureTitle id={step.id}>
-                                    <>
-                                        {createTitleWithHighlight(step.title, step.highlight)}
-                                        <span className="feature-subtitle">
-                                            {step.description}
-                                        </span>
-                                    </>
-                                </FeatureTitle>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div className="visualContainer">
-                    <div className="cardContainer">
-                        {/* {stepsData.map((step) => (
-                        <step.card id={step.id} key={step.id} />
-                    ))} */}
+            <section className="howitworks_section">
+                <div className="howitworks_scrollWrapper">
+                    {/* Desktop video only */}
+                    <div className="howitworks_videoColumn desktop-only">
+                        <video
+                            src="/assets/images/(postclips)/landing/how-it-works.mp4"
+                            autoPlay
+                            muted
+                            loop
+                            className="howitworks_video"
+                        />
+                    </div>
 
-                        <Image src={type === "clipper" ? "/assets/images/(postclips)/landing/how-it-works.svg" : "/assets/images/(postclips)/landing/how-it-works-network.svg"} alt="Test" fill />
+                    <div className="howitworks_textColumn">
+                        <div className="howitworks_content">
+                            {stepsClipper.map((step, index) => (
+                                <div className="howitworks_step" key={step.id}>
+                                    {index === 0 && (
+                                        <div className="howitworks_title">How it works</div>
+                                    )}
+                                    <h2>
+                                        {highlightTitle(
+                                            step.title,
+                                            step.highlight,
+                                            step.highlightColor1,
+                                            step.highlightColor2
+                                        )}
+                                    </h2>
+                                    <p>{step.description}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="mobile-image-container mb-5">
-                <Image
-                    src={type === "clipper" ? "/assets/images/(postclips)/landing/how-it-works.svg" : "/assets/images/(postclips)/landing/how-it-works-network.svg"}
-                    alt="How It Works"
-                    width={400}
-                    height={400}
-                    className="mobile-steps-image"
+                {/* Mobile video only */}
+            </section>
+
+            <div className="howitworks_videoMobile mobile-only">
+                <video
+                    src="/assets/images/(postclips)/landing/how-it-works.mp4"
+                    autoPlay
+                    muted
+                    loop
+                    className="howitworks_video"
                 />
-            </div></>
+            </div>
+        </>
     );
 };
-
-export default HowItWorks;

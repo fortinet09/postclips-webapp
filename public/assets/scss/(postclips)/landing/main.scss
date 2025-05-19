@@ -1,6 +1,9 @@
 @import "./how-it-works.scss";
 @import "./faqs.scss";
 @import "./footer.scss";
+@import "./slider.scss";
+@import "./start-right-now.scss";
+
 // Landing Page Hero Section Styles with Animations
 .landing-hero-section {
   min-height: 100vh;
@@ -57,6 +60,7 @@
   position: relative;
   z-index: 2;
   animation: fadeIn 0.8s ease-out forwards;
+  position: absolute;
 
   @media (max-width: 900px) {
     padding: 24px 16px 0 16px;
@@ -105,42 +109,53 @@
 }
 
 .landing-hero-main {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 80px;
-  width: 100%;
+  padding: 0 2rem;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 56px;
-  position: relative;
-  z-index: 1;
-
-  @media (max-width: 1200px) {
-    gap: 40px;
-    padding: 0 24px;
-  }
+  height: 100vh;
+  gap: 8rem;
 
   @media (max-width: 900px) {
     flex-direction: column;
-    gap: 32px;
-    padding: 0 8px;
+    padding-top: 12rem;
+    height: auto;
+    gap: 0;
+  }
+}
+
+.hero-title-container {
+  max-width: 480px;
+  color: #fff;
+
+  @media (max-width: 900px) {
+    order: 1;
+    text-align: center;
+  }
+}
+
+.hero-subcontent {
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 900px) {
+    order: 3;
+    align-items: center;
+    text-align: center;
   }
 }
 
 .phone-mockup-container {
-  flex: 0 0 340px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 320px;
-  max-width: 340px;
-  animation: scaleIn 0.8s ease-out forwards;
+  order: 2;
 
   @media (max-width: 900px) {
-    min-width: 220px;
-    max-width: 260px;
+    order: 2;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -159,6 +174,34 @@
   }
 }
 
+.hero-text-block {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  color: #fff;
+
+  @media (max-width: 900px) {
+    order: 1;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+  animation: fadeIn 0.8s ease-out forwards;
+  color: #fff !important;
+
+  @media (max-width: 900px) {
+    order: 1;
+    font-size: 2.2rem;
+  }
+}
+
 .hero-title {
   font-size: 3.5rem;
   font-weight: 800;
@@ -170,24 +213,6 @@
 
   @media (max-width: 900px) {
     font-size: 2.2rem;
-  }
-}
-
-.hero-subtitle {
-  font-size: 1.5rem;
-  font-weight: 500;
-  margin-bottom: 18px;
-  color: #fff !important;
-  opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
-  animation-delay: 1s;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  @media (max-width: 900px) {
-    font-size: 1.1rem;
-    align-items: center;
   }
 }
 
@@ -409,6 +434,7 @@
 .fadelogos-row {
   width: 100vw;
   max-width: 100vw;
+  max-height: 100px;
   margin: 0 auto;
   padding: 0;
   position: relative;
@@ -434,11 +460,11 @@
   height: 600px;
   margin-top: -180px;
   margin-bottom: 32px;
-  
+
   @media (max-width: 1200px) {
     margin-top: -120px;
   }
-  
+
   @media (max-width: 900px) {
     height: auto;
     margin-top: -60px;
@@ -467,7 +493,8 @@
   display: inline-block;
   border-radius: 24px;
   overflow: hidden;
-  margin: 0 -10px; /* Negative margin for overlap */
+  margin: 0 -10px;
+  /* Negative margin for overlap */
 }
 
 .phone img {
@@ -512,26 +539,26 @@
   .phones-carousel {
     overflow: hidden;
   }
-  
+
   .phones-row {
     flex-wrap: nowrap;
     overflow-x: auto;
     justify-content: flex-start;
     padding: 0 20px;
   }
-  
+
   .phone {
     flex: 0 0 auto;
     margin: 0 5px;
   }
-  
+
   .phone.size-1,
   .phone.size-2,
   .phone.size-3 {
     height: 380px !important;
     width: 160px !important;
   }
-  
+
   .phone.size-4 {
     height: 420px !important;
     width: 180px !important;
@@ -567,4 +594,99 @@
 .landing_toggle-btn.landing_active {
   background-color: #FFF;
   color: #2d2d2d;
+}
+
+
+
+.phone-animation-container {
+  position: relative;
+  width: 50%;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 900px) {
+    order: 2;
+  }
+}
+
+.phone-animation-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  /* Change from center to flex-start with padding-top to position higher */
+  align-items: flex-start;
+  /* Adjust this value to control how high up the phone appears */
+  /* Height should be auto to fully contain the device with all transformations */
+  height: auto;
+  min-height: 560px;
+  /* Match the height of the phone plus some margin */
+}
+
+.phone-animation-device {
+  position: relative;
+  /* Adjust the width/height as needed for your phone size */
+  width: 280px;
+  height: 560px;
+  /* Will be transformed by the JS */
+  /* Add margin bottom to ensure space for text */
+  margin-bottom: 80px;
+
+  @media (max-width: 900px) {
+    height: 300px;
+  }
+}
+
+.phone-animation-video {
+  width: 100%;
+  // height: 100%;
+  object-fit: contain;
+  border-radius: 30px;
+  /* Optional: if you want rounded corners */
+}
+
+/* Add a class for text that will go under the phone */
+.phone-animation-text {
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .phone-animation-wrapper {
+    padding-top: 12%;
+    /* Slightly different position on tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  .phone-animation-wrapper {
+    padding-top: 8%;
+    /* Different position on mobile */
+  }
+}
+
+.images-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0; // default for mobile
+
+  @media (min-width: 768px) {
+    padding: 0 15rem;
+  }
+}
+
+.responsive-image-container {
+  width: 100%;
+  display: block;
+}
+
+.responsive-image-container img {
+  display: block;
+  width: 100%;
+  height: auto;
 }

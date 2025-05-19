@@ -98,7 +98,7 @@ export default function Footer() {
             </div>
 
             {/* Legal Text */}
-            <div className="container mx-auto px-4 text-gray-400 text-xs text-center max-w-4xl footer-text">
+            {/* <div className="container mx-auto px-4 text-gray-400 text-xs text-center max-w-4xl footer-text">
                 <p className="mb-4">
                     Please read important legal information in our Legal section that applies to your relationship with Stargaze.
                 </p>
@@ -131,7 +131,7 @@ export default function Footer() {
                     © {currentYear} Stargaze Tech Inc.<br />
                     11720 Amber Park Dr Suite 160, Alpharetta, GA 30009
                 </p>
-            </div>
+            </div> */}
         </footer>
     );
 }
