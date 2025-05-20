@@ -26,14 +26,14 @@ export default function Footer() {
                         height={44}
                     />
                 </Link>
-                <Link href="https://play.google.com/store/apps/details?id=com.postclips.app" target="_blank" className="app-store-btn">
+                {/* <Link href="https://play.google.com/store/apps/details?id=com.postclips.app" target="_blank" className="app-store-btn">
                     <Image
                         src="/assets/images/(postclips)/landing/googleplay.svg"
                         alt="Google Play"
                         width={140}
                         height={44}
                     />
-                </Link>
+                </Link> */}
             </div>
 
             {/* Legal Links */}

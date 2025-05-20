@@ -50,7 +50,7 @@ export default function Home() {
                   height={44}
                 />
               </a>
-              <a
+              {/* <a
                 href="https://apps.apple.com/mx/app/post-clips/id6742848231?l=en-GB"
                 target="_blank"
                 className="app-store-btn app-store-android"
@@ -61,7 +61,7 @@ export default function Home() {
                   width={140}
                   height={44}
                 />
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
