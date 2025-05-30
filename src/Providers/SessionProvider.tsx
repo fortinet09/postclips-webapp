@@ -153,7 +153,16 @@ export const SessionProvider = ({
         try {
           dispatch(initializeSidebar());
           console.log("Fetching roles 2");
-          const { data: rolesData, error: rolesError } = await fetchAPI("GET", "/auth/roles");
+          const { data: rolesData, error: rolesError } = await fetchAPI(
+            "GET",
+            "/auth/roles",
+            undefined,
+            {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+              },
+            }
+          );
           if (!isMounted) return;
 
           if (rolesError) {
@@ -229,7 +238,16 @@ export const SessionProvider = ({
 
         // Fetch user roles after successful verification
         console.log("Fetching roles 3");
-        const { data: rolesData, error: rolesError } = await fetchAPI("GET", "/auth/roles");
+        const { data: rolesData, error: rolesError } = await fetchAPI(
+          "GET",
+          "/auth/roles",
+          undefined,
+          {
+            headers: {
+              Authorization: `Bearer ${newToken}`,
+            },
+          }
+        );
 
         console.log("Roles data", { rolesData, rolesError });
         if (rolesError) {
