@@ -912,3 +912,20 @@
     }
   }
 }
+
+// Metric box with right-side chip (for campaign metrics)
+.metric-box-chipped {
+  background: #fff;
+  color: #161616;
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  font-family: 'SpaceGrotesk', 'Sora', sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+}

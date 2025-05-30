@@ -217,6 +217,7 @@ export const SessionProvider = ({
     try {
       const result = await fetchAPI("POST", "/auth/verify-otp", { email, otp });
 
+      console.log("Verify OTP result", result);
       if (result.success && result.data) {
         const { token: newToken, user: userData } = result.data;
 
@@ -229,6 +230,8 @@ export const SessionProvider = ({
         // Fetch user roles after successful verification
         console.log("Fetching roles 3");
         const { data: rolesData, error: rolesError } = await fetchAPI("GET", "/auth/roles");
+
+        console.log("Roles data", { rolesData, rolesError });
         if (rolesError) {
           handleApiError(rolesError);
         } else if (rolesData?.roles) {
@@ -256,6 +259,7 @@ export const SessionProvider = ({
         handleApiError(result.error);
       }
     } catch (error) {
+      console.log("Verify OTP error", error);
       setErrorOtp("Failed to verify code. Please try again.");
       handleApiError(error);
     } finally {

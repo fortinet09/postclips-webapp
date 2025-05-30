@@ -39,6 +39,8 @@ export const fetchAPI = async <T = any>(
     // Get token from cookies
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value;
+    
+    console.log("[fetchAPI] token", token);
 
     // Prepare headers
     const headers: Record<string, string> = {

@@ -55,6 +55,8 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
       }
 
+      console.log({ roles, brand });
+
       if (roles && roles.length > 0) {
         let selectedRole = roles[0];
 
@@ -73,6 +75,10 @@ export async function updateSession(request: NextRequest) {
           url.pathname = firstItem.path || "/login";
           return NextResponse.redirect(url);
         }
+      } else {
+        const url = request.nextUrl.clone();
+        url.pathname = "/login";
+        return NextResponse.redirect(url);
       }
     } catch (error: any) {
       if (error.message === "UNAUTHORIZED" || error.error?.includes("Unauthorized")) {

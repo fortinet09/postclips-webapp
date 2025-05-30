@@ -70,6 +70,37 @@ const ClipCard = ({ clip, onReviewClick }: ClipCardProps) => {
                         )}
                     </>
                 )}
+                {/* Overlay for campaign title and ends-in at the bottom */}
+                <div
+                    className="position-absolute start-0 end-0 bottom-0 px-3 py-3"
+                    style={{
+                        background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%)",
+                        color: "#fff",
+                        zIndex: 2,
+                        minHeight: 64,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-end',
+                    }}
+                >
+                    <div style={{ fontWeight: 700, fontSize: 18, lineHeight: 1.2, fontFamily: 'Sora, sans-serif', marginBottom: 2 }}>
+                        {clip.campaign?.title || 'Untitled Campaign'}
+                    </div>
+                    <div style={{ fontSize: 14, color: '#e0e0e0', fontFamily: 'Sora, sans-serif' }}>
+                        {clip.campaign && 'end_date' in clip.campaign && clip.campaign.end_date ? (
+                            (() => {
+                                const endDate = new Date(clip.campaign.end_date as string);
+                                const now = new Date();
+                                endDate.setUTCHours(0, 0, 0, 0);
+                                now.setUTCHours(0, 0, 0, 0);
+                                const daysRemaining = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                                return daysRemaining > 0 ? `Ends in ${daysRemaining} days` : 'Ended';
+                            })()
+                        ) : (
+                            'No end date'
+                        )}
+                    </div>
+                </div>
             </div>
             <CardBody>
                 <div className="d-flex align-items-center mb-3">
@@ -89,9 +120,6 @@ const ClipCard = ({ clip, onReviewClick }: ClipCardProps) => {
                         </small>
                     </div>
                 </div>
-                <CardTitle tag="h5" className="mb-3">
-                    {clip.campaign?.title || 'Untitled Campaign'}
-                </CardTitle>
                 {clip.social_posts && clip.social_posts.length > 0 && (
                     <div className="mb-3">
                         <small className="text-muted d-block mb-1">Posted on:</small>
