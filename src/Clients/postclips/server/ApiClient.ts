@@ -36,9 +36,14 @@ export const fetchAPI = async <T = any>(
 ): Promise<ApiResponse<T>> => {
   try {
     console.log("[fetchAPI] url", url);
+    
     // Get token from cookies
     const cookieStore = await cookies();
-    const token = cookieStore.get("auth_token")?.value;
+    const tokenFromCookie = cookieStore.get("auth_token")?.value;
+    
+    // Check if token is provided in config headers, otherwise use cookie token
+    const authHeader = config?.headers?.Authorization;
+    const token = authHeader ? authHeader.replace('Bearer ', '') : tokenFromCookie;
 
     // Prepare headers
     const headers: Record<string, string> = {

@@ -21,6 +21,7 @@ export async function updateSession(request: NextRequest) {
   // If no token and trying to access protected route, redirect to login
   if (!token && isProtectedRoute) {
     const url = request.nextUrl.clone();
+    console.log("Redirect login 5");
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
@@ -72,10 +73,12 @@ export async function updateSession(request: NextRequest) {
         if (menuList && menuList.length > 0 && menuList[0].Items && menuList[0].Items.length > 0) {
           const firstItem = menuList[0].Items[0];
           const url = request.nextUrl.clone();
+          console.log("Redirect login 3");
           url.pathname = firstItem.path || "/login";
           return NextResponse.redirect(url);
         }
       } else {
+        console.log("Redirect login 1");
         const url = request.nextUrl.clone();
         url.pathname = "/login";
         return NextResponse.redirect(url);
@@ -85,6 +88,7 @@ export async function updateSession(request: NextRequest) {
         const cookieStore = await cookies();
         cookieStore.delete("auth_token");
 
+        console.log("Redirect login 2");
         const url = request.nextUrl.clone();
         url.pathname = "/login";
         return NextResponse.redirect(url);
