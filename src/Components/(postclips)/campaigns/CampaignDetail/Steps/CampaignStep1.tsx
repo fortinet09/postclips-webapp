@@ -7,11 +7,19 @@ import CampaignPreview from './CampaignPreview';
 
 interface CampaignStep1Props {
     campaign: Campaign;
-    handleSaveDraft: () => void;
-    onNextStep: () => void;
+    formData?: any; // Add formData from parent
+    updateFormData?: (data: any) => void; // Add update function
+    handleSaveDraft: (data?: any) => void;
+    onNextStep: (data?: any) => void;
 }
 
-const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft, onNextStep }) => {
+const CampaignStep1: React.FC<CampaignStep1Props> = ({ 
+    campaign, 
+    formData: parentFormData, 
+    updateFormData, 
+    handleSaveDraft, 
+    onNextStep 
+}) => {
     const [images, setImages] = useState<File[]>([]);
     const [previewImages, setPreviewImages] = useState<PreviewImage[]>(
         campaign.preview_images.map(img => ({
@@ -30,23 +38,33 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft
     const [uploadingClipIndex, setUploadingClipIndex] = useState<number | null>(null);
     const [deletingImageId, setDeletingImageId] = useState<string | null>(null);
     const [deletingClipId, setDeletingClipId] = useState<string | null>(null);
+    
+    // Initialize formData from parent or campaign
     const [formData, setFormData] = useState({
-        title: campaign.title || '',
-        description: campaign.description || '',
-        brand_message: campaign.brand_message || null,
-        targeted_amount_of_views: campaign.targeted_amount_of_views || '',
-        amount_cpm_payout: campaign.amount_cpm_payout || '',
-        total_budget: campaign.total_budget || '',
-        start_date: campaign.start_date || '',
-        end_date: campaign.end_date || ''
+        title: parentFormData?.title || campaign.title || '',
+        description: parentFormData?.description || campaign.description || '',
+        brand_message: parentFormData?.brand_message || campaign.brand_message || null,
+        targeted_amount_of_views: parentFormData?.targeted_amount_of_views || campaign.targeted_amount_of_views || '',
+        amount_cpm_payout: parentFormData?.amount_cpm_payout || campaign.amount_cpm_payout || '',
+        total_budget: parentFormData?.total_budget || campaign.total_budget || '',
+        start_date: parentFormData?.start_date || (campaign.start_date ? new Date(campaign.start_date).toISOString().split('T')[0] : ''),
+        end_date: parentFormData?.end_date || (campaign.end_date ? new Date(campaign.end_date).toISOString().split('T')[0] : '')
     });
+    
     const [rawValues, setRawValues] = useState({
-        targeted_amount_of_views: campaign.targeted_amount_of_views?.toString() || '',
-        amount_cpm_payout: campaign.amount_cpm_payout?.toString() || '',
-        total_budget: campaign.total_budget?.toString() || ''
+        targeted_amount_of_views: formData.targeted_amount_of_views?.toString() || '',
+        amount_cpm_payout: formData.amount_cpm_payout?.toString() || '',
+        total_budget: formData.total_budget?.toString() || ''
     });
 
     const { updateCampaignDraft, uploadPreviewImage, deletePreviewImage, uploadExampleClip, deleteExampleClip } = useCampaigns();
+
+    // Sync with parent when formData changes
+    useEffect(() => {
+        if (updateFormData) {
+            updateFormData(formData);
+        }
+    }, [formData]);
 
     useEffect(() => {
         console.log("campaign", { campaign });
@@ -68,6 +86,8 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft
 
     const handleFormChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const value = e.target.value;
+
+        console.log("handleFormChange: ", { value });
 
         // Handle number fields
         if (['targeted_amount_of_views', 'amount_cpm_payout', 'total_budget'].includes(field)) {
@@ -97,10 +117,11 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft
 
     const handleDateChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
+        console.log("handleDateChange: ", { value, field });
+        
         if (value) {
             // Format the date to match the database format
             const formattedDate = `${value}T00:00:00+00:00`;
-
             setFormData(prev => ({
                 ...prev,
                 [field]: formattedDate
@@ -210,6 +231,16 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft
         } finally {
             setDeletingClipId(null);
         }
+    };
+
+    // Handler for save draft button
+    const handleSaveDraftClick = () => {
+        handleSaveDraft(formData);
+    };
+
+    // Handler for next button
+    const handleNextClick = () => {
+        onNextStep(formData);
     };
 
     return (
@@ -527,7 +558,7 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft
                                     maxWidth: '200px',
                                     width: '100%'
                                 }}
-                                onClick={handleSaveDraft}
+                                onClick={handleSaveDraftClick}
                             >
                                 SAVE AS DRAFT
                             </Button>
@@ -537,7 +568,7 @@ const CampaignStep1: React.FC<CampaignStep1Props> = ({ campaign, handleSaveDraft
                                     maxWidth: '200px',
                                     width: '100%'
                                 }}
-                                onClick={() => onNextStep()}
+                                onClick={handleNextClick}
                             >
                                 NEXT
                             </Button>

@@ -28,6 +28,7 @@ const apiClient = axios.create({
  * @param {any} data - Request body (optional)
  * @param {AxiosRequestConfig} config - Additional Axios config (optional)
  */
+
 export const fetchAPI = async <T = any>(
   method: Method,
   url: string,
@@ -35,15 +36,23 @@ export const fetchAPI = async <T = any>(
   config?: AxiosRequestConfig
 ): Promise<ApiResponse<T>> => {
   try {
-    console.log("[fetchAPI] url", url);
-    
+    console.log("[fetchAPI] Starting request:", {
+      method,
+      url,
+      dataType: data instanceof FormData ? 'FormData' : typeof data,
+      hasConfig: !!config,
+      backendUrl: process.env.BACKEND_URL
+    });
+
     // Get token from cookies
     const cookieStore = await cookies();
     const tokenFromCookie = cookieStore.get("auth_token")?.value;
-    
+
     // Check if token is provided in config headers, otherwise use cookie token
     const authHeader = config?.headers?.Authorization;
     const token = authHeader ? authHeader.replace('Bearer ', '') : tokenFromCookie;
+
+    console.log("[fetchAPI] Token present:", !!token);
 
     // Prepare headers
     const headers: Record<string, string> = {
@@ -55,17 +64,30 @@ export const fetchAPI = async <T = any>(
       headers['Content-Type'] = 'application/json';
     }
 
+    // Filter out Content-Type from config headers if data is FormData
+    const configHeaders: Record<string, any> = { ...config?.headers };
+    if (data instanceof FormData && configHeaders['Content-Type']) {
+      delete configHeaders['Content-Type'];
+    }
+
+    const finalHeaders = {
+      ...headers,
+      ...configHeaders,
+    };
+
+    console.log("[fetchAPI] Final headers:", finalHeaders);
+    console.log("[fetchAPI] Full URL:", `${process.env.BACKEND_URL}${url}`);
+
     // Make API request
     const response = await apiClient({
       method,
       url,
       data,
       ...config,
-      headers: {
-        ...headers,
-        ...config?.headers,
-      },
+      headers: finalHeaders,
     });
+
+    console.log("[fetchAPI] Response received:", response.status);
 
     if (response.status === 200) {
       return {
@@ -83,7 +105,14 @@ export const fetchAPI = async <T = any>(
       error: "Could not fetch data",
     };
   } catch (error: any) {
-    console.log("API error", { error, status: error.response?.status, message: error.response?.data });
+    console.log("[fetchAPI] Error caught:", {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url,
+      baseURL: error.config?.baseURL
+    });
 
     // Check for 401 status code in the response
     if (error.response?.status === 401 ||

@@ -1,5 +1,6 @@
+// CampaignStep2.tsx
 import React, { useState, useCallback, useEffect } from 'react';
-import { Container, Form, FormGroup, Label, Input, Button, Row, Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Spinner } from 'reactstrap';
+import { Container, Form, FormGroup, Label, Input, Button, Row, Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Spinner, Progress } from 'reactstrap';
 import { useCampaigns, CampaignContent } from '@/Hooks/useCampaigns';
 import { toast } from 'react-toastify';
 import { Campaign } from '@/Types/(postclips)/Campaign';
@@ -23,7 +24,8 @@ import {
     verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
+import { checkVideoStatus } from '@/Clients/postclips/server/uploadLargeFile';
+import { useAuth } from '@/Providers/SessionProvider';
 interface CampaignStep2Props {
     campaign: Campaign;
     handleSaveDraft: () => void;
@@ -60,6 +62,7 @@ const SortableItem = ({ id, children }: SortableItemProps) => {
 };
 
 const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft, onNextStep, onPreviousStep }) => {
+    const { token } = useAuth();
     const [uploadedContent, setUploadedContent] = useState<CampaignContent[]>([]);
     const [contentLoading, setContentLoading] = useState(true);
     const [uploadingContentIndex, setUploadingContentIndex] = useState<number | null>(null);
@@ -71,8 +74,9 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
     const [linkDescription, setLinkDescription] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
     const [isVideo, setIsVideo] = useState(true);
+    const [isUploading, setIsUploading] = useState(false);
 
-    const { uploadCampaignContent, deleteCampaignContent, fetchCampaignContent, reorderCampaignContent } = useCampaigns();
+    const { uploadCampaignContent, deleteCampaignContent, fetchCampaignContent, reorderCampaignContent, uploadProgress } = useCampaigns();
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -92,6 +96,7 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
         if (result.success) {
             fetchAndSetCampaignContent();
         }
+        setIsUploading(false);
     };
 
     useEffect(() => {
@@ -102,6 +107,7 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
         if (event.target.files && event.target.files[0]) {
             const file = event.target.files[0];
             setUploadingContentIndex(index);
+            setIsUploading(true);
 
             uploadCampaignContent(campaign.id, {
                 title: file.name,
@@ -122,6 +128,7 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                 console.error('Error uploading content:', error);
             }).finally(() => {
                 setUploadingContentIndex(null);
+                setIsUploading(false);
             });
         }
     };
@@ -137,7 +144,8 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                 title: linkTitle,
                 description: linkDescription,
                 content_type: 'link',
-                content_url: linkUrl
+                content_url: linkUrl,
+                thumbnail_url: linkUrl // You might want to add a thumbnail URL field
             });
 
             if (response.success && response.data?.data) {
@@ -178,6 +186,7 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
     };
 
     const handleAddContent = async (data: any) => {
+        setIsUploading(true);
         if (isVideo) {
             return await uploadCampaignContent(campaign.id, {
                 title: data.title,
@@ -199,21 +208,82 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
 
     const handleDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
-        
+
         if (over && active.id !== over.id) {
             setUploadedContent((items) => {
                 const oldIndex = items.findIndex((item) => item.id === active.id);
                 const newIndex = items.findIndex((item) => item.id === over.id);
-                
+
                 const newItems = arrayMove(items, oldIndex, newIndex);
-                
+
                 // Update ordering in backend
                 const contentIds = newItems.map(item => item.id);
                 reorderCampaignContent(campaign.id, contentIds);
-                
+
                 return newItems;
             });
         }
+    };
+
+    // Add function to check and update video status
+    const updateVideoStatuses = useCallback(async () => {
+        if (!token) return;
+        const needsUpdate = uploadedContent.filter(
+            content => content.cloudflare_video_id &&
+                content.cloudflare_status &&
+                content.cloudflare_status !== 'ready' &&
+                content.cloudflare_status !== 'error'
+        );
+
+        if (needsUpdate.length === 0) return;
+
+        console.log(`Checking status for ${needsUpdate.length} processing videos...`);
+
+        let hasUpdates = false;
+
+        for (const content of needsUpdate) {
+            try {
+                const response = await checkVideoStatus(content.cloudflare_video_id!, token);
+
+                if (response.success && response.data) {
+                    console.log(`Video ${content.cloudflare_video_id} status:`, response.data.status);
+
+                    if (response.data.ready || response.data.status === 'error') {
+                        hasUpdates = true;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking video status:', error);
+            }
+        }
+
+        // If any videos were updated, refresh the content list
+        if (hasUpdates) {
+            console.log('Videos updated, refreshing content list...');
+            await fetchAndSetCampaignContent();
+        }
+    }, [uploadedContent, token, fetchAndSetCampaignContent]);
+
+    // Check status on mount and periodically
+    useEffect(() => {
+        // Initial check on mount
+        updateVideoStatuses();
+
+        // Set up periodic checks
+        const interval = setInterval(() => {
+            updateVideoStatuses();
+        }, 10000); // Check every 10 seconds
+
+        return () => clearInterval(interval);
+    }, [updateVideoStatuses]);
+
+    // Also add a manual refresh button
+    const handleManualRefresh = async () => {
+        setContentLoading(true);
+        await updateVideoStatuses();
+        await fetchAndSetCampaignContent();
+        setContentLoading(false);
+        toast.info('Content refreshed');
     };
 
     return (
@@ -221,6 +291,17 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
             <Row>
                 <Col md={12}>
                     <h1 className="text-white mb-4">Upload Media</h1>
+
+                    {/* Upload Progress Bar */}
+                    {isUploading && uploadProgress > 0 && (
+                        <div className="mb-4">
+                            <div className="d-flex justify-content-between mb-2">
+                                <span>Uploading...</span>
+                                <span>{uploadProgress}%</span>
+                            </div>
+                            <Progress value={uploadProgress} />
+                        </div>
+                    )}
 
                     <Form>
                         {contentLoading ? (
@@ -252,11 +333,24 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                                                         <Move size={20} />
                                                     </div>
                                                     <div className="media-list-row__thumb">
-                                                        <img
-                                                            src={item.thumbnail_url || '/assets/images/default-thumb.jpg'}
-                                                            alt={item.title}
-                                                            className="media-list-row__img"
-                                                        />
+                                                        {item.cloudflare_status && item.cloudflare_status !== 'ready' ? (
+                                                            <div className="thumbnail-loader">
+                                                                <Spinner size="sm" color="light" />
+                                                                <span className="processing-text">Processing...</span>
+                                                            </div>
+                                                        ) : (
+                                                            <Image
+                                                                src={item.thumbnail_url || '/assets/images/default-thumb.jpg'}
+                                                                alt={item.title}
+                                                                className="media-list-row__img"
+                                                                width={120}
+                                                                height={68}
+                                                                onError={(e) => {
+                                                                    // If thumbnail fails, show default
+                                                                    (e.target as HTMLImageElement).src = '/assets/images/default-thumb.jpg';
+                                                                }}
+                                                            />
+                                                        )}
                                                     </div>
                                                     <div className="media-list-row__info">
                                                         <div className="media-list-row__title">{item.title}</div>
@@ -264,8 +358,16 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                                                     </div>
                                                     <div className="media-list-row__season">{item.season || 'Not assigned'}</div>
                                                     <div className="media-list-row__actions">
-                                                        <button className="icon-btn" onClick={e => handleDeleteContent(uploadedContent.findIndex(i => i.id === item.id), e)}>
-                                                            <Trash2 size={18} />
+                                                        <button
+                                                            className="icon-btn"
+                                                            onClick={e => handleDeleteContent(uploadedContent.findIndex(i => i.id === item.id), e)}
+                                                            disabled={deletingContentId === item.id}
+                                                        >
+                                                            {deletingContentId === item.id ? (
+                                                                <Spinner size="sm" />
+                                                            ) : (
+                                                                <Trash2 size={18} />
+                                                            )}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -275,8 +377,8 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                                 </DndContext>
                                 <div className="media-list-add">
                                     <Dropdown isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
-                                        <DropdownToggle className="add-video-btn">
-                                            ADD VIDEO <span className="add-video-btn__arrow">▼</span>
+                                        <DropdownToggle className="add-video-btn" disabled={isUploading}>
+                                            {isUploading ? 'UPLOADING...' : 'ADD VIDEO'} <span className="add-video-btn__arrow">▼</span>
                                         </DropdownToggle>
                                         <DropdownMenu dark>
                                             <DropdownItem onClick={() => { setIsVideo(true); setModalOpen(true); }}>
@@ -320,8 +422,8 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                                     </div>
                                     {/* Add Video Button with Dropdown */}
                                     <Dropdown isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)} className="media-upload-dropdown">
-                                        <DropdownToggle caret>
-                                            ADD VIDEO
+                                        <DropdownToggle caret disabled={isUploading}>
+                                            {isUploading ? 'UPLOADING...' : 'ADD VIDEO'}
                                         </DropdownToggle>
                                         <DropdownMenu dark>
                                             <DropdownItem onClick={() => { setIsVideo(true); setModalOpen(true); }}>
@@ -336,60 +438,6 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                             </>
                         )}
 
-                        {showLinkInput && (
-                            <div className="link-input-container mb-4">
-                                <FormGroup>
-                                    <Label for="linkTitle">Title</Label>
-                                    <Input
-                                        type="text"
-                                        id="linkTitle"
-                                        value={linkTitle}
-                                        onChange={(e) => setLinkTitle(e.target.value)}
-                                        placeholder="Enter title"
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="linkUrl">URL</Label>
-                                    <Input
-                                        type="url"
-                                        id="linkUrl"
-                                        value={linkUrl}
-                                        onChange={(e) => setLinkUrl(e.target.value)}
-                                        placeholder="Enter video URL"
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="linkDescription">Description (Optional)</Label>
-                                    <Input
-                                        type="textarea"
-                                        id="linkDescription"
-                                        value={linkDescription}
-                                        onChange={(e) => setLinkDescription(e.target.value)}
-                                        placeholder="Enter description"
-                                    />
-                                </FormGroup>
-                                <div className="d-flex gap-2">
-                                    <Button
-                                        color="primary"
-                                        onClick={handleAddLink}
-                                    >
-                                        Add Link
-                                    </Button>
-                                    <Button
-                                        color="secondary"
-                                        onClick={() => {
-                                            setShowLinkInput(false);
-                                            setLinkUrl('');
-                                            setLinkTitle('');
-                                            setLinkDescription('');
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-
                         <div className="d-flex justify-content-between mt-5 mb-5">
                             <Button
                                 className="btn-chipped btn-chipped-gray"
@@ -398,6 +446,7 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                                     width: '100%'
                                 }}
                                 onClick={onPreviousStep}
+                                disabled={isUploading}
                             >
                                 BACK
                             </Button>
@@ -408,6 +457,7 @@ const CampaignStep2: React.FC<CampaignStep2Props> = ({ campaign, handleSaveDraft
                                     width: '100%'
                                 }}
                                 onClick={onNextStep}
+                                disabled={isUploading}
                             >
                                 NEXT
                             </Button>

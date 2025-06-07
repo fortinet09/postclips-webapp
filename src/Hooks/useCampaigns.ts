@@ -1,7 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { fetchAPI, ErrorResponse } from "@/Clients/postclips/server/ApiClient";
+import { uploadLargeFile, getCloudflareUploadUrl, uploadToCloudflare, finalizeCloudflareUpload, checkVideoStatus } from "@/Clients/postclips/server/uploadLargeFile";
+
 import { toast } from "react-toastify";
 import { handleApiError } from "@/Clients/postclips/server/errorHandler";
+import { useAuth } from "@/Providers/SessionProvider";
 
 export interface Campaign {
   id: string;
@@ -99,6 +102,8 @@ export interface CampaignContent {
   season?: string;
   duration?: number;
   created_at: string;
+  cloudflare_status: string;
+  cloudflare_video_id: string;
 }
 
 export interface UpdateCampaignViewsData {
@@ -149,6 +154,7 @@ interface SaveCardData {
 }
 
 export const useCampaigns = () => {
+  const { token } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [topCampaigns, setTopCampaigns] = useState<Campaign[]>([]);
   const [totalAnalytics, setTotalAnalytics] = useState<CampaignsResponse['totalAnalytics']>({
@@ -161,6 +167,7 @@ export const useCampaigns = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = useState<string>('active');
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   const fetchCampaigns = useCallback(async (status: string | null, searchTerm: string | null) => {
     try {
@@ -489,43 +496,76 @@ export const useCampaigns = () => {
   }): Promise<ApiResponse<{ data: CampaignContent }>> => {
     try {
       setLoading(true);
-      const formData = new FormData();
-      
+      setUploadProgress(0);
+
+      // Check if we have a token
+      if (!token) {
+        toast.error('Authentication required');
+        return {
+          success: false,
+          error: 'No authentication token available'
+        };
+      }
+
       if (data.file) {
-        // Check file size (50MB limit)
-        if (data.file.size > 50 * 1024 * 1024) {
-          toast.error('Media file size must be less than 50MB');
-          return {
-            success: false,
-            error: 'File size exceeds limit'
-          };
+        // ALL file uploads go through Cloudflare to avoid server limits
+        const fileSizeMB = data.file.size / (1024 * 1024);
+        console.log(`Uploading file: ${data.file.name}, size: ${fileSizeMB.toFixed(2)}MB`);
+
+        // Use the client-side upload function with token from auth context
+        const response = await uploadLargeFile(
+          campaignId,
+          data.file,
+          {
+            title: data.title,
+            description: data.description,
+            season: data.season
+          },
+          token, // Pass token from auth context
+          (progress) => {
+            setUploadProgress(progress.percentage);
+          }
+        );
+
+        setUploadProgress(0);
+
+        if (response.success) {
+          toast.success('Content uploaded successfully! Processing video...');
+
+          // Start checking video status if it's a Cloudflare upload
+          if (response.data?.data?.cloudflare_video_id) {
+            checkVideoProcessingStatus(response.data.data.cloudflare_video_id);
+          }
+
+          // Refresh content list
+          await fetchCampaigns(currentStatus, null);
+        } else {
+          const errorMessage = handleApiError(response.error);
+          toast.error(errorMessage);
         }
-        formData.append('media', data.file);
-      }
 
-      // Add other data as JSON string
-      formData.append('data', JSON.stringify({
-        title: data.title,
-        description: data.description,
-        content_type: data.content_type,
-        content_url: data.content_url,
-        thumbnail_url: data.thumbnail_url,
-        season: data.season
-      }));
-
-      const response = await fetchAPI("POST", `/campaigns/${campaignId}/content`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      if (response.success) {
-        toast.success('Content uploaded successfully!');
+        return response;
       } else {
-        const errorMessage = handleApiError(response.error);
-        toast.error(errorMessage);
+        // For non-file content (links), use server action which already has auth
+        const response = await fetchAPI("POST", `/campaigns/${campaignId}/content`, {
+          title: data.title,
+          description: data.description,
+          content_type: data.content_type,
+          content_url: data.content_url,
+          thumbnail_url: data.thumbnail_url,
+          season: data.season
+        });
+
+        if (response.success) {
+          toast.success('Content added successfully!');
+          await fetchCampaigns(currentStatus, null);
+        } else {
+          const errorMessage = handleApiError(response.error);
+          toast.error(errorMessage);
+        }
+
+        return response;
       }
-      return response;
     } catch (err) {
       const errorMessage = handleApiError(err);
       toast.error(errorMessage);
@@ -535,8 +575,58 @@ export const useCampaigns = () => {
       };
     } finally {
       setLoading(false);
+      setUploadProgress(0);
     }
-  }, []);
+  }, [currentStatus, fetchCampaigns, token]); // Add token to dependencies
+
+  // Also update the checkVideoProcessingStatus function to use token:
+  const checkVideoProcessingStatus = useCallback(async (videoId: string) => {
+    if (!token) {
+      console.error('No authentication token available for video status check');
+      return;
+    }
+
+    let attempts = 0;
+    const maxAttempts = 60; // 5 minutes max
+
+    const checkStatus = async () => {
+      try {
+        const response = await checkVideoStatus(videoId, token); // Pass token
+
+        if (response.success && response.data) {
+          if (response.data.ready) {
+            toast.success('Video processing complete!');
+            // Refresh campaign content
+            await fetchCampaigns(currentStatus, null);
+            return;
+          }
+
+          if (response.data.error) {
+            toast.error(`Video processing failed: ${response.data.error}`);
+            return;
+          }
+
+          // Still processing - show progress
+          if (response.data.progress > 0) {
+            console.log(`Video processing: ${response.data.progress}% complete`);
+          }
+
+          // Continue checking
+          if (attempts < maxAttempts) {
+            attempts++;
+            setTimeout(checkStatus, 5000); // Check every 5 seconds
+          } else {
+            toast.warning('Video is taking longer than expected to process. Check back later.');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking video status:', error);
+      }
+    };
+
+    // Start checking after 5 seconds
+    setTimeout(checkStatus, 5000);
+  }, [currentStatus, fetchCampaigns, token]);
 
   const deleteCampaignContent = useCallback(async (contentId: string): Promise<ApiResponse> => {
     try {
@@ -1126,6 +1216,7 @@ export const useCampaigns = () => {
     uploadMedia,
     deleteMedia,
     uploadCampaignContent,
+    uploadProgress,
     deleteCampaignContent,
     fetchCampaignContent,
     reorderCampaignContent,

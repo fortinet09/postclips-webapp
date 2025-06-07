@@ -70,7 +70,7 @@ const Campaigns: React.FC<CampaignsProps> = () => {
     const { campaigns, topCampaigns, totalAnalytics, loading, error, refetchCampaigns, handleSearch } = useCampaigns();
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [searchValue, setSearchValue] = useState('');
-    const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         align: 'center',
         skipSnaps: false,
@@ -309,7 +309,7 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                     <Row className="campaigns-grid">
                         {campaigns.map((campaign) => (
                             <Col key={campaign.id}>
-                                <Card 
+                                <Card
                                     className={`campaign-card ${(campaign.status === 'draft' || campaign.status === 'in_review') ? 'cursor-pointer' : ''}`}
                                     onClick={() => handleCampaignClick(campaign)}
                                     style={{ cursor: (campaign.status === 'draft' || campaign.status === 'in_review') ? 'pointer' : 'default' }}

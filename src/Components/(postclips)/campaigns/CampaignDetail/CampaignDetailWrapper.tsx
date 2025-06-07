@@ -32,7 +32,8 @@ const CampaignDetailWrapper: React.FC<CampaignDetailWrapperProps> = ({ campaign 
         }
     }, [campaign, handleRedirect]);
 
-    if (!campaign || campaign.status === 'active') {
+    if (!campaign || campaign.status === 'active'
+    ) {
         return null;
     }
 
