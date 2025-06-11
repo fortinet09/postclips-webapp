@@ -1,9 +1,8 @@
-import NoSsr from "@/utils/NoSsr";
-import MainProvider from "./MainProvider";
-import "../../src/index.scss";
 import { Lexend, Roboto } from "next/font/google";
 import { detectLanguage } from "./i18n/server";
 import { I18nProvider } from "./i18n/i18n-context";
+import MainProvider from "./MainProvider";
+import "../../src/index.scss";
 
 const lexend = Lexend({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -19,11 +18,7 @@ const roboto = Roboto({
   display: "swap",
 });
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lng = await detectLanguage();
 
   return (
@@ -57,9 +52,9 @@ export default async function RootLayout({
           className={`${lexend.className || roboto.className} dark-only`}
         >
           {/* <NoSsr> */}
-            <MainProvider>
-              <div id="app-root">{children}</div>
-            </MainProvider>
+          <MainProvider>
+            <div id="app-root">{children}</div>
+          </MainProvider>
           {/* </NoSsr> */}
         </body>
       </html>

@@ -6,10 +6,11 @@
 }
 
 .slider_counters {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
+    width: 100%;
+    max-width: 50rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
     margin-bottom: 1.5rem;
 }
 
@@ -18,14 +19,18 @@
 }
 
 .slider_counterLabel {
-    font-size: 1.25rem;
-    font-weight: 400;
+    font-size: 1.45rem;
+    font-weight: 300;
+    color: white !important;
+    font-family: 'SpaceGrotesk', sans-serif !important;
 }
 
 .slider_counterValue {
-    font-size: 2rem;
+    font-size: 3.4rem;
+    line-height: 4rem;
     font-weight: bold;
     color: white;
+    font-family: 'Sora', sans-serif !important;
 }
 
 .slider_wrapper {
@@ -56,6 +61,8 @@
     gap: 1rem;
     will-change: transform;
     transition: transform 0.6s ease;
+    width: 100%;
+    overflow: hidden;
 }
 
 .slider_rowItem {

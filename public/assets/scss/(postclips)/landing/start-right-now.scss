@@ -1,20 +1,38 @@
 .start-right-now-section {
   display: flex;
+  min-height: 100vh;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0rem 0rem 7rem 0rem;
-  gap: 1rem;
+  gap: 2rem;
+
+  .start-right-now-title {
+    color: #FFF !important;
+    font-size: 3rem;
+    line-height: 3.8rem;
+    font-weight: 500;
+  
+    @media (min-width: 768px) {
+      font-size: 6rem;
+    }
+  }
+  
+  .start-right-now-subtitle {
+    color: #FFFFFF99 !important;
+    font-size: 2.2rem;
+  }
+
+  img {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  a {
+    font-size: 1.2rem !important;
+    line-height: 1.6rem;
+    font-weight: 500 !important;
+    height: 54px;
+    align-items: center;
+    display: flex;
+  }
 }
-
-.start-right-now-title {
-  color: #FFF !important;
-  font-size: 3rem;
-}
-
-.start-right-now-subtitle {
-  color: #FFFFFF99 !important;
-  font-size: 1.5rem;
-}
-
-

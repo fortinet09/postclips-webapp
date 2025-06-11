@@ -12,13 +12,16 @@ const images = [
     "/assets/images/(postclips)/landing/carousel-7.png",
 ];
 
-export const MainSlider: React.FC = () => {
+export const MainSlider = ({ title, ...props }: { title?: any, labels?: string[], earnings?: number, clips?: number }) => {
     const [step, setStep] = useState(0);
 
     return (
         <div className="slider_container">
-            <h2 className="earnings-title">We pay you for every<br />1,000 views you generate</h2>
-            <Counters step={step} />
+            <h2
+                className="earnings-title"
+                dangerouslySetInnerHTML={{ __html: title || "We pay you for every<br />1,000 views you generate" }}
+            />
+            <Counters step={step} {...props} />
             {/* Glowline and Fadelogos */}
             <div className="glowline-row">
                 <Image src="/assets/images/(postclips)/landing/glowline.svg" alt="Glowline" width={1400} height={4} style={{ width: '100%', height: 'auto' }} />

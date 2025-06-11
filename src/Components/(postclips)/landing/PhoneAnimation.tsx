@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const PhoneAnimation = () => {
+const PhoneAnimation = ({ source, threshold = 50, transforms = [] }: { threshold?: number, transforms?: string[], source?: string }) => {
     // Just two states: initial (false) or final (true)
     const [showFinalState, setShowFinalState] = useState(false);
 
@@ -8,7 +8,7 @@ const PhoneAnimation = () => {
     const scrollYRef = useRef(0);
 
     // Threshold in pixels - how much scroll before triggering the final state
-    const SCROLL_THRESHOLD = 50;
+    const SCROLL_THRESHOLD = threshold;
 
     useEffect(() => {
         // Function to check if we should show initial or final state
@@ -54,20 +54,21 @@ const PhoneAnimation = () => {
         // Initial state (at the top)
         if (!showFinalState) {
             return {
-                transform: 'perspective(1200px) translateY(63px) scale(1.4) rotateX(25deg)'
+                transform: transforms?.at(0) || 'perspective(1200px) translateY(63px) scale(1.4) rotateX(25deg)'
             };
         }
 
         // Final state (when scrolled down)
         return {
-            transform: 'perspective(1200px) translateY(250px) scale(0.9) rotateX(0deg)'
+            transform: transforms?.at(1) || 'perspective(1200px) translateY(250px) scale(0.9) rotateX(0deg)'
         };
     };
 
     return (
         <div className="phone-animation-container" id="animation-section">
             <div className="phone-animation-wrapper">
-                <div 
+                <div className="phone-animation-glow" />
+                <div
                     className="phone-animation-device"
                     style={{
                         ...getTransform(),
@@ -75,7 +76,7 @@ const PhoneAnimation = () => {
                     }}
                 >
                     <video
-                        src="/assets/images/(postclips)/landing/phone1.mp4"
+                        src={source || "/assets/images/(postclips)/landing/phone1.mp4"}
                         autoPlay
                         muted
                         loop
