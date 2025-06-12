@@ -9,7 +9,7 @@ import { Header } from "@/Components/(postclips)/landing/Header";
 import Footer from '@/Components/(postclips)/landing/Footer';
 import FAQs from '@/Components/(postclips)/landing/FAQs';
 
-export function ClipperLP() {
+export default function ClipperLP() {
   return (
     <div className="landing-hero-section">
       <Header />
@@ -82,8 +82,6 @@ export function ClipperLP() {
     </div>
   );
 }
-
-export default ClipperLP;
 
 const HOW_IT_WORK_STEPS: Step[] = [
   {

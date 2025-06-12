@@ -2,16 +2,22 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 3rem;
+    padding: 3rem 1rem 0 1rem;
+    width: 100%;
 }
 
 .slider_counters {
     width: 100%;
     max-width: 50rem;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-bottom: 1.5rem;
+
+    @media (min-width: 560px) {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .slider_counterItem {
@@ -19,18 +25,30 @@
 }
 
 .slider_counterLabel {
-    font-size: 1.45rem;
-    font-weight: 300;
+    font-size: 1.12rem;
+    font-weight: 200;
     color: white !important;
     font-family: 'SpaceGrotesk', sans-serif !important;
+
+
+    .slider_counterValue {
+        font-size: 1.45rem;
+        font-weight: 300;
+    }
 }
 
 .slider_counterValue {
-    font-size: 3.4rem;
-    line-height: 4rem;
+    font-size: 3rem;
+    line-height: 3.4rem;
     font-weight: bold;
     color: white;
     font-family: 'Sora', sans-serif !important;
+    
+    @media (min-width: 700px) {
+        font-size: 2.6rem;
+        line-height: 2.8rem;
+        line-height: 4rem;
+    }
 }
 
 .slider_wrapper {

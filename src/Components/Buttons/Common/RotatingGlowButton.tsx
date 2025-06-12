@@ -1,6 +1,6 @@
 import React, { ButtonHTMLAttributes, useEffect, useRef } from "react";
 
-export default function RotatingGlowButton({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
+export default function RotatingGlowButton({ children, className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   const glowRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function RotatingGlowButton({ children, ...props }: ButtonHTMLAtt
   }, []);
 
   return (
-    <span className="glow-wrapper">
+    <span className={"glow-wrapper " + (className || "")}>
       <span className="glow" ref={glowRef} />
       {typeof children === "string" ? (
         <button className="btn-chipped" {...props}>

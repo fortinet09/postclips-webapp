@@ -2,7 +2,7 @@ import { AppStore } from "@/Components/(postclips)/landing/AppStore";
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Footer() {
+export default function Footer({ showDownloadApp = true }) {
     return (
         <footer className="bg-black text-white py-16">
             {/* Logo Section */}
@@ -16,9 +16,11 @@ export default function Footer() {
             </div>
 
             {/* App Store Buttons */}
-            <div className="container d-flex justify-content-center gap-3">
-                <AppStore />
-            </div>
+            {(showDownloadApp) && (
+                <div className="container d-flex justify-content-center gap-3">
+                    <AppStore />
+                </div>
+            )}
 
             {/* Legal Links */}
             <div className="container mx-auto px-4 mt-4">

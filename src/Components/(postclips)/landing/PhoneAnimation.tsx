@@ -19,7 +19,7 @@ const PhoneAnimation = ({ source, threshold = 50, transforms = [] }: { threshold
             scrollYRef.current = currentScrollY;
 
             // Check if we're at the very top (initial state) or scrolled down (final state)
-            const section = document.getElementById('animation-section');
+            const section = document.getElementsByClassName("network-lp")[0] || document.getElementById('animation-section');
             if (!section) return;
 
             const rect = section.getBoundingClientRect();
@@ -64,24 +64,25 @@ const PhoneAnimation = ({ source, threshold = 50, transforms = [] }: { threshold
         };
     };
 
+    const style = {
+        ...getTransform(),
+        transition: 'transform 0.3s ease-out'
+    }
+
     return (
         <div className="phone-animation-container" id="animation-section">
-            <div className="phone-animation-wrapper">
-                <div className="phone-animation-glow" />
-                <div
-                    className="phone-animation-device"
-                    style={{
-                        ...getTransform(),
-                        transition: 'transform 0.6s ease-out'
-                    }}
-                >
-                    <video
-                        src={source || "/assets/images/(postclips)/landing/phone1.mp4"}
-                        autoPlay
-                        muted
-                        loop
-                        className="phone-animation-video"
-                    />
+            <div style={style}>
+                <div className="phone-animation-wrapper">
+                    <div className="phone-animation-glow" />
+                    <div className="phone-animation-device">
+                        <video
+                            src={source || "/assets/images/(postclips)/landing/phone1.mp4"}
+                            autoPlay
+                            muted
+                            loop
+                            className="phone-animation-video"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

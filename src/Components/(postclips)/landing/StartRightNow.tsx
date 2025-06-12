@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import RotatingGlowButton from "@/Components/Buttons/Common/RotatingGlowButton";
 
 export const StartRightNow = ({ subtitle, link, button }: { subtitle?: string, link?: string, button?: string }) => {
   return (
@@ -8,13 +9,11 @@ export const StartRightNow = ({ subtitle, link, button }: { subtitle?: string, l
       <h2 className="start-right-now-title">Start right now</h2>
       <p className="start-right-now-subtitle">{subtitle || "Become a Clipper Today"}</p>
       <div className="header-btn-wrapper">
-        <a
-          href={link || "https://apps.apple.com/mx/app/post-clips/id6742848231?l=en-GB"}
-          target="_blank"
-          className="btn-chipped"
-        >
-          {button || "GET THE APP"}
-        </a>
+        <RotatingGlowButton>
+          <a className="btn-chipped" href={link || "https://apps.apple.com/mx/app/post-clips/id6742848231?l=en-GB"}>
+            {button || "GET THE APP"}
+          </a>
+        </RotatingGlowButton>
       </div>
     </div>
   );

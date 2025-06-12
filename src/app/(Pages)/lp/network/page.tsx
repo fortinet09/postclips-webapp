@@ -1,8 +1,10 @@
 "use client";
+import { CardSlider, ITEMS } from "@/Components/(postclips)/landing/CardSlider";
 import { HowItWorks, Step } from "@/Components/(postclips)/landing/HowItWorks";
 import { StartRightNow } from "@/Components/(postclips)/landing/StartRightNow";
 import PhoneAnimation from "@/Components/(postclips)/landing/PhoneAnimation";
 import { MainSlider } from "@/Components/(postclips)/landing/MainSlider";
+import { useMobile } from "@/Hooks/useMobile";
 import { AppStore } from "@/Components/(postclips)/landing/AppStore";
 import { Header } from "@/Components/(postclips)/landing/Header";
 import Footer from "@/Components/(postclips)/landing/Footer";
@@ -10,31 +12,34 @@ import Image from "next/image";
 import FAQs from "@/Components/(postclips)/landing/FAQs";
 
 export default function NetworkLP() {
+  const { mobile } = useMobile();
+
   return (
     <div className="network-lp">
-      <Header />
+      <Header button="LOGIN" />
 
       <section className="section-hero">
-        <div className="hero-text-block">
-          <h1 className="hero-title">
-            Stop Spending,<br />
-            <span className="text-gradient">Start Posting</span>
-          </h1>
-          <p className="hero-subtitle">
-            Traditional Media is about to takeover Social Media
-          </p>
-        </div>
+        <h1 className="hero-title">
+          Stop Spending,<br />
+          <span className="text-gradient">Start Posting</span>
+        </h1>
+        <p className="hero-subtitle">
+          Traditional Media is about to takeover Social Media
+        </p>
 
         <PhoneAnimation
           source="/assets/video/lp-network.mp4"
-          threshold={-100}
-          transforms={[
-            "perspective(1200px) translateY(0) scale(1.8) rotateX(25deg)",
-            "perspective(1200px) translateY(60px) scale(1.3) rotateX(0deg)"
+          threshold={mobile ? 170 : 370}
+          transforms={mobile ? [
+            "perspective(1200px) translateY(-90px) scale(1.8) rotateX(25deg)",
+            "perspective(1200px) translateY(-50px) scale(1.3) rotateX(0deg)"
+          ] : [
+            "perspective(1200px) translateY(0px) scale(1.8) rotateX(25deg)",
+            "perspective(1200px) translateY(-150px) scale(0.75) rotateX(0deg)"
           ]}
         />
 
-        <AppStore />
+        {/* <AppStore /> */}
       </section>
 
       <section className="section-earnings">
@@ -49,7 +54,7 @@ export default function NetworkLP() {
       <HowItWorks steps={HOW_IT_WORK_STEPS} />
 
       <StartRightNow
-        link="https://postclips.com/login"
+        link="/login"
         subtitle="Turn Every Scroll Into Your Ad Space"
         button="GO to Network Dashboard"
       />
@@ -57,19 +62,21 @@ export default function NetworkLP() {
       <div className="card-image-list">
         {Array.from({ length: 4 }).map((_, index) =>
           <Image
-            key={index}
-            src={`/assets/images/(postclips)/landing/network/card-${index + 1}.png`}
+            key={index + (mobile ? "-mobile" : "")}
+            src={`/assets/images/(postclips)/landing/network/card-${index + 1}${mobile ? "-mobile" : ""}.png`}
             alt={"Image card " + (index + 1)}
             className="image-card"
             width={1800}
             height={800}
           />
         )}
+
+        <CardSlider items={ITEMS} />
       </div>
 
       <FAQs type="network" />
 
-      <Footer />
+      <Footer showDownloadApp={false} />
     </div>
   );
 }
@@ -110,8 +117,8 @@ const HOW_IT_WORK_STEPS: Step[] = [
   },
   {
     id: "step-5",
-    title: "Up to 10,000 Accounts Analytics All in 1 Place",
-    description: "[placeholder description]",
+    title: "Have Infinite Account Analytics All in 1 Place",
+    description: "You can have thousands of accounts, all on different platforms, all controlled here",
     highlight: "Up to 10,000",
     highlightColor1: "#00E7FF",
     videoSrc: "/assets/video/analytics.mp4"

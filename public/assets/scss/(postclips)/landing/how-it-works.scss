@@ -1,9 +1,13 @@
 .howitworks_section {
-  --height: 130vh;
-
-  height: var(--height);
   overflow: hidden;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    height: 100vh;
+  }
 
   .howitworks_scrollWrapper {
     height: 100%;
@@ -11,151 +15,181 @@
     max-width: 1200px;
     margin: 0 auto;
     overflow-y: auto;
+    overflow-x: hidden;
     scroll-snap-type: y proximity;
     scroll-behavior: smooth;
-
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-
-    @media (max-width: 768px) {
-      flex-direction: column; // stack on mobile
-    }
-  }
-
-
-  .howitworks_videoColumn {
-    flex: 1;
-    height: var(--height);
-    position: sticky;
-    top: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    z-index: 1;
-
-    @media (max-width: 768px) {
-      position: static;
-      height: auto;
-      padding: 1rem 0;
-    }
-  }
-
-
-  .howitworks_video {
-    max-width: 20rem;
-    width: auto;
-    height: 70vh;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-    @media (max-width: 768px) {
-      width: 100%;
-      max-height: none;
-      height: auto;
-    }
-  }
-
-  .howitworks_textColumn {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-
-    @media (max-width: 768px) {
-      order: -1; // move text above the video on mobile
+    
+    @media (min-width: 768px) {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
     }
-  }
 
-  .howitworks_content {
-    height: 400vh; // 4 full screen steps
-  }
+    .howitworks_videoColumn {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 5rem 2rem;
+      z-index: 1;
+      overflow-y: hidden;
 
+      @media (min-width: 768px) {
+        align-items: flex-end;
+      }
+  
+      .howitworks_videoStack {
+        position: relative;
+        width: 220px;
+        height: 40vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-  .howitworks_step,
-  .howitworks_title_container {
-    height: var(--height);
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    box-sizing: border-box;
+        @media (min-width: 768px) {
+          height: 70vh;
+          width: 300px;
+          margin-right: 1.3rem;
+        }
+      
+        .howitworks_video {  
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          opacity: 0;
+          transition: opacity 0.8s ease-in-out;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          pointer-events: none;
+        }
+        
+        .howitworks_video.visible {
+          opacity: 1;
+          pointer-events: auto;
+          z-index: 2;
+        }
+      }
+    }
+
+    .howitworks_textColumn {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+
+      @media (min-width: 768px) {
+        height: 70vh;
+        overflow: hidden;
+      }
+    
+      @media (min-width: 768px) {
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 80px;
+        z-index: 20;
+        pointer-events: none;
+      }
+    
+      &::before {
+        top: 0;
+        background: linear-gradient(to bottom, #000, rgba(0,0,0,0.78), transparent)
+      }
+    
+      &::after {
+        bottom: 0;
+        background: linear-gradient(to top, #000, rgba(0,0,0,0.78), transparent)
+      }
+    }
+    
+      .howitworks_textScroller {
+        padding: 4rem 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+
+        @media (min-width: 768px) {
+          overflow-y: scroll;
+          height: 100vh;
+          padding: 0;
+
+          .howitworks_step {
+            min-height: 50vh;
+
+            &:first-child {
+              min-height: 100vh;
+
+              .howitworks_title {
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+    
+        .howitworks_step {
+          scroll-snap-align: start;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          padding: 4rem 2rem;
+          box-sizing: border-box;
+    
+          h2 {
+            font-size: 3rem;
+            color: #FFF;
+            margin-bottom: 1rem;
+            width: 100%;
+          }
+    
+          p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            color: #FFFFFF99;
+            line-height: 1.2;
+            width: 100%;
+          }
+        }
+      }
+    }   
   }
 
   .howitworks_title {
-    font-size: 6rem;
+    font-size: 4rem;
     line-height: 5.6rem;
-    text-align: left;
-    color: #FFF !important;
+    color: #FFF;
     margin-bottom: 2rem;
     font-weight: 600;
-  }
 
-  .howitworks_step h2 {
-    font-size: 3rem;
-    text-align: left !important;
-    color: #FFF !important;
-    margin-bottom: 1rem;
-    width: 100%;
-  }
+    @media (min-width: 768px) {
+      font-size: 6rem;
+    }
+  } 
 
-  .howitworks_step p {
-    font-size: 1.1rem;
-    text-align: left;
-    max-width: 600px;
-    color: #FFFFFF99 !important;
-    line-height: 1.2;
-    width: 100%;
-  }
-}
-
-.desktop-only {
-  @media (max-width: 768px) {
-    display: none;
+  .howitworks_videoColumn .howitworks_title {
+    font-size: 5rem;
+    line-height: 4.6rem;
   }
 }
 
 .mobile-only {
-  display: none;
-
   @media (max-width: 768px) {
-    display: flex;
     justify-content: center;
     padding: 2rem;
   }
-}
 
-.howitworks_videoMobile video {
-  width: 80%;
-  max-width: 300px;
-  padding-bottom: 5rem;
-}
-
-.howitworks_videoStack {
-  position: relative;
-  width: 300px;
-  height: 70vh;
-  
-  .howitworks_video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    opacity: 0;
-    transition: opacity 0.8s ease-in-out;
-    pointer-events: none;
-  }
-  
-  .howitworks_video.visible {
-    opacity: 1;
-    pointer-events: auto;
-    z-index: 2;
+  .howitworks_videoMobile video {
+    width: 80%;
+    max-width: 300px;
+    padding-bottom: 5rem;
   }
 }
-
