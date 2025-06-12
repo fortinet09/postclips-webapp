@@ -1,216 +1,217 @@
+import { useMobile } from "@/Hooks/useMobile";
+import { useEffect, useRef, useState } from "react";
 
-type Step = {
+export interface Step {
     id: string;
     title: string;
-    description: string;
-    highlight: string;
-    highlightColor1: string;
-    highlightColor2?: string;
+    description?: string;
+    highlight: string | string[];
+    highlightColor1: string | string[];
+    highlightColor2?: string | string[];
+    videoSrc?: string;
+}
+
+export const HowItWorks = ({ steps }: { steps: Step[] }) => {
+    const [activeIndex, setActiveIndex] = useState(0);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { mobile } = useMobile();
+
+    useEffect(() => {
+        const stepEls = document.querySelectorAll("[data-step-index]");
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const index = Number(entry.target.getAttribute("data-step-index"));
+                        setActiveIndex(index);
+                    }
+                });
+            },
+            {
+                root: containerRef.current,
+                threshold: 0.5,
+            }
+        );
+
+        stepEls.forEach(el => observer.observe(el));
+
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <section className="howitworks_section">
+            <div className="howitworks_scrollWrapper" ref={containerRef}>
+                <div className="howitworks_videoColumn">
+                    <h4 className="howitworks_title mobile-only">How it works</h4>
+
+                    {(!mobile) && (
+                        <VideoStack steps={steps} activeIndex={activeIndex} />
+                    )}
+                </div>
+
+                <div className="howitworks_textColumn">
+                    <div className="howitworks_textScroller">
+                        <div className="howitworks_step desktop-only">
+                            <div className="howitworks_title">How it works</div>
+                        </div>
+
+                        {steps.map((step, index) => (
+                            <div
+                                key={step.id}
+                                className="howitworks_step"
+                                data-step-index={index}
+                            >
+                                <VideoItem
+                                    step={step}
+                                    src={step.videoSrc}
+                                    className="howitworks_video"
+                                />
+
+                                <h2>
+                                    {highlightTitle(
+                                        step.title,
+                                        step.highlight,
+                                        step.highlightColor1,
+                                        step.highlightColor2
+                                    )}
+                                </h2>
+                                <p>{step.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
 };
 
-const stepsClipper: Step[] = [
-    {
-        id: "step-1",
-        title: "Watch YOUR Favorite Networks",
-        description:
-            "Browse top content from major networks—Just pick your show or movie & watch right inside our app",
-        highlight: "YOUR",
-        highlightColor1: "#00E7FF"
-    },
-    {
-        id: "step-2",
-        title: "Clip YOUR Favorite Moments",
-        description:
-            "Select the scenes that will go viral—anything interesting, intense, or meme-worthy",
-        highlight: "YOUR",
-        highlightColor1: "#75A4FF"
-    },
-    {
-        id: "step-3",
-        title: "Post YOUR Clips",
-        description:
-            "Instantly Post to TikTok, Instagram, Facebook, X (Twitter), and YouTube Shorts all from one place",
-        highlight: "YOUR",
-        highlightColor1: "#00E7FF",
-        highlightColor2: "#003FDD"
-    },
-    {
-        id: "step-4",
-        title: "YOU Get Paid!",
-        description:
-            "Get paid for every 1,000 views you get—the more views, the more you earn!",
-        highlight: "YOU",
-        highlightColor1: "#00E7FF",
-        highlightColor2: "#003FDD"
-    },
-];
 
-// Define network steps data based on the image
-const stepsNetwork = [
-    {
-        id: "step-1",
-        title: "DESIGN the Accounts",
-        description:
-            "Choose the username, bio, link in bio, and profile pictures for every account",
-        highlight: "DESIGN",
-    },
-    {
-        id: "step-2",
-        title: "CUSTOMIZE your clips",
-        description:
-            "Control every detail— Pick the caption, add your logo, show name, and outro for every post",
-        highlight: "CUSTOMIZE",
-    },
-    {
-        id: "step-3",
-        title: "APPROVE or REJECT Every Clip Submitted",
-        description:
-            "Total control—nothing goes live without your sign-off",
-        highlight: "APPROVE",
-    },
-    {
-        id: "step-4",
-        title: "GET UP to Billions of Views",
-        description:
-            "Let our clippers push content across thousands of accounts",
-        highlight: "GET UP",
-    },
-    {
-        id: "step-5",
-        title: "Up to 10,000 Accounts Analytics All in 1 Place",
-        description:
-            "[placeholder description]",
-        highlight: "Up to",
-    },
-];
+export const VideoStack = ({ activeIndex, steps }: { steps: Step[], activeIndex: number }) => {
+    return (
+        <div className="howitworks_videoStack">
+            <div className="phone-animation-glow small" />
+            {steps.map((step, index) =>
+                <VideoItem
+                    key={step.id + index}
+                    step={step}
+                    src={step.videoSrc}
+                    className={`howitworks_video ${index === activeIndex ? "visible" : ""}`}
+                />
+            )}
+        </div>
+    )
+}
 
+const VideoItem = ({ src, className, step }: { src?: string, className?: string, step: Step }) => {
+    const gradient = step.highlightColor1 && step.highlightColor2
+        ? [step.highlightColor1, step.highlightColor2]
+        : [step.highlightColor1, step.highlightColor1]
 
-export const HowItWorks: React.FC = () => {
+    return (
+        <div className={className}>
+            <div className="phone-animation-glow small" style={{ backgroundColor: `linear-gradient(90deg, ${gradient.at(0)} 0%, ${gradient.at(1)} 100%)` }} />
+            <video
+                src={src || "/assets/images/(postclips)/landing/how-it-works.mp4"}
+                autoPlay
+                muted
+                loop
+                playsInline
+            />
+        </div>
+    );
+}
 
-    function highlightTitle(
-        text: string,
-        highlight: string,
-        color1: string,
-        color2?: string
-    ): React.ReactNode {
-        const regex = new RegExp(`(${highlight})`, "gi");
+function highlightTitle(
+    text: string,
+    highlight: string | string[],
+    color1: string | string[],
+    color2?: string | string[]
+): React.ReactNode {
+    const highlights = Array.isArray(highlight) ? highlight : [highlight];
+    const colors1 = Array.isArray(color1) ? color1 : highlights.map(() => color1);
+    const colors2 = color2
+        ? Array.isArray(color2)
+            ? color2
+            : highlights.map(() => color2)
+        : undefined;
 
-        const parts = [];
-        let lastIndex = 0;
+    const baseStyle = { marginRight: "0.25ch" };
+    if (highlights.length === 0) return text;
 
-        text.replace(regex, (match, _, offset) => {
-            if (lastIndex < offset) {
-                parts.push(<span key={lastIndex}>{text.slice(lastIndex, offset)}</span>);
-            }
+    // Escape and build regex
+    const escaped = highlights.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const regex = new RegExp(`(${escaped.join("|")})`, "gi");
 
-            const key = `highlight-${offset}`;
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
 
-            if (color2) {
-                parts.push(
+    text.replace(regex, (match, _, offset) => {
+        if (lastIndex < offset) {
+            parts.push(
+                <span key={lastIndex} style={baseStyle}>
+                    {text.slice(lastIndex, offset)}
+                </span>
+            );
+        }
+
+        // Identify original highlight index to get corresponding colors
+        const matchLower = match.toLowerCase();
+        const index = highlights.findIndex((h) => h.toLowerCase() === matchLower);
+        const c1 = colors1[index] || "#000";
+        const c2 = colors2?.[index];
+
+        const key = `highlight-${offset}`;
+
+        if (c2) {
+            parts.push(
+                <span
+                    key={key}
+                    style={{
+                        position: "relative",
+                        display: "inline-block",
+                        fontWeight: 700,
+                        ...baseStyle,
+                    }}
+                >
+                    <span style={{ opacity: 0 }}>{match}</span>
                     <span
-                        key={offset}
                         style={{
-                            position: "relative",
-                            display: "inline-block",
-                            fontWeight: 700,
-                            margin: "0 0.25ch", // ensures spacing before/after
-                        }}
-                    >
-                        <span style={{ opacity: 0 }}>{match}</span>
-                        <span
-                            style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                background: `linear-gradient(to right, ${color1}, ${color2})`,
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                                whiteSpace: "nowrap",
-                            }}
-                        >
-                            {match}
-                        </span>
-                    </span>
-                );
-
-            } else {
-                parts.push(
-                    <span
-                        key={offset}
-                        style={{
-                            color: color1,
-                            fontWeight: 700,
-                            margin: "0 0.25ch",
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            background: `linear-gradient(to right, ${c1}, ${c2})`,
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            whiteSpace: "nowrap",
                         }}
                     >
                         {match}
                     </span>
-                );
-            }
-
-            lastIndex = offset + match.length;
-            return match;
-        });
-
-        if (lastIndex < text.length) {
-            parts.push(<span key={lastIndex}>{" "}{text.slice(lastIndex)}{" "}</span>);
+                </span>
+            );
+        } else {
+            parts.push(
+                <span
+                    key={key}
+                    style={{ color: c1, fontWeight: 700, ...baseStyle }}
+                >
+                    {match}
+                </span>
+            );
         }
 
-        return parts;
+        lastIndex = offset + match.length;
+        return match;
+    });
+
+    if (lastIndex < text.length) {
+        parts.push(
+            <span key={lastIndex} style={baseStyle}>
+                {text.slice(lastIndex)}
+            </span>
+        );
     }
 
-
-
-
-    return (
-        <>
-            <section className="howitworks_section">
-                <div className="howitworks_scrollWrapper">
-                    {/* Desktop video only */}
-                    <div className="howitworks_videoColumn desktop-only">
-                        <video
-                            src="/assets/images/(postclips)/landing/how-it-works.mp4"
-                            autoPlay
-                            muted
-                            loop
-                            className="howitworks_video"
-                        />
-                    </div>
-
-                    <div className="howitworks_textColumn">
-                        <div className="howitworks_content">
-                            {stepsClipper.map((step, index) => (
-                                <div className="howitworks_step" key={step.id}>
-                                    {index === 0 && (
-                                        <div className="howitworks_title">How it works</div>
-                                    )}
-                                    <h2>
-                                        {highlightTitle(
-                                            step.title,
-                                            step.highlight,
-                                            step.highlightColor1,
-                                            step.highlightColor2
-                                        )}
-                                    </h2>
-                                    <p>{step.description}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Mobile video only */}
-            </section>
-
-            <div className="howitworks_videoMobile mobile-only">
-                <video
-                    src="/assets/images/(postclips)/landing/how-it-works.mp4"
-                    autoPlay
-                    muted
-                    loop
-                    className="howitworks_video"
-                />
-            </div>
-        </>
-    );
-};
+    return parts;
+}
