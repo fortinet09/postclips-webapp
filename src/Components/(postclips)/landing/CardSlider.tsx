@@ -71,20 +71,22 @@ export const CardSlider = ({ items }: { items: typeof ITEMS }) => {
 
       <p>{items[activeIndex].text}</p>
 
-      <div className="card-item-images">
+      <div className="card-item-images-container">
         <button onClick={prev} className="card-item-indicator-control prev">
           <ChevronLeft />
         </button>
 
-        {items.map((item, index) => (
-          <img
-            key={item.image}
-            alt={item.text}
-            src={`/assets/images/(postclips)/landing/network/${item.image}${mobile ? "-mobile" : ""
-              }.png?v=1`}
-            className={activeIndex === index ? "active" : ""}
-          />
-        ))}
+        <div className="card-item-images">
+          {items.map((item, index) => (
+            <img
+              key={item.image}
+              alt={item.text}
+              src={`/assets/images/(postclips)/landing/network/${item.image}${mobile ? "-mobile" : ""
+                }.png?v=1`}
+              className={activeIndex === index ? "active" : ""}
+            />
+          ))}
+        </div>
 
         <button onClick={next} className="card-item-indicator-control next">
           <ChevronRight />

@@ -1,11 +1,11 @@
 "use client";
 import { CardSlider, ITEMS } from "@/Components/(postclips)/landing/CardSlider";
 import { HowItWorks, Step } from "@/Components/(postclips)/landing/HowItWorks";
+import RotatingGlowButton from "@/Components/Buttons/Common/RotatingGlowButton";
 import { StartRightNow } from "@/Components/(postclips)/landing/StartRightNow";
 import PhoneAnimation from "@/Components/(postclips)/landing/PhoneAnimation";
 import { MainSlider } from "@/Components/(postclips)/landing/MainSlider";
 import { useMobile } from "@/Hooks/useMobile";
-import { AppStore } from "@/Components/(postclips)/landing/AppStore";
 import { Header } from "@/Components/(postclips)/landing/Header";
 import Footer from "@/Components/(postclips)/landing/Footer";
 import Image from "next/image";
@@ -39,12 +39,16 @@ export default function NetworkLP() {
           ]}
         />
 
-        {/* <AppStore /> */}
+        <RotatingGlowButton>
+          <a href="/login" className="btn-chipped">
+            Go To Network Dashboard
+          </a>
+        </RotatingGlowButton>
       </section>
 
       <section className="section-earnings">
         <MainSlider
-          title={`You just discovered the <span class="text-gradient">CHEAT CODE</span> for getting customers attention`}
+          title={`You just discovered the <span class="text-gradient">CHEAT CODE</span> for getting customers <span class="text-gradient">ATTENTION</span>`}
           labels={["Campaign Views"]}
           earnings={2150209000}
           clips={26450}
@@ -103,23 +107,23 @@ const HOW_IT_WORK_STEPS: Step[] = [
     title: "APPROVE or REJECT Every Clip Submitted",
     description: "Total control—nothing goes live without your sign-off",
     highlight: ["APPROVE", "REJECT"],
-    highlightColor1: "#00E7FF",
-    highlightColor2: "#75A4FF",
+    highlightColor1: ["#00E7FF", "#e93b2e"],
+    highlightColor2: ["#75A4FF", "#601616"],
     videoSrc: "/assets/video/review.mp4"
   },
   {
     id: "step-4",
     title: "GET UP to Billions of Views",
     description: "Let our clippers push content across thousands of accounts",
-    highlight: "GET UP",
+    highlight: "Billions of Views",
     highlightColor1: "#00E7FF",
     videoSrc: "/assets/video/views.mp4"
   },
   {
     id: "step-5",
-    title: "Have Infinite Account Analytics All in 1 Place",
+    title: "Get Analytics for Unlimited Accounts All in 1 Place",
     description: "You can have thousands of accounts, all on different platforms, all controlled here",
-    highlight: "Up to 10,000",
+    highlight: "Unlimited Accounts",
     highlightColor1: "#00E7FF",
     videoSrc: "/assets/video/analytics.mp4"
   },
