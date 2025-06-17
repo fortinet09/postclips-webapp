@@ -19,3 +19,28 @@
   font-weight: bold;
   color: white !important;
 }
+
+.page-header {
+  background: #161616 !important;
+
+  .header-wrapper {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  ul.nav-menus {
+    li {
+      margin-right: 0px !important;
+      padding: 9px 8px !important;
+  
+      div {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+}

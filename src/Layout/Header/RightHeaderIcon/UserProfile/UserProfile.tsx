@@ -31,12 +31,12 @@ const UserProfile = () => {
   };
 
   return (
-    <li className="profile-nav onhover-dropdown p-0">
+    <li className="profile-nav onhover-dropdown">
       <div className="d-flex align-items-center profile-media">
         <Image
-          className="b-r-10 img-40 img-fluid"
-          width={40}
-          height={40}
+          className="b-r-10 img-fluid"
+          width={24}
+          height={24}
           src={user?.avatar || `${ImagePath}/dashboard/profile.png`}
           alt=""
         />

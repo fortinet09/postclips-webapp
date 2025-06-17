@@ -1749,7 +1749,6 @@
     .nav-right {
       > ul{
         > li{
-          margin-right: 5px !important;
           &:nth-child(3){
             display: none !important;
           }
@@ -4201,12 +4200,6 @@
               margin-right: 10px;
               .flag-icon {
                 font-size: 14px !important;
-              }
-              .profile-media {
-                img {
-                  width: 25px !important;
-                  height: 25px;
-                }
               }
             }
           }

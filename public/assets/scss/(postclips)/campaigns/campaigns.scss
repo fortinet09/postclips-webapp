@@ -28,6 +28,21 @@
     margin-top: 24px;
     padding: 24px;
 
+    @media (max-width: 768px) {
+        margin-bottom: 40px;
+        padding-top: 34px !important;
+    }
+
+    .breadcrumbs-section {
+        padding: 18px 0px;
+        justify-content: left;
+
+        span {
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 16px;
+        }
+    }
+
     // Section titles styling
     .section-title {
         color: #ffffff;
@@ -74,6 +89,7 @@
 
     // Top Campaigns Section
     .top-campaigns {
+        margin-top: 28px;
         margin-bottom: 32px;
 
         .carousel-container {
@@ -88,8 +104,7 @@
                 overflow: visible;
                 width: 100%;
                 height: 100%;
-                margin: auto;
-                padding: 0 10px;
+                margin: 0 10px;
 
                 .embla__container {
                     display: flex;
@@ -178,9 +193,8 @@
                                 width: 100%;
 
                                 div {
-                                    text-align: center;
                                     background: #ffffff;
-                                    padding: 8px 12px;
+                                    padding: 8px 8px 10px;
                                     min-width: 0;
                                     width: 100%;
                                     border-radius: 4px;
@@ -215,13 +229,13 @@
                                     }
 
                                     span {
+                                        font-family: $font-lexend, $font-serif;
                                         display: block;
-                                        color: #666666;
-                                        font-size: 10px;
-                                        margin-bottom: 2px;
-                                        text-transform: uppercase;
+                                        color: rgba(22, 22, 22, 0.8);
+                                        font-size: 12px;
+                                        margin-bottom: 4px;
                                         letter-spacing: 0.5px;
-                                        font-weight: 500;
+                                        font-weight: 400;
                                         white-space: nowrap;
                                         overflow: hidden;
                                         text-overflow: ellipsis;
@@ -230,37 +244,12 @@
                                     strong {
                                         display: block;
                                         font-size: 18px;
-                                        color: #000000;
+                                        color: #161616;
                                         font-weight: 700;
                                         line-height: 1;
                                         white-space: nowrap;
                                         overflow: hidden;
                                         text-overflow: ellipsis;
-                                    }
-
-                                    @media (max-width: 1200px) {
-                                        padding: 6px 8px;
-
-                                        span {
-                                            font-size: 9px;
-                                        }
-
-                                        strong {
-                                            font-size: 16px;
-                                        }
-                                    }
-
-                                    @media (max-width: 992px) {
-                                        padding: 4px 6px;
-
-                                        span {
-                                            font-size: 8px;
-                                            margin-bottom: 1px;
-                                        }
-
-                                        strong {
-                                            font-size: 14px;
-                                        }
                                     }
                                 }
                             }
@@ -281,12 +270,22 @@
                         }
                     }
 
-                    // Mobile styles
                     @media (max-width: 768px) {
-                        flex: 0 0 100%;
+                        flex: 0 0 100% !important;
+                        height: 100%;
+                        max-width: 329px;
+                        margin: 0 8px;
 
                         &.is-selected {
-                            flex: 0 0 100%;
+                        }
+
+                        &:not(.is-selected) {
+                            max-width: 258px;
+                            height: 342px;
+                        }
+
+                        .campaign-card {
+                            transform: none !important;
                         }
                     }
 
@@ -303,8 +302,10 @@
 
             // Adjust container height for mobile
             @media (max-width: 768px) {
-                height: 400px;
-                padding: 20px 0;
+                height: 438px;
+                width: 100%;
+                padding: 0;
+                margin: 0 auto;
             }
 
             .carousel-control {
@@ -312,11 +313,11 @@
                 top: 50%;
                 transform: translateY(-50%);
                 z-index: 3;
-                background: rgba(0, 0, 0, 0.5);
-                border: 2px solid rgba(255, 255, 255, 0.3);
+                background: rgba(54, 54, 54, 0.94);
+                border: 0px;
                 border-radius: 50%;
-                width: 48px;
-                height: 48px;
+                width: 44px;
+                height: 44px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -340,15 +341,13 @@
 
                 // Adjust control positions for mobile
                 @media (max-width: 768px) {
-                    width: 36px;
-                    height: 36px;
 
                     &.prev {
-                        left: 10px;
+                        left: -22px;
                     }
 
                     &.next {
-                        right: 10px;
+                        right: -22px;
                     }
                 }
             }
@@ -373,6 +372,7 @@
             border: none !important;
             border-radius: 4px;
             overflow: hidden;
+            margin-bottom: 0px !important;
 
             &.first-card {
                 clip-path: polygon(0 0,
@@ -400,14 +400,15 @@
             }
 
             .card-body {
-                padding: 20px;
+                padding: 20px 16px;
                 background: transparent !important;
 
                 .analytics-title {
                     font-size: 14px;
-                    color: rgba(255, 255, 255, 0.6) !important;
+                    color: rgb(255, 255, 255);
                     font-weight: 400;
-                    margin-bottom: 8px;
+                    text-wrap: nowrap;
+                    letter-spacing: 0px;
                 }
 
                 strong {
@@ -415,24 +416,26 @@
                     font-size: 28px;
                     color: #ffffff !important;
                     font-weight: 700;
-                    margin-bottom: 8px;
+                    margin-bottom: 0px;
                 }
 
                 .trend {
                     display: flex;
                     align-items: center;
-                    gap: 4px;
-                    font-size: 14px;
-                    color: #23C55E;
+                    font-size: 12px;
+                    color: rgba(81, 246, 75, 1);
+                    font-weight: 700;
 
                     &::before {
                         content: '+';
+                        font-weight: 700;
                     }
 
                     &::after {
                         content: 'this month';
                         color: rgba(255, 255, 255, 0.5);
                         margin-left: 4px;
+                        font-weight: 400;
                     }
                 }
             }
@@ -449,6 +452,31 @@
         @media (max-width: 768px) {
             &-grid {
                 flex-wrap: wrap !important;
+
+                .first-card {
+                    clip-path: polygon(0 0,
+                            100% 0,
+                            100% calc(100% - 12px),
+                            calc(100% - 12px) 100%,
+                            0 100%) !important;
+
+                }
+
+                > .col-md-3:nth-child(2) .card {
+                    clip-path: polygon(0 0,
+                            100% 0,
+                            100% 100%,
+                            12px 100%,
+                            0 calc(100% - 12px)) !important;
+                }
+
+                > .col-md-3:nth-child(3) .card {
+                    clip-path: polygon(0 0,
+                            calc(100% - 12px) 0,
+                            100% 12px,
+                            100% 100%,
+                            0 100%) !important;
+                }
             }
 
             &-card {
@@ -483,6 +511,10 @@
 
     // Campaigns List Section
     .campaigns-list {
+        @media (max-width: 768px) {
+            margin-bottom: 20px;
+        }
+
         .section-title {
             margin-bottom: 24px;
         }
@@ -506,7 +538,7 @@
                 transform: translateY(-50%);
                 width: calc(100% - 460px);
                 pointer-events: auto;
-                
+
                 &.filters-hidden {
                     opacity: 0;
                     pointer-events: none;
@@ -515,7 +547,7 @@
 
                 .nav-tabs {
                     border: none;
-                    gap: 16px;
+                    gap: 4px;
                     margin: 0;
                     display: flex;
                     white-space: nowrap;
@@ -524,18 +556,21 @@
                         margin: 0;
 
                         .nav-link {
-                            background: none;
+                            background: rgba(36, 36, 36, 1);
                             border: none;
-                            color: rgba(255, 255, 255, 0.5);
-                            padding: 8px 16px;
+                            color: rgba(255, 255, 255, 1);
+                            padding: 8px 8px;
                             cursor: pointer;
-                            font-size: 14px;
-                            font-weight: 500;
+                            font-size: 16px;
+                            font-weight: 400;
+                            border-radius: var(--bs-nav-tabs-border-radius);
+                            letter-spacing: 0px;
 
                             &.active {
-                                color: #ffffff;
-                                background: rgba(255, 255, 255, 0.1);
+                                color: rgba(22, 22, 22, 1);
+                                background: rgba(255, 255, 255, 1);
                                 border-radius: 8px;
+                                font-weight: 700;
                             }
 
                             &:hover:not(.active) {
@@ -581,7 +616,7 @@
                     transform: none;
                     width: 100%;
                     top: 0;
-                    
+
                     &.filters-hidden {
                         display: none;
                     }
@@ -590,15 +625,15 @@
                         width: 100%;
                         overflow-x: auto;
                         padding-bottom: 4px;
-                        
+
                         &::-webkit-scrollbar {
                             height: 2px;
                         }
-                        
+
                         &::-webkit-scrollbar-track {
                             background: rgba(255, 255, 255, 0.1);
                         }
-                        
+
                         &::-webkit-scrollbar-thumb {
                             background: rgba(255, 255, 255, 0.3);
                         }
@@ -609,17 +644,17 @@
                     width: 100%;
                     flex-direction: column;
                     margin-left: 0;
-                    
+
                     .search-input {
                         width: 100%;
-                        
+
                         &.search-expanded {
                             width: 100%;
                         }
                     }
-                    
+
                     .btn-chipped {
-                        width: 100%;
+                        display: none;
                     }
                 }
             }
@@ -631,16 +666,29 @@
             gap: 20px;
 
             .campaign-card {
-                background: rgba(255, 255, 255, 0.05) !important;
-                border: none !important;
-                border-radius: 12px;
-                overflow: hidden;
-                height: 360px;
-                position: relative;
+                background: transparent !important;
+
+                &:not(.skeleton-card) {
+                    border-radius: 0px !important;
+                }
                 transition: transform 0.2s ease;
+                height: auto;
 
                 &:hover {
                     transform: translateY(-4px);
+                }
+
+                .card-content {
+                    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    height: 338px;
+                    width: auto;
+                    position: relative;
+
+                    @media (max-width: 768px) {
+                        width: 252px;
+                    }                  
                 }
 
                 .card-img-top {
@@ -658,6 +706,10 @@
                     padding: 20px;
                     color: #ffffff;
 
+                    @media (max-width: 768px) {
+                        padding: 0 8px 8px;
+                    }
+
                     h3 {
                         font-size: 18px;
                         font-weight: 600;
@@ -673,7 +725,11 @@
                         display: grid;
                         grid-template-columns: 1fr 1fr;
                         gap: 12px;
-                        margin-bottom: 12px;
+                        margin-bottom: 0px;
+
+                        @media (max-width: 768px) {
+                            gap: 2px;
+                        }
 
                         div {
                             span {
@@ -698,6 +754,30 @@
                         margin: 0;
                     }
                 }
+
+                .card-footer {
+                    padding: 0px;
+                    margin-top: 16px;
+                    border: 0px !important;
+                }
+
+                .card-title {
+                    font-size: 18px;
+                    color: #ffffff;
+                    font-weight: 600;
+                }
+
+                .card-subtitle {
+                    font-family: $font-lexend, $font-serif;
+                    font-size: 12px;
+                    font-weight: 300;
+                    color: rgba(255, 255, 255, 0.8);
+                }
+
+                @media (max-width: 768px) {
+                    margin-bottom: 0px;
+                    width: 252px;
+                }
             }
 
             @media (max-width: 1200px) {
@@ -705,9 +785,38 @@
             }
 
             @media (max-width: 768px) {
-                grid-template-columns: 1fr;
+                &.campaigns-row-scroll {
+                    display: flex;
+                    flex-direction: row;
+                    overflow-x: auto;
+                    gap: 8px;
+                    scrollbar-width: thin;
+                    scrollbar-color: #888 #222;
+                    margin: 0 -23px 0 0;
+    
+                    .campaigns-row-item {
+                        padding: 4px 0px;
+
+                        &:last-child {
+                            padding-right: 23px;
+                        }
+                    }
+                }
             }
         }
+    }
+
+}
+
+.create-campaign-mobile {
+    display: none;
+
+    button {
+        width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        display: block;
     }
 }
 
@@ -863,67 +972,68 @@
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
 }
 
 .skeleton-card {
-  .skeleton-img {
-    height: 200px;
-    background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite linear;
-  }
-
-  .skeleton-title {
-    height: 24px;
-    width: 80%;
-    margin-bottom: 16px;
-    background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite linear;
-    border-radius: 4px;
-  }
-
-  .campaign-metrics {
-    .metric-box {
-      .skeleton-label {
-        height: 12px;
-        width: 60%;
-        margin-bottom: 8px;
+    .skeleton-img {
+        height: 360px;
         background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
         background-size: 1000px 100%;
         animation: shimmer 2s infinite linear;
-        border-radius: 2px;
-      }
-
-      .skeleton-value {
-        height: 20px;
-        width: 100%;
-        background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
-        background-size: 1000px 100%;
-        animation: shimmer 2s infinite linear;
-        border-radius: 2px;
-      }
     }
-  }
+
+    .skeleton-title {
+        height: 24px;
+        width: 80%;
+        margin-bottom: 16px;
+        background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+        background-size: 1000px 100%;
+        animation: shimmer 2s infinite linear;
+        border-radius: 4px;
+    }
+
+    .campaign-metrics {
+        .metric-box {
+            .skeleton-label {
+                height: 12px;
+                width: 60%;
+                margin-bottom: 8px;
+                background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+                background-size: 1000px 100%;
+                animation: shimmer 2s infinite linear;
+                border-radius: 2px;
+            }
+
+            .skeleton-value {
+                height: 20px;
+                width: 100%;
+                background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+                background-size: 1000px 100%;
+                animation: shimmer 2s infinite linear;
+                border-radius: 2px;
+            }
+        }
+    }
 }
 
 // Metric box with right-side chip (for campaign metrics)
 .metric-box-chipped {
-  background: #fff;
-  color: #161616;
-  padding: 12px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
-  font-weight: 600;
-  font-size: 1.1rem;
+    background: #fff;
+    color: #161616;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+    font-weight: 600;
+    font-size: 1.1rem;
 }

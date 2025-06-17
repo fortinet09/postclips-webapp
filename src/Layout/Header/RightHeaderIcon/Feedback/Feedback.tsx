@@ -10,13 +10,13 @@ const Feedback = () => {
 
     return (
         <li className="onhover-dropdown">
-            <div onClick={handleClick} style={{ backgroundColor: "#FFFFFF14", borderRadius: "99px", padding: "12px" }}>
+            <div onClick={handleClick}>
                 <Image
                     src="/assets/images/(postclips)/header/help.svg"
                     alt="!"
                     className="next-image-full"
-                    width={25}
-                    height={25}
+                    width={18}
+                    height={18}
                     priority
                 />
             </div>

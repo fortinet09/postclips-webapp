@@ -9,6 +9,7 @@ import {
     Col,
     Card,
     CardBody,
+    CardFooter,
     CardImg,
     Button,
     Input,
@@ -16,11 +17,15 @@ import {
     NavItem,
     NavLink,
     Progress,
+    CardTitle,
+    CardText,
+    CardSubtitle,
 } from 'reactstrap';
-import { ChevronLeft, ChevronRight } from 'react-feather';
 import useEmblaCarousel from 'embla-carousel-react';
 import CreateCampaignModal from './CreateCampaignModal';
 import { useRouter } from 'next/navigation';
+import ArrowLeft from '@/Components/Icons/Custom/ArrowLeft';
+import ArrowRight from '@/Components/Icons/Custom/ArrowRight';
 
 interface CampaignsProps { }
 
@@ -148,7 +153,10 @@ const Campaigns: React.FC<CampaignsProps> = () => {
     }
 
     return (
-        <Container fluid className="campaigns px-4 pt-5">
+        <Container fluid className="campaigns px-2 px-md-4 pt-5">
+            <div className="mobile-only breadcrumbs-section">
+                <span>Campaigns</span>
+            </div>
             {topCampaigns && topCampaigns.length > 0 && (
                 <div className="top-campaigns mb-4">
                     <div className="section-title mb-3">Top performing campaigns</div>
@@ -172,11 +180,11 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                                                             <strong>{formatNumber(campaign.analytics.total_views)}</strong>
                                                         </div>
                                                         <div>
-                                                            <span>Clips</span>
+                                                            <span>Clips posted</span>
                                                             <strong>{formatNumber(campaign.analytics.total_clips)}</strong>
                                                         </div>
                                                         <div>
-                                                            <span>Likes</span>
+                                                            <span>Link clicks</span>
                                                             <strong>{formatNumber(campaign.analytics.total_likes)}</strong>
                                                         </div>
                                                     </div>
@@ -189,10 +197,10 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                             {topCampaigns.length > 1 && (
                                 <>
                                     <button className="carousel-control prev" onClick={scrollPrev}>
-                                        <ChevronLeft size={24} />
+                                        <ArrowLeft />
                                     </button>
                                     <button className="carousel-control next" onClick={scrollNext}>
-                                        <ChevronRight size={24} />
+                                        <ArrowRight />
                                     </button>
                                 </>
                             )}
@@ -206,36 +214,40 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                     <div className="section-title d-flex justify-content-between align-items-center mb-3">
                         Analytics <span className="view-all">VIEW ALL</span>
                     </div>
-                    <Row className="analytics-grid">
-                        <Col md={3}>
+                    <Row className="analytics-grid g-2">
+                        <Col md={3} xs={6}>
                             <Card className="analytics-card first-card">
                                 <CardBody>
                                     <div className="analytics-title">Total views generated</div>
                                     <strong>{formatNumber(totalAnalytics.total_views)}</strong>
+                                    <span className="trend">23%</span>
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col md={3}>
+                        <Col md={3} xs={6}>
                             <Card className="analytics-card middle-card">
                                 <CardBody>
                                     <div className="analytics-title">Total clips posted</div>
                                     <strong>{formatNumber(totalAnalytics.total_clips)}</strong>
+                                    <span className="trend">23%</span>
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col md={3}>
+                        <Col md={3} xs={6}>
                             <Card className="analytics-card middle-card">
                                 <CardBody>
                                     <div className="analytics-title">Average views per clip</div>
                                     <strong>{formatAverageViews(totalAnalytics.average_views_per_clip)}</strong>
+                                    <span className="trend">23%</span>
                                 </CardBody>
                             </Card>
                         </Col>
-                        <Col md={3}>
+                        <Col md={3} xs={6}>
                             <Card className="analytics-card last-card">
                                 <CardBody>
                                     <div className="analytics-title">Total link clicks</div>
                                     <strong>{formatNumber(totalAnalytics.total_link_clicks)}</strong>
+                                    <span className="trend">23%</span>
                                 </CardBody>
                             </Card>
                         </Col>
@@ -300,72 +312,79 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                 </div>
 
                 {loading ? (
-                    <Row className="campaigns-grid">
+                    <div className="campaigns-grid campaigns-row-scroll">
                         {[1, 2, 3].map((i) => (
-                            <CampaignSkeleton key={i} />
+                            <div className="campaigns-row-item" key={i}>
+                                <CampaignSkeleton />
+                            </div>
                         ))}
-                    </Row>
+                    </div>
                 ) : campaigns && campaigns.length > 0 ? (
-                    <Row className="campaigns-grid">
+                    <div className="campaigns-grid campaigns-row-scroll">
                         {campaigns.map((campaign) => (
-                            <Col key={campaign.id}>
+                            <div className="campaigns-row-item" key={campaign.id}>
                                 <Card
                                     className={`campaign-card ${(campaign.status === 'draft' || campaign.status === 'in_review') ? 'cursor-pointer' : ''}`}
                                     onClick={() => handleCampaignClick(campaign)}
                                     style={{ cursor: (campaign.status === 'draft' || campaign.status === 'in_review') ? 'pointer' : 'default' }}
                                 >
-                                    <CardImg top src={getRandomPreviewImage(campaign.preview_images)} alt={campaign.title} />
-                                    <CardBody>
-                                        <h3>{campaign.title}</h3>
-                                        <div className="campaign-metrics">
-                                            <div className="metric-box metric-box-right-chip">
-                                                <span>Budget</span>
-                                                <strong className="d-flex align-items-center">
-                                                    <span className="m-0 metric-primary-value">
-                                                        {formatNumber(campaign.analytics.total_payments)}
-                                                    </span>
-                                                    /{formatNumber(campaign.total_budget)}
-                                                </strong>
-                                                <Progress
-                                                    value={Math.min(campaign.analytics.budget_percentage, 100)}
-                                                    style={{
-                                                        height: '2px',
-                                                        backgroundColor: '#E5E5E5',
-                                                        borderRadius: 0
-                                                    }}
-                                                    className="metric-progress"
-                                                    barStyle={{
-                                                        background: 'linear-gradient(90deg, #00E7FF 0%, #003FDD 100%)'
-                                                    }}
-                                                />
+                                    <div className="card-content">
+                                        <CardImg top src={getRandomPreviewImage(campaign.preview_images)} alt={campaign.title} />
+                                        <CardBody>
+                                            <div className="campaign-metrics">
+                                                <div className="metric-box metric-box-right-chip">
+                                                    <span>Budget</span>
+                                                    <strong className="d-flex align-items-center">
+                                                        <span className="m-0 metric-primary-value">
+                                                            {formatNumber(campaign.analytics.total_payments)}
+                                                        </span>
+                                                        /{formatNumber(campaign.total_budget)}
+                                                    </strong>
+                                                    <Progress
+                                                        value={Math.min(campaign.analytics.budget_percentage, 100)}
+                                                        style={{
+                                                            height: '2px',
+                                                            backgroundColor: '#E5E5E5',
+                                                            borderRadius: 0
+                                                        }}
+                                                        className="metric-progress"
+                                                        barStyle={{
+                                                            background: 'linear-gradient(90deg, #00E7FF 0%, #003FDD 100%)'
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="metric-box metric-box-left-chip">
+                                                    <span>Views</span>
+                                                    <strong className="d-flex align-items-center">
+                                                        <span className="m-0 metric-primary-value">
+                                                            {formatNumber(campaign.analytics.total_views)}
+                                                        </span>
+                                                        /{formatNumber(campaign.targeted_amount_of_views)}
+                                                    </strong>
+                                                    <Progress
+                                                        value={Math.min(campaign.analytics.views_percentage, 100)}
+                                                        style={{
+                                                            height: '2px',
+                                                            backgroundColor: '#E5E5E5',
+                                                            borderRadius: 0
+                                                        }}
+                                                        className="metric-progress"
+                                                        barStyle={{
+                                                            background: 'linear-gradient(90deg, #00E7FF 0%, #003FDD 100%)'
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="metric-box metric-box-left-chip">
-                                                <span>Views</span>
-                                                <strong className="d-flex align-items-center">
-                                                    <span className="m-0 metric-primary-value">
-                                                        {formatNumber(campaign.analytics.total_views)}
-                                                    </span>
-                                                    /{formatNumber(campaign.targeted_amount_of_views)}
-                                                </strong>
-                                                <Progress
-                                                    value={Math.min(campaign.analytics.views_percentage, 100)}
-                                                    style={{
-                                                        height: '2px',
-                                                        backgroundColor: '#E5E5E5',
-                                                        borderRadius: 0
-                                                    }}
-                                                    className="metric-progress"
-                                                    barStyle={{
-                                                        background: 'linear-gradient(90deg, #00E7FF 0%, #003FDD 100%)'
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </CardBody>
+                                        </CardBody>
+                                    </div>
+                                    <CardFooter>
+                                        <CardTitle>{campaign.title}</CardTitle>
+                                        <CardSubtitle>Ends in 6 days</CardSubtitle>
+                                    </CardFooter>
                                 </Card>
-                            </Col>
+                            </div>
                         ))}
-                    </Row>
+                    </div>
                 ) : (
                     <div className="empty-campaigns">
                         <div className="empty-campaigns__content">
@@ -380,6 +399,12 @@ const Campaigns: React.FC<CampaignsProps> = () => {
                         </div>
                     </div>
                 )}
+            </div>
+
+            <div className="create-campaign-mobile">
+                <Button className="btn-chipped" onClick={toggle}>
+                    CREATE CAMPAIGN
+                </Button>
             </div>
 
             <CreateCampaignModal modal={modal} toggle={toggle} />
